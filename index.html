@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity IDE Plugins - 開源擴充套件展示與使用指南</title>
+  <meta name="description" content="Google Antigravity IDE 專屬原生擴充套件生態系：AI 上下文檢視器、MCP 管理儀表板、檔案總管常用暫存視窗、AI 配額監控、腳本右鍵執行工具與控制中心。">
+  <meta name="keywords" content="Antigravity, Google Antigravity, Antigravity IDE, VS Code Extension, MCP Manager, AI Context, Gemini Quota">
+  <meta name="author" content="TonyLongGu">
+  
+  <!-- OpenGraph / Social Cards -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Antigravity IDE Plugins - 開源擴充套件展示與使用指南">
+  <meta property="og:description" content="極致擴展你的 AI 協同開發體驗，6 大原生擴充套件無縫整合側邊欄、狀態列與工作區。">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/variables.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=3">
+</head>
+<body>
+
+  <!-- Dynamic Starry Constellation Background -->
+  <canvas id="nebula-canvas"></canvas>
+  <div class="ambient-glow ambient-glow-1"></div>
+  <div class="ambient-glow ambient-glow-2"></div>
+
+  <!-- 1. Navbar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="#" class="nav-brand">
+        <img src="assets/icons/logo.png?v=3" alt="Antigravity Logo" class="nav-logo" />
+        <div class="nav-title-group">
+          <div class="nav-main-title">
+            <span data-i18n="brand_title">Antigravity</span>
+            <span class="badge-ide">IDE</span>
+          </div>
+          <span class="nav-sub-title" data-i18n="brand_subtitle">擴充套件生態系</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#explore" class="nav-link" data-i18n="nav_explore">探索插件</a></li>
+        <li><a href="#tutorials" class="nav-link" data-i18n="nav_video">影音教學</a></li>
+        <li><a href="#install" class="nav-link" data-i18n="nav_install">安裝指南</a></li>
+        <li><a href="#author" class="nav-link" data-i18n="nav_author">關於作者</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button id="btn-lang-toggle" class="btn-lang">EN</button>
+        <a href="https://github.com/TonyLongGu/antigravity-plugins" target="_blank" rel="noopener noreferrer" class="btn-github github-link">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span data-i18n="nav_github">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span data-i18n="hero_badge">專為 Google Antigravity IDE 打造的原生擴充套件生態系</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span data-i18n="hero_title_1">極致擴展你的</span><br>
+        <span class="text-gradient" data-i18n="hero_title_gradient">AI 協同開發體驗</span>
+      </h1>
+
+      <p class="hero-subtitle" data-i18n="hero_subtitle">
+        無縫整合 Antigravity IDE 側邊欄面板、狀態列即時監控、工作區同名修正與腳本一鍵直達，免編譯 Junction 掛載即刻生效。
+      </p>
+
+      <div class="hero-cta-group">
+        <a href="https://github.com/TonyLongGu/antigravity-plugins/archive/refs/heads/main.zip" class="btn-primary" style="background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #07090e; font-weight: 700;">
+          <span data-i18n="btn_download_all_zip">📦 下載全套插件包 (.zip)</span>
+        </a>
+        <a href="#explore" class="btn-secondary">
+          <span data-i18n="btn_explore">瀏覽 6 大插件</span> ➔
+        </a>
+        <a href="#tutorials" class="btn-secondary" style="border-color: rgba(0, 242, 254, 0.4);">
+          ▶ <span data-i18n="btn_watch_video">觀看教學影片</span>
+        </a>
+      </div>
+
+      <!-- Quick Terminal Widget -->
+      <div class="hero-terminal">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="terminal-title">PowerShell / Git Bash</div>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-code">
+            <span class="terminal-prompt">$</span>git clone https://github.com/TonyLongGu/antigravity-plugins.git
+          </div>
+          <button class="btn-copy" onclick="copyToClipboard('git clone https://github.com/TonyLongGu/antigravity-plugins.git', '已複製 Git Clone 指令！')">
+            <span data-i18n="btn_copy_cmd">複製</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Plugins Explorer Section -->
+  <section id="explore" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Ecosystem Suite</span>
+        <h2 class="section-title">全方位 Antigravity IDE 擴充套件</h2>
+        <p class="section-desc">即時搜尋、分類過濾，點擊卡片即可查看完整指令列表與設定參數。</p>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="filter-wrapper">
+        <div class="search-box-container">
+          <input 
+            type="text" 
+            id="search-input" 
+            class="search-input" 
+            data-i18n-placeholder="search_placeholder" 
+            placeholder="搜尋擴充套件名稱、指令、功能關鍵字..."
+          />
+          <div class="search-shortcut"><kbd>Ctrl</kbd> + <kbd>K</kbd></div>
+        </div>
+
+        <div class="category-tabs">
+          <button class="tab-btn active" data-category="all" data-i18n="tab_all">全部插件</button>
+          <button class="tab-btn" data-category="sidebar" data-i18n="tab_sidebar">側邊欄面板</button>
+          <button class="tab-btn" data-category="status" data-i18n="tab_status">狀態列監控</button>
+          <button class="tab-btn" data-category="explorer" data-i18n="tab_explorer">檔案總管視圖</button>
+          <button class="tab-btn" data-category="script" data-i18n="tab_script">腳本與工具箱</button>
+        </div>
+      </div>
+
+      <!-- Plugins Grid Container -->
+      <div id="plugins-grid" class="plugins-grid">
+        <!-- Rendered dynamically by filter.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- 3.5 Video Tutorials Showcase Section -->
+  <section id="tutorials" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n="section_video_tag">影片教學</span>
+        <h2 class="section-title" data-i18n="section_video_title">精選影音示範與實戰教學</h2>
+        <p class="section-desc" data-i18n="section_video_desc">透過生動詳細的影片解說，快速掌握 Antigravity IDE 擴充套件的最佳實踐與操作技巧。</p>
+      </div>
+
+      <div class="video-showcase-wrapper">
+        <div class="video-player-container">
+          <div id="video-thumbnail-cover" class="video-thumbnail-cover" onclick="playTutorialVideo()">
+            <div class="video-play-btn">▶</div>
+            <div class="video-play-text">點擊立即播放教學影片 (YouTube)</div>
+          </div>
+          <iframe 
+            id="tutorial-video-iframe" 
+            src="https://www.youtube-nocookie.com/embed/fgDIeYi-NCo" 
+            data-src="https://www.youtube-nocookie.com/embed/fgDIeYi-NCo"
+            title="Antigravity IDE Plugins Tutorial Video" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <div class="video-meta-bar">
+          <div class="video-title-info">
+            <h3 id="tutorial-video-title">Antigravity IDE 擴充套件實戰教學指南</h3>
+            <p id="tutorial-video-desc">精選實戰影片，快速了解擴充套件於 Antigravity IDE 中的安裝、設定與完整操作流程。</p>
+          </div>
+        </div>
+
+        <!-- Dynamic Tool Playlist Switcher -->
+        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">點擊切換各插件教學影片：</div>
+          <div id="video-playlist-pills" class="video-playlist-pills">
+            <!-- Rendered by app.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- 4. Installation Guide Section -->
+  <section id="install" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n="section_install_tag">極速上手</span>
+        <h2 class="section-title" data-i18n="section_install_title">兩種安裝方式 • 輕鬆無縫部署</h2>
+        <p class="section-desc" data-i18n="section_install_desc">支援「下載 ZIP 點擊安裝」與「Git Clone + AI Agent 自動化協同」雙路徑，自由選擇一鍵全安裝或個別插件自選啟用。</p>
+      </div>
+
+      <div class="install-container">
+        <!-- Dual Method Switcher Tabs -->
+        <div class="install-method-switcher">
+          <button id="tab-btn-zip" class="install-tab-btn active" onclick="switchInstallMethod('zip')">
+            <div class="install-tab-icon">
+              <svg class="install-tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16.5 9.4 7.55 4.24"/>
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.29 7 12 12 20.71 7"/>
+                <line x1="12" y1="22" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <div class="install-tab-text">
+              <div class="install-tab-title" data-i18n="install_tab_zip">方式一：下載 ZIP 壓縮包</div>
+              <div class="install-tab-sub" data-i18n="install_tab_zip_sub">免 Git • 本機雙擊即用</div>
+            </div>
+          </button>
+          <button id="tab-btn-git" class="install-tab-btn" onclick="switchInstallMethod('git')">
+            <div class="install-tab-icon">
+              <svg class="install-tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 8V4H8"/>
+                <rect width="16" height="12" x="4" y="8" rx="3"/>
+                <circle cx="9" cy="13" r="1.2" fill="currentColor"/>
+                <circle cx="15" cy="13" r="1.2" fill="currentColor"/>
+                <path d="M9.5 17h5"/>
+                <path d="M2 14h2"/>
+                <path d="M20 14h2"/>
+              </svg>
+            </div>
+            <div class="install-tab-text">
+              <div class="install-tab-title" data-i18n="install_tab_git">方式二：Git Clone + AI Agent</div>
+              <div class="install-tab-sub" data-i18n="install_tab_git_sub">智慧協同 • 極速同步更新</div>
+            </div>
+          </button>
+        </div>
+
+        <!-- Method 1: Download ZIP Panel -->
+        <div id="install-panel-zip" class="install-method-panel active">
+          <div class="steps-list">
+            <!-- Step 1: Download & Extract -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">STEP 01</span>
+                <span data-i18n="install_zip_step1_title">下載全套套件包並解壓縮</span>
+              </h3>
+              <p class="step-desc" data-i18n="install_zip_step1_desc">點擊下方按鈕下載最新版全套套件 ZIP，並解壓縮至本機任意目錄（例如 D:\antigravity-plugins）：</p>
+              <div class="install-action-row">
+                <a href="https://github.com/TonyLongGu/antigravity-plugins/archive/refs/heads/main.zip" class="btn-primary install-dl-btn">
+                  <span data-i18n="btn_download_zip_action">📦 下載全套插件包 (.zip)</span>
+                </a>
+                <span class="install-note-badge">無需 Git 環境 • 解壓即用</span>
+              </div>
+            </div>
+
+            <!-- Step 2: Choose Mode (Full vs Selective) -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">STEP 02</span>
+                <span data-i18n="install_submode_title">執行安裝腳本（一鍵全安裝 或 單獨安裝）</span>
+              </h3>
+              
+              <div class="ai-prompts-container">
+                <!-- Option 1: Full Install -->
+                <div class="ai-prompt-card">
+                  <div class="ai-prompt-header">
+                    <div class="ai-agent-indicator">
+                      <span class="ai-status-dot"></span>
+                      <span data-i18n="install_submode_full_title">一鍵安裝全部插件</span>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">雙擊執行腳本</span>
+                  </div>
+                  <p class="step-desc" data-i18n="install_submode_full_desc" style="margin-bottom: 10px;">
+                    雙擊專案根目錄下的「雙擊一鍵安裝.bat」，腳本將自動以目前解壓目錄為路徑基底，一次性批次為 6 大擴充套件建立免編譯掛載：
+                  </p>
+                  <div class="install-action-bubble">
+                    <code>.\雙擊一鍵安裝.bat</code>
+                  </div>
+                </div>
+
+                <!-- Option 2: Selective Install -->
+                <div class="ai-prompt-card">
+                  <div class="ai-prompt-header">
+                    <div class="ai-agent-indicator">
+                      <span class="ai-status-dot"></span>
+                      <span data-i18n="install_submode_custom_title">單獨安裝特定插件</span>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">進入插件目錄執行</span>
+                  </div>
+                  <p class="step-desc" data-i18n="install_submode_custom_desc" style="margin-bottom: 10px;">
+                    打開「plugins/」資料夾，進入欲啟用的插件目錄（例如 plugins/antigravity-toolbox），雙擊該目錄下的「install-extension.bat」即可單獨啟用：
+                  </p>
+                  <div class="install-action-bubble">
+                    <code>plugins/&lt;插件名稱&gt;/install-extension.bat</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Method 2: Git Clone + AI Agent Panel -->
+        <div id="install-panel-git" class="install-method-panel">
+          <div class="steps-list">
+            <!-- Step 1: Git Clone -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">STEP 01</span>
+                <span data-i18n="install_git_step1_title">Clone 專案倉庫至本地</span>
+              </h3>
+              <p class="step-desc" data-i18n="install_git_step1_desc">在終端機（PowerShell / Git Bash）執行以下指令，並在 Antigravity IDE 中開啟該專案資料夾：</p>
+              <div class="code-snippet">
+                <code>git clone https://github.com/TonyLongGu/antigravity-plugins.git</code>
+                <button class="btn-copy" onclick="copyToClipboard('git clone https://github.com/TonyLongGu/antigravity-plugins.git', '已複製 Git Clone 指令！')"><span data-i18n="btn_copy_cmd">複製</span></button>
+              </div>
+            </div>
+
+            <!-- Step 2: Ask AI Agent via Chat -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">STEP 02</span>
+                <span data-i18n="install_git_step2_title">在 Antigravity Chat 吩咐 AI Agent 幫您安裝</span>
+              </h3>
+              <p class="step-desc" data-i18n="install_git_step2_desc">在 Antigravity IDE 的 AI Chat 對話框輸入以下 Prompt 提示詞，AI Agent 將自動解析目錄並為您執行安裝腳本：</p>
+              
+              <div class="ai-prompts-container">
+                <!-- Prompt 1 -->
+                <div class="ai-prompt-card">
+                  <div class="ai-prompt-header">
+                    <div class="ai-agent-indicator">
+                      <span class="ai-status-dot"></span>
+                      <span data-i18n="ai_prompt_1_label">一鍵安裝全部插件</span>
+                    </div>
+                    <button class="btn-copy btn-copy-sm" onclick="copyToClipboard('請幫我一鍵安裝本倉庫的所有 Antigravity 擴充套件', t('ai_prompt_copied'))">
+                      <span data-i18n="ai_prompt_copy_btn">複製 Prompt</span>
+                    </button>
+                  </div>
+                  <div class="ai-chat-bubble" onclick="copyToClipboard('請幫我一鍵安裝本倉庫的所有 Antigravity 擴充套件', t('ai_prompt_copied'))">
+                    <span class="chat-quote">“</span>
+                    <span data-i18n="ai_prompt_1_text">請幫我一鍵安裝本倉庫的所有 Antigravity 擴充套件</span>
+                    <span class="chat-quote">”</span>
+                  </div>
+                </div>
+
+                <!-- Prompt 2 -->
+                <div class="ai-prompt-card">
+                  <div class="ai-prompt-header">
+                    <div class="ai-agent-indicator">
+                      <span class="ai-status-dot"></span>
+                      <span data-i18n="ai_prompt_2_label">單獨安裝特定插件</span>
+                    </div>
+                    <button class="btn-copy btn-copy-sm" onclick="copyToClipboard('請幫我安裝 plugins/antigravity-toolbox 控制中心擴充套件', t('ai_prompt_copied'))">
+                      <span data-i18n="ai_prompt_copy_btn">複製 Prompt</span>
+                    </button>
+                  </div>
+                  <div class="ai-chat-bubble" onclick="copyToClipboard('請幫我安裝 plugins/antigravity-toolbox 控制中心擴充套件', t('ai_prompt_copied'))">
+                    <span class="chat-quote">“</span>
+                    <span data-i18n="ai_prompt_2_text">請幫我安裝 plugins/antigravity-toolbox 控制中心擴充套件</span>
+                    <span class="chat-quote">”</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shared Step 3: Reload IDE Window -->
+        <div class="step-card" style="margin-top: 20px;">
+          <h3 class="step-title">
+            <span class="step-badge">STEP 03</span>
+            <span data-i18n="install_common_step3_title">重新載入 Antigravity IDE 視窗</span>
+          </h3>
+          <p class="step-desc" data-i18n="install_common_step3_desc" style="margin-bottom: 0;">
+            重新啟動 IDE，或是在 IDE 中按快捷鍵 Ctrl + Shift + P，輸入並執行 Developer: Reload Window 即可立即在側邊欄與狀態列看到全新擴充功能！
+          </p>
+        </div>
+
+        <!-- Technical & Uninstall Banner Info -->
+        <div class="install-info-grid">
+          <div class="info-card">
+            <div class="info-card-icon">
+              <svg class="info-card-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" fill="url(#boltGradient)" stroke="#fbbf24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs>
+                  <linearGradient id="boltGradient" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#f59e0b" stop-opacity="0.85"/>
+                    <stop offset="1" stop-color="#ef4444" stop-opacity="0.85"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="info-card-body">
+              <h4 class="info-card-title" data-i18n="install_feature_junction_title">Windows Junction 免編譯技術</h4>
+              <p class="info-card-desc" data-i18n="install_feature_junction_desc">以原生目錄連接點掛載至 Antigravity 擴充目錄，零磁碟重複空間，修改代碼即時熱生效。</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-card-icon">
+              <svg class="info-card-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2.5L4 5.8V11.2C4 16.6 7.4 21.4 12 22.5C16.6 21.4 20 16.6 20 11.2V5.8L12 2.5Z" stroke="#38bdf8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="url(#shieldGradLeft)"/>
+                <path d="M12 2.5V22.5C16.6 21.4 20 16.6 20 11.2V5.8L12 2.5Z" fill="url(#shieldGradRight)"/>
+                <defs>
+                  <linearGradient id="shieldGradLeft" x1="4" y1="2.5" x2="20" y2="22.5" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#38bdf8" stop-opacity="0.3"/>
+                    <stop offset="1" stop-color="#0284c7" stop-opacity="0.5"/>
+                  </linearGradient>
+                  <linearGradient id="shieldGradRight" x1="12" y1="2.5" x2="20" y2="22.5" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#00f2fe" stop-opacity="0.45"/>
+                    <stop offset="1" stop-color="#0369a1" stop-opacity="0.7"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <div class="info-card-body">
+              <h4 class="info-card-title" data-i18n="install_feature_safe_title">無痕卸載安全無殘留</h4>
+              <p class="info-card-desc" data-i18n="install_feature_safe_desc">隨時雙擊「雙擊一鍵解除安裝.bat」或個別目錄下的「uninstall-extension.bat」秒級乾淨卸載。</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. About Creator Section -->
+  <section id="author" class="section" style="background: rgba(10, 13, 20, 0.45);">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n="section_author_tag">開發者簡介</span>
+        <h2 class="section-title" data-i18n="section_author_title">關於擴充套件作者</h2>
+      </div>
+
+      <div class="author-card-wrapper">
+        <div class="author-card">
+          <!-- Avatar Frame with Ambient Glow -->
+          <div class="author-avatar-col">
+            <div class="author-avatar-glow"></div>
+            <div class="author-avatar-frame">
+              <img src="assets/images/author.png?v=2" alt="劉庭豪 (TonyLongGu)" class="author-avatar-img" />
+            </div>
+          </div>
+
+          <!-- Author Information -->
+          <div class="author-info-col">
+            <div class="author-title-group">
+              <div class="author-names">
+                <h3 class="author-realname" data-i18n="author_name">劉庭豪</h3>
+                <span class="author-alias">/ <span data-i18n="author_alias">TonyLongGu</span></span>
+              </div>
+              <span class="badge badge-author" data-i18n="author_badge">獨立開發者 / 工具創作者</span>
+            </div>
+
+            <p class="author-bio" data-i18n="author_bio">
+              專注於 3D 動畫綁定工具開發、自動化腳本管線與 Google Antigravity IDE 原生擴充生態系構建，致力於讓 AI 與開發者的協同流程達到極致流暢。
+            </p>
+
+            <div class="author-details-grid">
+              <div class="author-detail-item">
+                <div class="detail-label">
+                  <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                  </svg>
+                  <span data-i18n="author_email_label">聯絡信箱</span>
+                </div>
+                <div class="detail-value-group">
+                  <a href="mailto:sx785878@gmail.com" class="detail-link">sx785878@gmail.com</a>
+                  <button class="btn-copy btn-copy-sm" onclick="copyToClipboard('sx785878@gmail.com', t('author_email_copied'))">
+                    <span data-i18n="author_copy_email">複製</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="author-detail-item">
+                <div class="detail-label">
+                  <svg class="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                  <span data-i18n="author_website_label">個人官方網站</span>
+                </div>
+                <div class="detail-value-group">
+                  <a href="https://tonylonggu.wixsite.com/thrigtools/about-9" target="_blank" rel="noopener noreferrer" class="btn-author-website">
+                    <span data-i18n="author_visit_website">前往個人作品集網站 ↗</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Universal Modal Container -->
+  <div id="plugin-modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div id="modal-icon" class="modal-icon"></div>
+          <div>
+            <h3 id="modal-title" class="modal-title">插件名稱</h3>
+            <div id="modal-subtitle" class="modal-subtitle">插件 ID</div>
+          </div>
+        </div>
+        <button id="btn-modal-close" class="btn-modal-close" aria-label="Close">✕</button>
+      </div>
+
+      <div id="modal-nav" class="modal-nav">
+        <!-- Sub-tabs rendered dynamically -->
+      </div>
+
+      <div id="modal-body" class="modal-body">
+        <!-- Tab Content rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Toast Notification -->
+  <div id="global-toast" class="toast">
+    <span style="color: var(--accent-cyan);">✓</span>
+    <span id="toast-message">已複製到剪貼簿！</span>
+  </div>
+
+  <!-- 8. Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="nav-brand" style="margin-bottom: 8px;">
+            <img src="assets/icons/logo.png?v=3" alt="Antigravity Logo" class="nav-logo" style="width: 28px; height: 28px;" />
+            <span class="nav-title" style="font-size: 1.15rem;">Antigravity Plugins</span>
+          </div>
+          <p class="footer-desc" data-i18n="footer_desc">
+            Google Antigravity IDE 專屬原生擴充套件生態系，賦予 AI 輔助編程前所未有的掌控力與流暢度。
+          </p>
+        </div>
+
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <h4 data-i18n="footer_quick_links">快速導航</h4>
+            <ul class="footer-list">
+              <li><a href="#explore" data-i18n="nav_explore">探索插件</a></li>
+              <li><a href="#tutorials" data-i18n="nav_video">影音教學</a></li>
+              <li><a href="#install" data-i18n="nav_install">安裝指南</a></li>
+              <li><a href="#author" data-i18n="nav_author">關於作者</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4 data-i18n="footer_resources">生態資源</h4>
+            <ul class="footer-list">
+              <li><a href="https://github.com/TonyLongGu/antigravity-plugins" target="_blank" rel="noopener noreferrer" class="github-link">GitHub Repository</a></li>
+              <li><a href="https://github.com/TonyLongGu/antigravity-plugins/issues" target="_blank" rel="noopener noreferrer">問題回報 (Issues)</a></li>
+              <li><a href="https://github.com/TonyLongGu/antigravity-plugins/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          © <span id="current-year">2026</span> <span class="site-author">TonyLongGu</span>. <span data-i18n="footer_rights">版權所有。以 MIT 授權條款開源發布。</span>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">
+          Tailored for Google Antigravity IDE
+        </div>
+      </div>
+
+      <div class="footer-disclaimer">
+        <p data-i18n="footer_disclaimer">
+          免責聲明：本專案為獨立開源社群專案，旨在擴展 Antigravity IDE 開發體驗，與 Google 或 Antigravity 官方無關。所有產品名稱與商標均屬其各自所有者所有。
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/plugins-data.js"></script>
+  <script src="assets/js/nebula-canvas.js"></script>
+  <script src="assets/js/filter.js"></script>
+  <script src="assets/js/modal.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

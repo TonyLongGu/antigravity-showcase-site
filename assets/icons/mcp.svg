@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="mcpGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+  </defs>
+  <!-- 單一複合路徑：頂部雙插腳 + 圓弧插座本體 + 底部接線 (完全對齊 VS Code Codicon Plug 圖 1) -->
+  <path fill="url(#mcpGrad)" fill-rule="evenodd" clip-rule="evenodd" d="M7.5 2.5h2V7h5V2.5h2V7h1.5A1.5 1.5 0 0 1 19.5 8.5V12A7.5 7.5 0 0 1 13 19.42V22.5h-2v-3.08A7.5 7.5 0 0 1 4.5 12V8.5A1.5 1.5 0 0 1 6 7h1.5V2.5zm-1 6.5v3a5.5 5.5 0 0 0 11 0V9h-11z"/>
+</svg>
