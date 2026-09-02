@@ -107,7 +107,7 @@
           <div class="terminal-code">
             <span class="terminal-prompt">$</span>git clone https://github.com/TonyLongGu/antigravity-plugins.git
           </div>
-          <button class="btn-copy" onclick="copyToClipboard('git clone https://github.com/TonyLongGu/antigravity-plugins.git', '已複製 Git Clone 指令！')">
+          <button class="btn-copy" onclick="copyToClipboard('git clone https://github.com/TonyLongGu/antigravity-plugins.git', t('git_clone_copied'))">
             <span data-i18n="btn_copy_cmd">複製</span>
           </button>
         </div>
@@ -305,7 +305,7 @@
                 <a href="https://github.com/TonyLongGu/antigravity-plugins/archive/refs/heads/main.zip" class="btn-primary install-dl-btn">
                   <span data-i18n="btn_download_zip_action">📦 下載全套插件包 (.zip)</span>
                 </a>
-                <span class="install-note-badge">無需 Git 環境 • 解壓即用</span>
+                <span class="install-note-badge" data-i18n="install_zip_note_badge">無需 Git 環境 • 解壓即用</span>
               </div>
             </div>
 
@@ -324,7 +324,7 @@
                       <span class="ai-status-dot"></span>
                       <span data-i18n="install_submode_full_title">一鍵安裝全部插件</span>
                     </div>
-                    <span style="font-size: 0.8rem; color: var(--text-muted);">雙擊執行腳本</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="install_submode_full_badge">雙擊執行腳本</span>
                   </div>
                   <p class="step-desc" data-i18n="install_submode_full_desc" style="margin-bottom: 10px;">
                     雙擊專案根目錄下的「雙擊一鍵安裝.bat」，腳本將自動以目前解壓目錄為路徑基底，一次性批次為 6 大擴充套件建立免編譯掛載：
@@ -341,7 +341,7 @@
                       <span class="ai-status-dot"></span>
                       <span data-i18n="install_submode_custom_title">單獨安裝特定插件</span>
                     </div>
-                    <span style="font-size: 0.8rem; color: var(--text-muted);">進入插件目錄執行</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="install_submode_custom_badge">進入插件目錄執行</span>
                   </div>
                   <p class="step-desc" data-i18n="install_submode_custom_desc" style="margin-bottom: 10px;">
                     進入欲啟用的插件目錄（例如 antigravity-toolbox/），雙擊該目錄下的「install-extension.bat」即可單獨啟用：
@@ -387,7 +387,7 @@
                   </div>
                   <div class="ai-chat-bubble preview-only">
                     <span class="chat-quote">“</span>
-                    <span style="font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.6; display: inline-block;">
+                    <span style="font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.6; display: inline-block;" data-i18n-html="install_ai_preview_prompt">
                       請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity IDE 原生擴充套件。<br><br>
                       請依序執行以下引導流程：<br>
                       1. 先詢問我要安裝哪些套件（提供選項：一鍵安裝全部 6 大套件，或自選個別套件）。<br>
@@ -401,7 +401,7 @@
                     <button class="btn-primary install-dl-btn" onclick="copyAiInstallPrompt()">
                       <span data-i18n="install_ai_prompt_copy_btn">📋 複製 AI 智能安裝提示詞</span>
                     </button>
-                    <span class="install-note-badge">零終端機操作 • AI 互動引導</span>
+                    <span class="install-note-badge" data-i18n="install_ai_note_badge">零終端機操作 • AI 互動引導</span>
                   </div>
                 </div>
               </div>
@@ -597,7 +597,7 @@
             <h4 data-i18n="footer_resources">生態資源</h4>
             <ul class="footer-list">
               <li><a href="https://github.com/TonyLongGu/antigravity-plugins" target="_blank" rel="noopener noreferrer" class="github-link">GitHub Repository</a></li>
-              <li><a href="https://github.com/TonyLongGu/antigravity-plugins/issues" target="_blank" rel="noopener noreferrer">問題回報 (Issues)</a></li>
+              <li><a href="https://github.com/TonyLongGu/antigravity-plugins/issues" target="_blank" rel="noopener noreferrer" data-i18n="footer_issues">問題回報 (Issues)</a></li>
               <li><a href="https://github.com/TonyLongGu/antigravity-plugins/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a></li>
             </ul>
           </div>

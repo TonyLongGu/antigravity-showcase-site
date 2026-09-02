@@ -96,6 +96,14 @@ const I18N = {
     install_feature_safe_title: '無痕卸載安全無殘留',
     install_feature_safe_desc: '隨時雙擊「雙擊一鍵解除安裝.bat」或個別目錄下的「uninstall-extension.bat」秒級乾淨卸載。',
     
+    install_zip_note_badge: '無需 Git 環境 • 解壓即用',
+    install_submode_full_badge: '雙擊執行腳本',
+    install_submode_custom_badge: '進入插件目錄執行',
+    install_ai_note_badge: '零終端機操作 • AI 互動引導',
+    install_ai_preview_prompt: '請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity IDE 原生擴充套件。<br><br>請依序執行以下引導流程：<br>1. 先詢問我要安裝哪些套件（提供選項：一鍵安裝全部 6 大套件，或自選個別套件）。<br>2. 詢問我希望將專案原始碼 Clone/放置在本機的哪個目錄（提供預設建議路徑，如 D:\\antigravity-plugins）。<br>3. 根據我的回覆，自動在該目錄執行 Git Clone，並自動為選定的套件建立 IDE 擴充功能掛載。<br>4. 安裝完成後，提醒我重新載入視窗 (Developer: Reload Window)。',
+    git_clone_copied: '已複製 Git Clone 指令！',
+    footer_issues: '問題回報 (Issues)',
+    
     section_plugins_tag: '探索插件',
     section_plugins_title: '全方位 Antigravity IDE 擴充套件',
     section_plugins_desc: '即時搜尋、分類過濾，探索各項專屬功能並一鍵前往 GitHub 倉庫。',
@@ -201,6 +209,16 @@ const I18N = {
     install_feature_junction_title: 'Windows Junction Hot-Reload',
     install_feature_junction_desc: 'Directly mounted to Antigravity extension directory via Directory Junction. Zero disk redundancy, edits hot-reload immediately.',
     install_feature_safe_title: 'Clean & Zero-Trace Uninstall',
+    install_feature_safe_desc: 'Double-click "雙擊一鍵解除安裝.bat" or "uninstall-extension.bat" in individual folders anytime for instant clean removal.',
+    
+    install_zip_note_badge: 'No Git Required • Extract & Use',
+    install_submode_full_badge: 'Double-click to run script',
+    install_submode_custom_badge: 'Run in plugin directory',
+    install_ai_note_badge: 'Zero Terminal • AI Conversational',
+    install_ai_preview_prompt: 'Please help me install the Antigravity IDE native extensions from GitHub (https://github.com/TonyLongGu/antigravity-plugins.git).<br><br>Please guide me through the following interactive workflow:<br>1. Ask me which plugins to install (Provide options: 1-Click Install All 6 Plugins, or selectively choose individual plugins).<br>2. Ask me where I want to clone and store the repository locally (Provide a recommended default path, e.g. D:\\antigravity-plugins).<br>3. Based on my response, automatically clone the repository to that location and create the IDE extension mounts.<br>4. After installation is complete, guide me to reload the IDE window (Developer: Reload Window).',
+    git_clone_copied: 'Git Clone command copied!',
+    footer_issues: 'Report Issues (Issues)',
+    
     section_plugins_tag: 'Ecosystem Suite',
     section_plugins_title: 'Antigravity IDE Extension Suite',
     section_plugins_desc: 'Instant search and filtering. Explore tailored features and head straight to GitHub repositories.',
@@ -246,6 +264,11 @@ function updateDOMTranslations() {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     el.setAttribute('placeholder', t(key));
+  });
+
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    el.innerHTML = t(key);
   });
 
   const langBtn = document.getElementById('btn-lang-toggle');
