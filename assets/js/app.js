@@ -184,35 +184,79 @@ function onYtPlayerReady(event) {
   }
 }
 
+function wakePlayerUI() {
+  const container = document.getElementById('main-video-player');
+  const controls = document.getElementById('custom-player-controls');
+  if (!container || !controls) return;
+
+  container.classList.remove('hide-ui');
+  controls.classList.add('visible');
+
+  clearTimeout(controlsHideTimer);
+
+  if (isPlaying && !isDraggingProgress) {
+    controlsHideTimer = setTimeout(() => {
+      hidePlayerUI();
+    }, 2400); // 靜止 2.4 秒後平滑自動收合控制列並隱藏游標
+  }
+}
+
+function hidePlayerUI() {
+  const container = document.getElementById('main-video-player');
+  const controls = document.getElementById('custom-player-controls');
+  if (!container || !controls) return;
+
+  // 僅在播放中且未拖曳進度條時才隱藏
+  if (isPlaying && !isDraggingProgress) {
+    container.classList.add('hide-ui');
+    controls.classList.remove('visible');
+  }
+}
+
 function onYtPlayerStateChange(event) {
   if (currentVideoMode !== 'youtube') return;
   const playIcon = document.getElementById('ctrl-icon-play');
   const pauseIcon = document.getElementById('ctrl-icon-pause');
   const controls = document.getElementById('custom-player-controls');
+  const container = document.getElementById('main-video-player');
 
   if (event.data === YT.PlayerState.PLAYING) {
     isPlaying = true;
     if (playIcon) playIcon.style.display = 'none';
     if (pauseIcon) pauseIcon.style.display = 'block';
     if (controls) controls.classList.remove('paused');
+    if (container) container.classList.remove('paused');
     startProgressLoop();
+    wakePlayerUI();
   } else {
     isPlaying = false;
+    clearTimeout(controlsHideTimer);
     if (playIcon) playIcon.style.display = 'block';
     if (pauseIcon) pauseIcon.style.display = 'none';
-    if (controls) controls.classList.add('paused');
+    if (controls) {
+      controls.classList.add('paused');
+      controls.classList.add('visible');
+    }
+    if (container) {
+      container.classList.add('paused');
+      container.classList.remove('hide-ui');
+    }
     stopProgressLoop();
     updateTimeAndDuration();
   }
 }
 
 function toggleCustomPlayer() {
+  // 防止進度條拖曳後的 ghost click、拖曳中的穿透、以及 seek 過程中的誤觸
+  if (justDraggedProgress || isDraggingProgress) return;
+  if (html5VideoEl && html5VideoEl.seeking) return;
   const badge = document.getElementById('player-feedback-badge');
   const badgePlay = document.getElementById('badge-icon-play');
   const badgePause = document.getElementById('badge-icon-pause');
   const playIcon = document.getElementById('ctrl-icon-play');
   const pauseIcon = document.getElementById('ctrl-icon-pause');
   const controls = document.getElementById('custom-player-controls');
+  const container = document.getElementById('main-video-player');
 
   if (currentVideoMode === 'html5') {
     if (!html5VideoEl) html5VideoEl = document.getElementById('tutorial-html5-video');
@@ -226,15 +270,25 @@ function toggleCustomPlayer() {
       if (playIcon) playIcon.style.display = 'none';
       if (pauseIcon) pauseIcon.style.display = 'block';
       if (controls) controls.classList.remove('paused');
+      if (container) container.classList.remove('paused');
       startProgressLoop();
+      wakePlayerUI();
     } else {
       html5VideoEl.pause();
       isPlaying = false;
+      clearTimeout(controlsHideTimer);
       if (badgePlay) badgePlay.style.display = 'none';
       if (badgePause) badgePause.style.display = 'block';
       if (playIcon) playIcon.style.display = 'block';
       if (pauseIcon) pauseIcon.style.display = 'none';
-      if (controls) controls.classList.add('paused');
+      if (controls) {
+        controls.classList.add('paused');
+        controls.classList.add('visible');
+      }
+      if (container) {
+        container.classList.add('paused');
+        container.classList.remove('hide-ui');
+      }
       stopProgressLoop();
     }
   } else if (currentVideoMode === 'youtube') {
@@ -296,6 +350,7 @@ function toggleMute() {
       if (slider) slider.value = 0;
     }
   }
+  wakePlayerUI();
 }
 
 function changeVolume(val) {
@@ -322,25 +377,111 @@ function changeVolume(val) {
     if (volHigh) volHigh.style.display = 'block';
     if (volMute) volMute.style.display = 'none';
   }
+  wakePlayerUI();
+}
+
+function updateFullscreenState() {
+  const container = document.getElementById('main-video-player');
+  const fsEnter = document.getElementById('ctrl-icon-fullscreen-enter');
+  const fsExit = document.getElementById('ctrl-icon-fullscreen-exit');
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+  if (container) {
+    if (isFs) {
+      container.classList.add('is-fullscreen');
+    } else {
+      container.classList.remove('is-fullscreen');
+    }
+  }
+
+  if (fsEnter && fsExit) {
+    if (isFs) {
+      fsEnter.style.display = 'none';
+      fsExit.style.display = 'block';
+    } else {
+      fsEnter.style.display = 'block';
+      fsExit.style.display = 'none';
+    }
+  }
+
+  isDraggingProgress = false;
+  wakePlayerUI();
 }
 
 function toggleFullscreen() {
   const container = document.getElementById('main-video-player');
-  const fsEnter = document.getElementById('ctrl-icon-fullscreen-enter');
-  const fsExit = document.getElementById('ctrl-icon-fullscreen-exit');
   if (!container) return;
 
-  if (!document.fullscreenElement) {
-    container.requestFullscreen().then(() => {
-      if (fsEnter) fsEnter.style.display = 'none';
-      if (fsExit) fsExit.style.display = 'block';
-    }).catch(err => console.warn(err));
+  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+
+  if (!isFs) {
+    if (container.requestFullscreen) {
+      container.requestFullscreen().catch(err => console.warn(err));
+    } else if (container.webkitRequestFullscreen) {
+      container.webkitRequestFullscreen();
+    } else if (container.mozRequestFullScreen) {
+      container.mozRequestFullScreen();
+    } else if (container.msRequestFullscreen) {
+      container.msRequestFullscreen();
+    }
   } else {
-    document.exitFullscreen().then(() => {
-      if (fsEnter) fsEnter.style.display = 'block';
-      if (fsExit) fsExit.style.display = 'none';
-    }).catch(err => console.warn(err));
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(err => console.warn(err));
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
   }
+}
+
+let justDraggedProgress = false;
+let dragCooldownTimer = null;
+
+function safeSeekHtml5Video(targetTime) {
+  if (!html5VideoEl) return;
+  const dur = html5VideoEl.duration;
+  if (!dur || dur <= 0 || !isFinite(dur)) return;
+  const clamped = Math.max(0, Math.min(dur, targetTime));
+
+  html5VideoEl.currentTime = clamped;
+}
+
+function seekRelative(seconds) {
+  let dur = 0;
+  let curr = 0;
+  if (currentVideoMode === 'html5' && html5VideoEl) {
+    dur = html5VideoEl.duration || 0;
+    curr = html5VideoEl.currentTime || 0;
+    const target = Math.max(0, Math.min(dur, curr + seconds));
+    safeSeekHtml5Video(target);
+    updateTimeAndDuration();
+  } else if (currentVideoMode === 'youtube' && customYtPlayer && isYtPlayerReady) {
+    try {
+      dur = customYtPlayer.getDuration() || 0;
+      curr = customYtPlayer.getCurrentTime() || 0;
+      const target = Math.max(0, Math.min(dur, curr + seconds));
+      customYtPlayer.seekTo(target, true);
+      updateTimeAndDuration();
+    } catch (e) {}
+  }
+}
+
+function adjustVolumeRelative(delta) {
+  const slider = document.getElementById('ctrl-volume-slider');
+  let currentVol = 100;
+  if (currentVideoMode === 'html5' && html5VideoEl) {
+    currentVol = html5VideoEl.muted ? 0 : Math.round(html5VideoEl.volume * 100);
+  } else if (currentVideoMode === 'youtube' && customYtPlayer && isYtPlayerReady) {
+    try {
+      currentVol = customYtPlayer.isMuted() ? 0 : customYtPlayer.getVolume();
+    } catch (e) {}
+  }
+  const newVol = Math.max(0, Math.min(100, currentVol + delta));
+  if (slider) slider.value = newVol;
+  changeVolume(newVol);
 }
 
 function formatTime(seconds) {
@@ -375,7 +516,12 @@ function updateTimeAndDuration() {
     curr = html5VideoEl.currentTime || 0;
     dur = html5VideoEl.duration || 0;
     if (html5VideoEl.buffered && html5VideoEl.buffered.length > 0 && dur > 0) {
-      loadedPct = (html5VideoEl.buffered.end(html5VideoEl.buffered.length - 1) / dur) * 100;
+      for (let i = 0; i < html5VideoEl.buffered.length; i++) {
+        if (curr >= html5VideoEl.buffered.start(i) && curr <= html5VideoEl.buffered.end(i)) {
+          loadedPct = (html5VideoEl.buffered.end(i) / dur) * 100;
+          break;
+        }
+      }
     }
   } else if (currentVideoMode === 'youtube') {
     if (!customYtPlayer || !isYtPlayerReady) return;
@@ -415,57 +561,183 @@ function initCustomVideoPlayer() {
   const controls = document.getElementById('custom-player-controls');
   if (!container || !progContainer) return;
 
+  // 監聽跨瀏覽器全螢幕切換事件
+  ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+    document.addEventListener(evt, updateFullscreenState);
+  });
+
   // HTML5 Video 原生事件監聽
   if (html5VideoEl) {
     html5VideoEl.addEventListener('timeupdate', updateTimeAndDuration);
     html5VideoEl.addEventListener('loadedmetadata', updateTimeAndDuration);
-    html5VideoEl.addEventListener('ended', () => {
+    html5VideoEl.addEventListener('play', () => {
+      isPlaying = true;
+      const playIcon = document.getElementById('ctrl-icon-play');
+      const pauseIcon = document.getElementById('ctrl-icon-pause');
+      if (playIcon) playIcon.style.display = 'none';
+      if (pauseIcon) pauseIcon.style.display = 'block';
+      if (controls) controls.classList.remove('paused');
+      if (container) container.classList.remove('paused');
+      startProgressLoop();
+      wakePlayerUI();
+    });
+    html5VideoEl.addEventListener('pause', () => {
       isPlaying = false;
+      clearTimeout(controlsHideTimer);
       const playIcon = document.getElementById('ctrl-icon-play');
       const pauseIcon = document.getElementById('ctrl-icon-pause');
       if (playIcon) playIcon.style.display = 'block';
       if (pauseIcon) pauseIcon.style.display = 'none';
-      if (controls) controls.classList.add('paused');
+      if (controls) {
+        controls.classList.add('paused');
+        controls.classList.add('visible');
+      }
+      if (container) {
+        container.classList.add('paused');
+        container.classList.remove('hide-ui');
+      }
+      stopProgressLoop();
+    });
+    html5VideoEl.addEventListener('ended', () => {
+      isPlaying = false;
+      clearTimeout(controlsHideTimer);
+      const playIcon = document.getElementById('ctrl-icon-play');
+      const pauseIcon = document.getElementById('ctrl-icon-pause');
+      if (playIcon) playIcon.style.display = 'block';
+      if (pauseIcon) pauseIcon.style.display = 'none';
+      if (controls) {
+        controls.classList.add('paused');
+        controls.classList.add('visible');
+      }
+      if (container) {
+        container.classList.add('paused');
+        container.classList.remove('hide-ui');
+      }
+      stopProgressLoop();
+    });
+
+    // 全螢幕 Seek 卡頓自動恢復：偵測 waiting 狀態並在就緒時確保播放
+    html5VideoEl.addEventListener('waiting', () => {
+      if (isPlaying && !html5VideoEl.paused) {
+        setTimeout(() => {
+          if (html5VideoEl && isPlaying && html5VideoEl.readyState >= 2) {
+            const p = html5VideoEl.play();
+            if (p && p.catch) p.catch(() => {});
+          }
+        }, 500);
+      }
     });
   }
 
-  // 控制列自動隱藏 (移出 0.4s 漸隱，靜止 1.8s 漸隱)
-  const showControls = () => {
-    if (controls) controls.classList.add('visible');
-    clearTimeout(controlsHideTimer);
-    if (isPlaying) {
-      controlsHideTimer = setTimeout(() => {
-        if (controls && isPlaying && !isDraggingProgress) {
-          controls.classList.remove('visible');
-        }
-      }, 1800);
-    }
-  };
-
-  container.addEventListener('mousemove', showControls);
+  // 控制列與滑鼠游標喚醒/自動隱藏監聽
+  container.addEventListener('mousemove', wakePlayerUI);
+  container.addEventListener('pointermove', wakePlayerUI);
+  container.addEventListener('mouseenter', wakePlayerUI);
+  container.addEventListener('touchstart', wakePlayerUI, { passive: true });
   container.addEventListener('mouseleave', () => {
     clearTimeout(controlsHideTimer);
     if (isPlaying && !isDraggingProgress) {
       controlsHideTimer = setTimeout(() => {
-        if (controls) controls.classList.remove('visible');
-      }, 400);
+        hidePlayerUI();
+      }, 500);
     }
   });
 
-  // 進度條跳轉
-  const handleSeek = (e) => {
-    const rect = progContainer.getBoundingClientRect();
-    const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  // 全域/播放器鍵盤快捷鍵 (全螢幕或播放中均可極速操控)
+  document.addEventListener('keydown', (e) => {
+    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+    if (isInput) return;
 
+    const isHovered = container.matches(':hover');
+    if (!isFs && !isHovered) return;
+
+    if (e.code === 'Space' || e.key === 'k' || e.key === 'K') {
+      e.preventDefault();
+      toggleCustomPlayer();
+      wakePlayerUI();
+    } else if (e.key === 'f' || e.key === 'F') {
+      e.preventDefault();
+      toggleFullscreen();
+    } else if (e.key === 'm' || e.key === 'M') {
+      e.preventDefault();
+      toggleMute();
+      wakePlayerUI();
+    } else if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      seekRelative(-5);
+      wakePlayerUI();
+    } else if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      seekRelative(5);
+      wakePlayerUI();
+    } else if (e.code === 'ArrowUp') {
+      e.preventDefault();
+      adjustVolumeRelative(5);
+      wakePlayerUI();
+    } else if (e.code === 'ArrowDown') {
+      e.preventDefault();
+      adjustVolumeRelative(-5);
+      wakePlayerUI();
+    }
+  });
+
+  // click-surface 使用 pointerdown+pointerup 精確判定「有意按下並釋放」才觸發播放/暫停
+  // 取代 inline onclick，徹底避免全螢幕下各種 ghost click 穿透暫停
+  const clickSurface = document.getElementById('player-click-surface');
+  if (clickSurface) {
+    let surfacePointerDownTime = 0;
+    let surfacePointerDownX = 0;
+    let surfacePointerDownY = 0;
+
+    clickSurface.addEventListener('pointerdown', (e) => {
+      surfacePointerDownTime = Date.now();
+      surfacePointerDownX = e.clientX;
+      surfacePointerDownY = e.clientY;
+    });
+
+    clickSurface.addEventListener('pointerup', (e) => {
+      const dt = Date.now() - surfacePointerDownTime;
+      const dx = Math.abs(e.clientX - surfacePointerDownX);
+      const dy = Math.abs(e.clientY - surfacePointerDownY);
+      // 僅在快速按下並釋放（<400ms）且未移動（<10px）時才視為有效點擊
+      if (dt < 400 && dx < 10 && dy < 10) {
+        toggleCustomPlayer();
+      }
+    });
+
+    // 阻止 click-surface 上的 click 事件（防止殘留的 onclick 或瀏覽器自動派發的 click）
+    clickSurface.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  }
+
+  // 阻斷控制列事件穿透到背景 click-surface
+  controls.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+  controls.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+  });
+  controls.addEventListener('pointerup', (e) => {
+    e.stopPropagation();
+  });
+
+  // 計算進度條點擊/拖曳比例 (0 ~ 1)
+  const getProgressPos = (e) => {
+    const rect = progContainer.getBoundingClientRect();
+    if (!rect.width) return 0;
+    return Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  };
+
+  // 僅即時更新 UI（不頻繁請求影片解碼，保證 60fps 極速響應與 0 卡頓）
+  const updateSeekUI = (pos) => {
     let dur = 0;
     if (currentVideoMode === 'html5' && html5VideoEl) {
       dur = html5VideoEl.duration || 0;
-      const targetTime = pos * dur;
-      html5VideoEl.currentTime = targetTime;
     } else if (currentVideoMode === 'youtube' && customYtPlayer && isYtPlayerReady) {
       dur = customYtPlayer.getDuration() || 0;
-      const targetTime = pos * dur;
-      customYtPlayer.seekTo(targetTime, true);
     }
 
     const filledBar = document.getElementById('player-progress-filled');
@@ -477,30 +749,70 @@ function initCustomVideoPlayer() {
     if (timeCurrEl && dur > 0) timeCurrEl.textContent = formatTime(pos * dur);
   };
 
-  progContainer.addEventListener('click', handleSeek);
+  // 真正執行跳轉（僅在點擊釋放或拖曳結束時執行一次）
+  const applySeek = (pos) => {
+    let dur = 0;
+    if (currentVideoMode === 'html5' && html5VideoEl) {
+      dur = html5VideoEl.duration || 0;
+      const targetTime = pos * dur;
+      safeSeekHtml5Video(targetTime);
+    } else if (currentVideoMode === 'youtube' && customYtPlayer && isYtPlayerReady) {
+      dur = customYtPlayer.getDuration() || 0;
+      const targetTime = pos * dur;
+      try {
+        customYtPlayer.seekTo(targetTime, true);
+      } catch (e) {
+        console.warn('YouTube Seek Error:', e);
+      }
+    }
+    updateSeekUI(pos);
+    wakePlayerUI();
+  };
 
-  progContainer.addEventListener('mousedown', (e) => {
+  // 使用現代 Pointer Events 與 setPointerCapture 徹底解決全螢幕放開滑鼠丟失事件
+  let lastPointerPos = 0;
+
+  progContainer.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
     isDraggingProgress = true;
-    handleSeek(e);
-
-    const onMove = (moveEvt) => {
-      if (isDraggingProgress) handleSeek(moveEvt);
-    };
-
-    const onUp = () => {
-      isDraggingProgress = false;
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
-    };
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+    try {
+      progContainer.setPointerCapture(e.pointerId);
+    } catch (err) {}
+    lastPointerPos = getProgressPos(e);
+    updateSeekUI(lastPointerPos);
+    wakePlayerUI();
   });
-}
 
-/**
- * Video Showcase & Playlist Switcher
- */
+  progContainer.addEventListener('pointermove', (e) => {
+    if (!isDraggingProgress) return;
+    e.stopPropagation();
+    lastPointerPos = getProgressPos(e);
+    updateSeekUI(lastPointerPos);
+    wakePlayerUI();
+  });
+
+  const endDragSeek = (e) => {
+    if (!isDraggingProgress) return;
+    e.stopPropagation();
+    try {
+      if (progContainer.hasPointerCapture(e.pointerId)) {
+        progContainer.releasePointerCapture(e.pointerId);
+      }
+    } catch (err) {}
+    isDraggingProgress = false;
+    justDraggedProgress = true;
+    clearTimeout(dragCooldownTimer);
+    dragCooldownTimer = setTimeout(() => {
+      justDraggedProgress = false;
+    }, 280);
+
+    lastPointerPos = getProgressPos(e);
+    applySeek(lastPointerPos);
+  };
+
+  progContainer.addEventListener('pointerup', endDragSeek);
+  progContainer.addEventListener('pointercancel', endDragSeek);
+}
 function getTutorialVideosList() {
   if (typeof TUTORIAL_VIDEOS !== 'undefined' && Array.isArray(TUTORIAL_VIDEOS) && TUTORIAL_VIDEOS.length > 0) {
     return TUTORIAL_VIDEOS;
@@ -589,9 +901,18 @@ function switchTutorialVideo(videoId) {
 
   // 重設播放狀態與進度條
   isPlaying = false;
+  clearTimeout(controlsHideTimer);
+  const container = document.getElementById('main-video-player');
+  if (container) {
+    container.classList.add('paused');
+    container.classList.remove('hide-ui');
+  }
   if (playIcon) playIcon.style.display = 'block';
   if (pauseIcon) pauseIcon.style.display = 'none';
-  if (controls) controls.classList.add('paused');
+  if (controls) {
+    controls.classList.add('paused');
+    controls.classList.add('visible');
+  }
   if (filledBar) filledBar.style.width = '0%';
   if (thumbEl) thumbEl.style.left = '0%';
   if (bufBar) bufBar.style.width = '0%';

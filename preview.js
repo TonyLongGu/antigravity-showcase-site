@@ -47,48 +47,61 @@ const server = http.createServer((req, res) => {
   // 支援影片 HTTP 206 範圍請求 (Range Requests for streaming)
   if (range && (ext === '.mp4' || ext === '.mov' || ext === '.webm')) {
     const parts = range.replace(/bytes=/, '').split('-');
-    const start = parseInt(parts[0], 10);
+    const start = parseInt(parts[0], 10) || 0;
     const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+    if (start >= fileSize || end >= fileSize || start > end) {
+      res.writeHead(416, {
+        'Content-Range': `bytes */${fileSize}`,
+        'Content-Type': 'text/plain'
+      });
+      res.end();
+      return;
+    }
+
     const chunksize = (end - start) + 1;
     const file = fs.createReadStream(filePath, { start, end });
-    
-    file.on('error', () => {
-      if (!res.headersSent) res.writeHead(500);
-      res.end();
-    });
 
     req.on('close', () => {
       if (!file.destroyed) file.destroy();
     });
 
-    const head = {
+    file.on('error', () => {
+      if (!file.destroyed) file.destroy();
+      if (!res.headersSent) res.writeHead(500);
+      res.end();
+    });
+
+    res.writeHead(206, {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunksize,
       'Content-Type': contentType,
-      'Access-Control-Allow-Origin': '*'
-    };
-    res.writeHead(206, head);
+      'Access-Control-Allow-Origin': '*',
+      'Cache-Control': 'no-cache'
+    });
+
     file.pipe(res);
   } else {
     const file = fs.createReadStream(filePath);
-    file.on('error', () => {
-      if (!res.headersSent) res.writeHead(500);
-      res.end();
-    });
-
+    
     req.on('close', () => {
       if (!file.destroyed) file.destroy();
     });
 
-    const head = {
+    file.on('error', () => {
+      if (!file.destroyed) file.destroy();
+      if (!res.headersSent) res.writeHead(500);
+      res.end();
+    });
+
+    res.writeHead(200, {
       'Content-Length': fileSize,
       'Content-Type': contentType,
       'Accept-Ranges': 'bytes',
       'Access-Control-Allow-Origin': '*',
       'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
-    };
-    res.writeHead(200, head);
+    });
     file.pipe(res);
   }
 });
