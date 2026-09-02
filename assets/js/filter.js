@@ -105,18 +105,4 @@ function renderPlugins() {
       </article>
     `;
   }).join('');
-
-  // 綁定卡片點擊以開啟手冊與指令詳情彈窗
-  grid.querySelectorAll('.plugin-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      // 若點擊的是 GitHub 倉庫外連按鈕，則不觸發彈窗
-      if (e.target.closest('.btn-card-github') || e.target.closest('a') || e.target.closest('button')) {
-        return;
-      }
-      const pluginId = card.getAttribute('data-plugin-id');
-      if (pluginId && typeof openPluginModal === 'function') {
-        openPluginModal(pluginId);
-      }
-    });
-  });
 }

@@ -13,10 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initFilters();
   renderPlugins();
 
-  // 4. Initialize Modal
-  initModal();
-
-  // 5. Initialize Navigation & Scrollspy
+  // 4. Initialize Navigation & Scrollspy
   initNavigation();
 
   // 5.5 Initialize Video Showcase
