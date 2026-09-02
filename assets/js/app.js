@@ -508,24 +508,29 @@ function getTutorialVideosList() {
   return typeof PLUGINS_DATA !== 'undefined' ? PLUGINS_DATA : [];
 }
 
+let currentActiveVideoId = 'antigravity-design-philosophy';
+
 function initVideoShowcase() {
   const playlistPills = document.getElementById('video-playlist-pills');
   const videoList = getTutorialVideosList();
   if (!playlistPills || videoList.length === 0) return;
 
-  playlistPills.innerHTML = videoList.map((item, idx) => {
+  const targetId = currentActiveVideoId || (videoList[0] ? videoList[0].id : null);
+
+  playlistPills.innerHTML = videoList.map((item) => {
     const name = item.name ? (item.name[currentLang] || item.name['zh-TW']) : (item.title || '');
     const shortName = name.split('(')[0].trim();
+    const isActive = item.id === targetId;
     return `
-      <button class="playlist-btn ${idx === 0 ? 'active' : ''}" onclick="switchTutorialVideo('${item.id}')">
+      <button class="playlist-btn ${isActive ? 'active' : ''}" onclick="switchTutorialVideo('${item.id}')">
         <img src="${item.icon || 'assets/icons/philosophy.svg'}" style="width: 16px; height: 16px;" alt="" />
         ${shortName}
       </button>
     `;
   }).join('');
 
-  if (videoList.length > 0) {
-    switchTutorialVideo(videoList[0].id);
+  if (targetId) {
+    switchTutorialVideo(targetId);
   }
 }
 
@@ -555,6 +560,8 @@ function switchTutorialVideo(videoId) {
   const videoList = getTutorialVideosList();
   const videoItem = videoList.find(v => v.id === videoId) || (typeof PLUGINS_DATA !== 'undefined' ? PLUGINS_DATA.find(p => p.id === videoId) : null);
   if (!videoItem) return;
+
+  currentActiveVideoId = videoId;
 
   const html5Video = document.getElementById('tutorial-html5-video');
   const videoIframe = document.getElementById('tutorial-video-iframe');
@@ -620,8 +627,8 @@ function switchTutorialVideo(videoId) {
   }
 
   if (videoTitle) {
-    const rawName = videoItem.name ? (videoItem.name[currentLang] || videoItem.name['zh-TW']) : (videoItem.title || '實戰教學');
-    videoTitle.textContent = `${rawName} — 實戰教學`;
+    const rawName = videoItem.name ? (videoItem.name[currentLang] || videoItem.name['zh-TW']) : (videoItem.title || '');
+    videoTitle.textContent = rawName;
   }
   if (videoDesc) {
     videoDesc.textContent = videoItem.shortDesc ? (videoItem.shortDesc[currentLang] || videoItem.shortDesc['zh-TW']) : '';

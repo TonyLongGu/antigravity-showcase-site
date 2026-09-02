@@ -39,7 +39,8 @@ const I18N = {
     
     section_video_tag: '影片教學',
     section_video_title: '精選影音示範與實戰教學',
-    section_video_desc: '透過生動詳細的影片解說，快速掌握 Antigravity IDE 擴充套件的最佳實踐與操作技巧規定。',
+    section_video_desc: '透過生動詳細的影片解說，快速掌握 Antigravity IDE 擴充套件的最佳實踐與操作技巧。',
+    video_playlist_prompt: '點擊切換各主題與插件教學影片：',
     
     nav_author: '關於作者',
     section_author_tag: '開發者簡介',
@@ -95,7 +96,7 @@ const I18N = {
     install_feature_safe_title: '無痕卸載安全無殘留',
     install_feature_safe_desc: '隨時雙擊「雙擊一鍵解除安裝.bat」或個別目錄下的「uninstall-extension.bat」秒級乾淨卸載。',
     
-    section_plugins_tag: 'Ecosystem Suite',
+    section_plugins_tag: '探索插件',
     section_plugins_title: '全方位 Antigravity IDE 擴充套件',
     section_plugins_desc: '即時搜尋、分類過濾，探索各項專屬功能並一鍵前往 GitHub 倉庫。',
     
@@ -146,10 +147,11 @@ const I18N = {
     section_video_tag: 'Video Guides',
     section_video_title: 'Featured Video Walkthroughs',
     section_video_desc: 'Master Antigravity IDE native extensions with step-by-step video tutorials and real-world workflows.',
+    video_playlist_prompt: 'Click to switch tutorial video topics & plugins:',
     
     section_author_tag: 'Developer Profile',
     section_author_title: 'About the Creator',
-    author_name: 'Ting-Hao Liu (劉庭豪)',
+    author_name: 'Ting-Hao Liu',
     author_alias: 'TonyLongGu',
     author_badge: 'Creator & Tool Developer',
     author_bio: 'Focused on 3D animation rigging tools, pipeline automation, and native Google Antigravity IDE ecosystem extensions, dedicated to supercharging AI-assisted pair programming flows.',
