@@ -50,15 +50,32 @@ function initNavigation() {
     });
   }
 
-  // Smooth scroll
+  // Smooth scroll with customized offset to display more rich content directly
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
       const targetId = this.getAttribute('href');
-      if (targetId === '#') return;
+      if (targetId === '#' || targetId === '#hero') {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
       const targetEl = document.querySelector(targetId);
       if (targetEl) {
         e.preventDefault();
-        targetEl.scrollIntoView({ behavior: 'smooth' });
+        const navbar = document.querySelector('.navbar');
+        const navHeight = navbar ? navbar.offsetHeight : 70;
+        
+        // 取得目標元素相對於全頁面的頂部位置
+        const elementPosition = targetEl.getBoundingClientRect().top + window.pageYOffset;
+        
+        // 額外向下偏移約 48px（微調回彈，保留適當頂部留白並充分呈現內容）
+        const extraOffset = 48;
+        const offsetPosition = Math.max(0, elementPosition - navHeight + extraOffset);
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
       }
     });
   });

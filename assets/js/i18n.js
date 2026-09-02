@@ -5,6 +5,7 @@ const I18N = {
   'zh-TW': {
     brand_title: 'Antigravity',
     brand_subtitle: '擴充套件生態系',
+    nav_home: '首頁',
     nav_explore: '探索插件',
     nav_features: '核心特色',
     nav_video: '影音教學',
@@ -117,6 +118,7 @@ const I18N = {
   'en': {
     brand_title: 'Antigravity',
     brand_subtitle: 'PLUGINS ECOSYSTEM',
+    nav_home: 'Home',
     nav_explore: 'Explore Plugins',
     nav_features: 'Features',
     nav_video: 'Video Tutorials',
