@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <linearGradient id="philosophyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#c084fc" />
+    </linearGradient>
+  </defs>
+  <!-- 燈泡外輪廓 (Bulb Contour) -->
+  <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z" stroke="url(#philosophyGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 底座橫線 (Bulb Base) -->
+  <path d="M9 21h6" stroke="url(#philosophyGrad)" stroke-width="2" stroke-linecap="round"/>
+  <!-- 核心光芒與發光鎢絲 (Core Spark & Filament) -->
+  <path d="M12 6v3" stroke="url(#philosophyGrad)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M10 9.5l2 1.5 2-1.5" stroke="url(#philosophyGrad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

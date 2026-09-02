@@ -242,6 +242,9 @@ function setLanguage(lang) {
   if (typeof renderPlugins === 'function') {
     renderPlugins();
   }
+  if (typeof initVideoShowcase === 'function') {
+    initVideoShowcase();
+  }
 }
 
 function toggleLanguage() {

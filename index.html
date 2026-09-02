@@ -19,10 +19,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/variables.css">
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/variables.css?v=2.1">
+  <link rel="stylesheet" href="assets/css/base.css?v=2.1">
+  <link rel="stylesheet" href="assets/css/components.css?v=2.1">
+  <link rel="stylesheet" href="assets/css/animations.css?v=2.1">
   <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=3">
 </head>
 <body>
@@ -162,32 +162,79 @@
       </div>
 
       <div class="video-showcase-wrapper">
-        <div class="video-player-container">
-          <div id="video-thumbnail-cover" class="video-thumbnail-cover" onclick="playTutorialVideo()">
-            <div class="video-play-btn">▶</div>
-            <div class="video-play-text">點擊立即播放教學影片 (YouTube)</div>
-          </div>
+        <div class="video-player-container" id="main-video-player">
           <iframe 
             id="tutorial-video-iframe" 
-            src="https://www.youtube-nocookie.com/embed/fgDIeYi-NCo" 
-            data-src="https://www.youtube-nocookie.com/embed/fgDIeYi-NCo"
+            src="https://www.youtube.com/embed/HSYWa4WkBe0?controls=0&modestbranding=1&rel=0&enablejsapi=1&iv_load_policy=3&disablekb=1&playsinline=1" 
+            data-src="https://www.youtube.com/embed/HSYWa4WkBe0?controls=0&modestbranding=1&rel=0&enablejsapi=1&iv_load_policy=3&disablekb=1&playsinline=1"
             title="Antigravity IDE Plugins Tutorial Video" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
             referrerpolicy="strict-origin-when-cross-origin"
             allowfullscreen>
           </iframe>
+          <!-- HTML5 原生影片標籤 (支援自訂 MP4/WebM，0 秒無延遲、0 大圖示黑幕) -->
+          <video 
+            id="tutorial-html5-video" 
+            playsinline 
+            style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; object-fit:contain; background:#000;">
+          </video>
+
+          <!-- 畫面點擊即時播放/暫停層 (0.3s 極速淡出微圖標) -->
+          <div class="player-click-surface" id="player-click-surface" onclick="toggleCustomPlayer()">
+            <div class="player-feedback-badge" id="player-feedback-badge">
+              <svg id="badge-icon-play" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="badge-icon-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </div>
+          </div>
+
+          <!-- 自訂高質感 Antigravity 播放控制列 -->
+          <div class="custom-player-controls" id="custom-player-controls">
+            <!-- 進度條 -->
+            <div class="player-progress-container" id="player-progress-container">
+              <div class="player-progress-buffered" id="player-progress-buffered"></div>
+              <div class="player-progress-filled" id="player-progress-filled"></div>
+              <div class="player-progress-thumb" id="player-progress-thumb"></div>
+            </div>
+
+            <!-- 控制按鈕列 -->
+            <div class="custom-controls-row">
+              <div class="custom-controls-left">
+                <button class="custom-ctrl-btn" id="ctrl-play-btn" onclick="toggleCustomPlayer()" title="播放 / 暫停 (Space)">
+                  <svg id="ctrl-icon-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                  <svg id="ctrl-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <div class="custom-time-display">
+                  <span class="curr-time" id="time-current">0:00</span> / <span id="time-duration">0:00</span>
+                </div>
+              </div>
+
+              <div class="custom-controls-right">
+                <div class="custom-volume-group">
+                  <button class="custom-ctrl-btn" id="ctrl-mute-btn" onclick="toggleMute()" title="靜音 / 取消靜音">
+                    <svg id="ctrl-icon-vol-high" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    <svg id="ctrl-icon-vol-mute" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                  </button>
+                  <input type="range" class="custom-volume-slider" id="ctrl-volume-slider" min="0" max="100" value="100" oninput="changeVolume(this.value)" />
+                </div>
+                <button class="custom-ctrl-btn" id="ctrl-fullscreen-btn" onclick="toggleFullscreen()" title="全螢幕">
+                  <svg id="ctrl-icon-fullscreen-enter" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                  <svg id="ctrl-icon-fullscreen-exit" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="video-meta-bar">
           <div class="video-title-info">
-            <h3 id="tutorial-video-title">Antigravity IDE 擴充套件實戰教學指南</h3>
-            <p id="tutorial-video-desc">精選實戰影片，快速了解擴充套件於 Antigravity IDE 中的安裝、設定與完整操作流程。</p>
+            <h3 id="tutorial-video-title">設計理念 (Design Philosophy) — 實戰教學</h3>
+            <p id="tutorial-video-desc">深入解析 Antigravity 原生擴充套件架構思維：極致簡約、原生無縫融合與高效率 AI 協同開發實戰哲學。</p>
           </div>
         </div>
 
         <!-- Dynamic Tool Playlist Switcher -->
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-subtle);">
-          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">點擊切換各插件教學影片：</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">點擊切換各主題與插件教學影片：</div>
           <div id="video-playlist-pills" class="video-playlist-pills">
             <!-- Rendered by app.js -->
           </div>
@@ -596,12 +643,13 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/i18n.js"></script>
-  <script src="assets/js/plugins-data.js"></script>
-  <script src="assets/js/nebula-canvas.js"></script>
-  <script src="assets/js/filter.js"></script>
-  <script src="assets/js/modal.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/config.js?v=2.1"></script>
+  <script src="assets/js/i18n.js?v=2.1"></script>
+  <script src="assets/js/plugins-data.js?v=2.1"></script>
+  <script src="assets/js/nebula-canvas.js?v=2.1"></script>
+  <script src="assets/js/filter.js?v=2.1"></script>
+  <script src="assets/js/modal.js?v=2.1"></script>
+  <script src="assets/js/app.js?v=2.1"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>

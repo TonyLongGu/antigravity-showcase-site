@@ -6,9 +6,9 @@ const MAIN_REPO_URL = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG.githubUrl
 
 // 預設/精選教學影片 (支援隨時為各套件擴充專屬影片)
 const FEATURED_TUTORIAL_VIDEO = {
-  title: 'Antigravity IDE 擴充套件實戰教學指南',
-  url: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
-  embedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo'
+  title: 'Antigravity IDE 擴充套件設計理念與實戰指南',
+  url: 'https://youtu.be/HSYWa4WkBe0',
+  embedUrl: 'https://www.youtube.com/embed/HSYWa4WkBe0'
 };
 
 const PLUGINS_DATA = [
@@ -21,7 +21,8 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-ai-context-inspector`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-ai-context-inspector && .\\install-extension.bat',
-    videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
+    videoSrc: 'assets/videos/ai-context-inspector.mov',
+    videoUrl: 'https://youtu.be/LbbEhPD-LE0',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
       'zh-TW': 'AI 上下文檢視器 (AI Context Inspector)',
@@ -61,7 +62,8 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-mcp-manager`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-mcp-manager && .\\install-extension.bat',
-    videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
+    videoSrc: 'assets/videos/mcp-manager.mov',
+    videoUrl: 'https://youtu.be/zJDDg9SsjQI',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
       'zh-TW': 'Antigravity MCP 管理儀表板 (MCP Manager)',
@@ -101,7 +103,8 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quick-access`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-quick-access && .\\install-extension.bat',
-    videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
+    videoSrc: 'assets/videos/quick-access.mov',
+    videoUrl: 'https://youtu.be/7sCUQ5e8VEE',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
       'zh-TW': '常用捷徑與暫存清單 (Quick Access)',
@@ -145,7 +148,8 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quota-status`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-quota-status && .\\install-extension.bat',
-    videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
+    videoSrc: 'assets/videos/quota-status.mov',
+    videoUrl: 'https://youtu.be/NLgUHA1G-Kw',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
       'zh-TW': 'AI 模型額度狀態監控 (Quota Status)',
@@ -216,7 +220,8 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-script-runner && .\\install-extension.bat',
-    videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
+    videoSrc: 'assets/videos/script-runner.mov',
+    videoUrl: 'https://youtu.be/ibyt48Tulu4',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
       'zh-TW': '腳本右鍵執行工具 (Script Runner)',
@@ -276,7 +281,8 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-toolbox`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-toolbox && .\\install-extension.bat',
-    videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
+    videoSrc: 'assets/videos/toolbox.mov',
+    videoUrl: 'https://youtu.be/OSNrBl1BBCo',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
       'zh-TW': 'Antigravity 控制中心 (Toolbox)',
@@ -312,3 +318,24 @@ const PLUGINS_DATA = [
     configurations: []
   }
 ];
+ 
+// 影片教學播放清單（排在第一位的「設計理念」+ 各大套件實戰教學）
+const TUTORIAL_VIDEOS = [
+  {
+    id: 'antigravity-design-philosophy',
+    name: {
+      'zh-TW': '設計理念 (Design Philosophy)',
+      'en': 'Design Philosophy'
+    },
+    shortDesc: {
+      'zh-TW': '深入解析 Antigravity 原生擴充套件架構思維：極致簡約、原生無縫融合與高效率 AI 協同開發實戰哲學。',
+      'en': 'In-depth breakdown of Antigravity native extensions philosophy: minimal footprint, seamless IDE integration, and AI-driven workflows.'
+    },
+    icon: 'assets/icons/philosophy.svg?v=2',
+    videoSrc: 'assets/videos/design-philosophy.mov',
+    videoUrl: 'https://youtu.be/HSYWa4WkBe0',
+    videoEmbedUrl: 'https://www.youtube.com/embed/HSYWa4WkBe0'
+  },
+  ...PLUGINS_DATA
+];
+
