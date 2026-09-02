@@ -382,20 +382,18 @@
                   <div class="ai-prompt-header">
                     <div class="ai-agent-indicator">
                       <span class="ai-status-dot"></span>
-                      <span>Antigravity AI Interactive Installer</span>
+                      <span data-i18n="install_ai_installer_title">Antigravity AI 互動式安裝引導</span>
                     </div>
                   </div>
                   <div class="ai-chat-bubble preview-only">
-                    <span class="chat-quote">“</span>
-                    <span style="font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.6; display: inline-block;" data-i18n-html="install_ai_preview_prompt">
-                      請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity IDE 原生擴充套件。<br><br>
+                    <span class="ai-prompt-preview-text" data-i18n-html="install_ai_preview_prompt">
+                      “請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity IDE 原生擴充套件。<br><br>
                       請依序執行以下引導流程：<br>
                       1. 先詢問我要安裝哪些套件（提供選項：一鍵安裝全部 6 大套件，或自選個別套件）。<br>
                       2. 詢問我希望將專案原始碼 Clone/放置在本機的哪個目錄（提供預設建議路徑，如 D:\antigravity-plugins）。<br>
                       3. 根據我的回覆，自動在該目錄執行 Git Clone，並自動為選定的套件建立 IDE 擴充功能掛載。<br>
-                      4. 安裝完成後，提醒我重新載入視窗 (Developer: Reload Window)。
+                      4. 安裝完成後，提醒我重新載入視窗 (Developer: Reload Window)。”
                     </span>
-                    <span class="chat-quote">”</span>
                   </div>
                   <div class="install-action-row" style="margin-top: 14px;">
                     <button class="btn-primary install-dl-btn" onclick="copyAiInstallPrompt()">

@@ -1761,15 +1761,17 @@
   background: rgba(23, 31, 48, 0.8);
   border: 1px dashed rgba(253, 186, 116, 0.35);
   border-radius: var(--radius-sm);
-  padding: 10px 14px;
+  padding: 12px 16px;
   color: #fed7aa;
   font-family: var(--font-body);
   font-size: 0.92rem;
-  line-height: 1.5;
+  line-height: 1.6;
   cursor: pointer;
   transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
+  display: block;
+  position: relative;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .ai-chat-bubble:hover {
@@ -1781,12 +1783,26 @@
 .ai-chat-bubble.preview-only {
   cursor: text;
   user-select: text;
+  display: block;
+  padding: 16px 18px;
+  background: rgba(18, 25, 40, 0.75);
 }
 
 .ai-chat-bubble.preview-only:hover {
-  background: rgba(23, 31, 48, 0.8);
+  background: rgba(18, 25, 40, 0.75);
   border-color: rgba(253, 186, 116, 0.35);
   color: #fed7aa;
+}
+
+.ai-prompt-preview-text {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: #fed7aa;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .install-action-bubble {
@@ -1798,22 +1814,24 @@
   font-family: var(--font-body);
   font-size: 0.92rem;
   line-height: 1.5;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
+  word-break: break-all;
+  overflow-wrap: anywhere;
   transition: all var(--transition-fast);
 }
 
 .install-action-bubble code {
   color: #fed7aa;
   font-family: var(--font-mono);
+  word-break: break-all;
+  overflow-wrap: anywhere;
 }
 
 .chat-quote {
   color: #fdba74;
   font-weight: 700;
-  margin: 0 4px;
-  font-size: 1.1rem;
+  font-family: serif;
+  font-size: 1.15rem;
 }
 
 /* AI Flow Interactive Workflow Steps */
@@ -1829,18 +1847,20 @@
   align-items: center;
   gap: 12px;
   background: rgba(13, 18, 30, 0.7);
-  border: 1px solid rgba(0, 242, 254, 0.2);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   padding: 12px 16px;
   font-size: 0.92rem;
   color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
+  position: relative;
 }
 
 .ai-flow-item:hover {
-  border-color: var(--accent-cyan);
-  background: rgba(0, 242, 254, 0.05);
+  background: var(--bg-card-hover);
+  border-color: var(--border-focus);
   transform: translateX(4px);
+  box-shadow: 0 8px 25px rgba(0, 242, 254, 0.14), inset 0 0 12px rgba(0, 242, 254, 0.04);
 }
 
 .ai-flow-badge {
@@ -1867,8 +1887,10 @@
 }
 
 .ai-flow-item.success:hover {
-  border-color: #10b981;
-  background: rgba(16, 185, 129, 0.08);
+  background: var(--bg-card-hover);
+  border-color: var(--border-focus);
+  transform: translateX(4px);
+  box-shadow: 0 8px 25px rgba(0, 242, 254, 0.14), inset 0 0 12px rgba(0, 242, 254, 0.04);
 }
 
 .ai-flow-text {
@@ -1966,6 +1988,29 @@
   }
   .install-info-grid {
     grid-template-columns: 1fr;
+  }
+  .ai-prompt-card {
+    padding: 12px 14px;
+  }
+  .ai-chat-bubble.preview-only {
+    padding: 12px 14px;
+  }
+  .ai-prompt-preview-text {
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+  .install-action-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .install-dl-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .install-note-badge {
+    text-align: center;
+    width: 100%;
   }
 }
 
