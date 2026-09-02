@@ -1,9 +1,8 @@
 /**
  * Antigravity Plugins Showcase - Detailed Plugin Database
- * All plugins map to their respective independent GitHub repositories.
+ * All plugins map to the unified GitHub repository subfolders.
  */
-const GITHUB_REPO = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG.githubUrl : 'https://github.com/TonyLongGu/antigravity-plugins';
-const GITHUB_BASE = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG.githubBaseUrl : 'https://github.com/TonyLongGu';
+const MAIN_REPO_URL = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG.githubUrl : 'https://github.com/TonyLongGu/antigravity-plugins';
 
 // 預設/精選教學影片 (支援隨時為各套件擴充專屬影片)
 const FEATURED_TUTORIAL_VIDEO = {
@@ -19,9 +18,9 @@ const PLUGINS_DATA = [
     version: '1.0.0',
     icon: 'assets/icons/inspector.svg?v=2',
     themeClass: 'icon-theme-purple',
-    repoUrl: `${GITHUB_REPO}/tree/main/plugins/antigravity-ai-context-inspector`,
-    cloneCmd: `git clone ${GITHUB_REPO}.git`,
-    installCmd: 'cd antigravity-plugins\\plugins\\antigravity-ai-context-inspector && .\\install-extension.bat',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-ai-context-inspector`,
+    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
+    installCmd: 'cd antigravity-ai-context-inspector && .\\install-extension.bat',
     videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
@@ -59,9 +58,9 @@ const PLUGINS_DATA = [
     version: '1.0.0',
     icon: 'assets/icons/mcp.svg?v=2',
     themeClass: 'icon-theme-cyan',
-    repoUrl: `${GITHUB_REPO}/tree/main/plugins/antigravity-mcp-manager`,
-    cloneCmd: `git clone ${GITHUB_REPO}.git`,
-    installCmd: 'cd antigravity-plugins\\plugins\\antigravity-mcp-manager && .\\install-extension.bat',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-mcp-manager`,
+    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
+    installCmd: 'cd antigravity-mcp-manager && .\\install-extension.bat',
     videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
@@ -99,9 +98,9 @@ const PLUGINS_DATA = [
     version: '1.1.0',
     icon: 'assets/icons/quick-access.svg?v=2',
     themeClass: 'icon-theme-emerald',
-    repoUrl: `${GITHUB_REPO}/tree/main/plugins/antigravity-quick-access`,
-    cloneCmd: `git clone ${GITHUB_REPO}.git`,
-    installCmd: 'cd antigravity-plugins\\plugins\\antigravity-quick-access && .\\install-extension.bat',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quick-access`,
+    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
+    installCmd: 'cd antigravity-quick-access && .\\install-extension.bat',
     videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
@@ -143,9 +142,9 @@ const PLUGINS_DATA = [
     version: '1.0.1',
     icon: 'assets/icons/quota-status.svg?v=2',
     themeClass: 'icon-theme-amber',
-    repoUrl: `${GITHUB_REPO}/tree/main/plugins/antigravity-quota-status`,
-    cloneCmd: `git clone ${GITHUB_REPO}.git`,
-    installCmd: 'cd antigravity-plugins\\plugins\\antigravity-quota-status && .\\install-extension.bat',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quota-status`,
+    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
+    installCmd: 'cd antigravity-quota-status && .\\install-extension.bat',
     videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
@@ -214,9 +213,9 @@ const PLUGINS_DATA = [
     version: '1.2.0',
     icon: 'assets/icons/script-runner.svg?v=2',
     themeClass: 'icon-theme-lime',
-    repoUrl: `${GITHUB_REPO}/tree/main/plugins/antigravity-script-runner`,
-    cloneCmd: `git clone ${GITHUB_REPO}.git`,
-    installCmd: 'cd antigravity-plugins\\plugins\\antigravity-script-runner && .\\install-extension.bat',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
+    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
+    installCmd: 'cd antigravity-script-runner && .\\install-extension.bat',
     videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {
@@ -274,9 +273,9 @@ const PLUGINS_DATA = [
     version: '1.2.0',
     icon: 'assets/icons/toolbox.svg?v=2',
     themeClass: 'icon-theme-indigo',
-    repoUrl: `${GITHUB_REPO}/tree/main/plugins/antigravity-toolbox`,
-    cloneCmd: `git clone ${GITHUB_REPO}.git`,
-    installCmd: 'cd antigravity-plugins\\plugins\\antigravity-toolbox && .\\install-extension.bat',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-toolbox`,
+    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
+    installCmd: 'cd antigravity-toolbox && .\\install-extension.bat',
     videoUrl: 'https://www.youtube.com/watch?v=fgDIeYi-NCo',
     videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
     name: {

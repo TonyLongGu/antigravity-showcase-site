@@ -248,7 +248,7 @@
             <!-- Step 1: Download & Extract -->
             <div class="step-card">
               <h3 class="step-title">
-                <span class="step-badge">STEP 01</span>
+                <span class="step-badge">01</span>
                 <span data-i18n="install_zip_step1_title">下載全套套件包並解壓縮</span>
               </h3>
               <p class="step-desc" data-i18n="install_zip_step1_desc">點擊下方按鈕下載最新版全套套件 ZIP，並解壓縮至本機任意目錄（例如 D:\antigravity-plugins）：</p>
@@ -263,7 +263,7 @@
             <!-- Step 2: Choose Mode (Full vs Selective) -->
             <div class="step-card">
               <h3 class="step-title">
-                <span class="step-badge">STEP 02</span>
+                <span class="step-badge">02</span>
                 <span data-i18n="install_submode_title">執行安裝腳本（一鍵全安裝 或 單獨安裝）</span>
               </h3>
               
@@ -295,91 +295,102 @@
                     <span style="font-size: 0.8rem; color: var(--text-muted);">進入插件目錄執行</span>
                   </div>
                   <p class="step-desc" data-i18n="install_submode_custom_desc" style="margin-bottom: 10px;">
-                    打開「plugins/」資料夾，進入欲啟用的插件目錄（例如 plugins/antigravity-toolbox），雙擊該目錄下的「install-extension.bat」即可單獨啟用：
+                    進入欲啟用的插件目錄（例如 antigravity-toolbox/），雙擊該目錄下的「install-extension.bat」即可單獨啟用：
                   </p>
                   <div class="install-action-bubble">
-                    <code>plugins/&lt;插件名稱&gt;/install-extension.bat</code>
+                    <code>&lt;插件名稱&gt;/install-extension.bat</code>
                   </div>
                 </div>
               </div>
             </div>
+
+            <!-- Shared Step 3: Reload IDE Window for Method 1 -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">03</span>
+                <span data-i18n="install_common_step3_title">重新載入 Antigravity IDE 視窗</span>
+              </h3>
+              <p class="step-desc" data-i18n="install_common_step3_desc" style="margin-bottom: 0;">
+                重新啟動 IDE，或是在 IDE 中按快捷鍵 Ctrl + Shift + P，輸入並執行 Developer: Reload Window 即可立即在側邊欄與狀態列看到全新擴充功能！
+              </p>
+            </div>
           </div>
         </div>
 
-        <!-- Method 2: Git Clone + AI Agent Panel -->
+        <!-- Method 2: AI Guided Installation Panel -->
         <div id="install-panel-git" class="install-method-panel">
           <div class="steps-list">
-            <!-- Step 1: Git Clone -->
+            <!-- Step 1: Copy AI Guided Prompt -->
             <div class="step-card">
               <h3 class="step-title">
-                <span class="step-badge">STEP 01</span>
-                <span data-i18n="install_git_step1_title">Clone 專案倉庫至本地</span>
+                <span class="step-badge">01</span>
+                <span data-i18n="install_ai_step1_title">複製 AI 智能安裝提示詞</span>
               </h3>
-              <p class="step-desc" data-i18n="install_git_step1_desc">在終端機（PowerShell / Git Bash）執行以下指令，並在 Antigravity IDE 中開啟該專案資料夾：</p>
-              <div class="code-snippet">
-                <code>git clone https://github.com/TonyLongGu/antigravity-plugins.git</code>
-                <button class="btn-copy" onclick="copyToClipboard('git clone https://github.com/TonyLongGu/antigravity-plugins.git', '已複製 Git Clone 指令！')"><span data-i18n="btn_copy_cmd">複製</span></button>
+              <p class="step-desc" data-i18n="install_ai_step1_desc">點擊下方按鈕複製結構化安裝 Prompt，提示詞內建 GitHub 倉庫來源與全流程對話引導：</p>
+              
+              <div class="ai-prompts-container">
+                <div class="ai-prompt-card">
+                  <div class="ai-prompt-header">
+                    <div class="ai-agent-indicator">
+                      <span class="ai-status-dot"></span>
+                      <span>Antigravity AI Interactive Installer</span>
+                    </div>
+                  </div>
+                  <div class="ai-chat-bubble preview-only">
+                    <span class="chat-quote">“</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.6; display: inline-block;">
+                      請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity IDE 原生擴充套件。<br><br>
+                      請依序執行以下引導流程：<br>
+                      1. 先詢問我要安裝哪些套件（提供選項：一鍵安裝全部 6 大套件，或自選個別套件）。<br>
+                      2. 詢問我希望將專案原始碼 Clone/放置在本機的哪個目錄（提供預設建議路徑，如 D:\antigravity-plugins）。<br>
+                      3. 根據我的回覆，自動在該目錄執行 Git Clone，並自動為選定的套件建立 IDE 擴充功能掛載。<br>
+                      4. 安裝完成後，提醒我重新載入視窗 (Developer: Reload Window)。
+                    </span>
+                    <span class="chat-quote">”</span>
+                  </div>
+                  <div class="install-action-row" style="margin-top: 14px;">
+                    <button class="btn-primary install-dl-btn" onclick="copyAiInstallPrompt()">
+                      <span data-i18n="install_ai_prompt_copy_btn">📋 複製 AI 智能安裝提示詞</span>
+                    </button>
+                    <span class="install-note-badge">零終端機操作 • AI 互動引導</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Step 2: Ask AI Agent via Chat -->
+            <!-- Step 2: Paste into AI Chat -->
             <div class="step-card">
               <h3 class="step-title">
-                <span class="step-badge">STEP 02</span>
-                <span data-i18n="install_git_step2_title">在 Antigravity Chat 吩咐 AI Agent 幫您安裝</span>
+                <span class="step-badge">02</span>
+                <span data-i18n="install_ai_step2_title">貼入 Antigravity AI Chat 對話框</span>
               </h3>
-              <p class="step-desc" data-i18n="install_git_step2_desc">在 Antigravity IDE 的 AI Chat 對話框輸入以下 Prompt 提示詞，AI Agent 將自動解析目錄並為您執行安裝腳本：</p>
-              
-              <div class="ai-prompts-container">
-                <!-- Prompt 1 -->
-                <div class="ai-prompt-card">
-                  <div class="ai-prompt-header">
-                    <div class="ai-agent-indicator">
-                      <span class="ai-status-dot"></span>
-                      <span data-i18n="ai_prompt_1_label">一鍵安裝全部插件</span>
-                    </div>
-                    <button class="btn-copy btn-copy-sm" onclick="copyToClipboard('請幫我一鍵安裝本倉庫的所有 Antigravity 擴充套件', t('ai_prompt_copied'))">
-                      <span data-i18n="ai_prompt_copy_btn">複製 Prompt</span>
-                    </button>
-                  </div>
-                  <div class="ai-chat-bubble" onclick="copyToClipboard('請幫我一鍵安裝本倉庫的所有 Antigravity 擴充套件', t('ai_prompt_copied'))">
-                    <span class="chat-quote">“</span>
-                    <span data-i18n="ai_prompt_1_text">請幫我一鍵安裝本倉庫的所有 Antigravity 擴充套件</span>
-                    <span class="chat-quote">”</span>
-                  </div>
-                </div>
+              <p class="step-desc" data-i18n="install_ai_step2_desc" style="margin-bottom: 0;">在 Antigravity IDE 任意視窗打開 AI Chat 對話框，貼上剛剛複製的提示詞並發送。</p>
+            </div>
 
-                <!-- Prompt 2 -->
-                <div class="ai-prompt-card">
-                  <div class="ai-prompt-header">
-                    <div class="ai-agent-indicator">
-                      <span class="ai-status-dot"></span>
-                      <span data-i18n="ai_prompt_2_label">單獨安裝特定插件</span>
-                    </div>
-                    <button class="btn-copy btn-copy-sm" onclick="copyToClipboard('請幫我安裝 plugins/antigravity-toolbox 控制中心擴充套件', t('ai_prompt_copied'))">
-                      <span data-i18n="ai_prompt_copy_btn">複製 Prompt</span>
-                    </button>
-                  </div>
-                  <div class="ai-chat-bubble" onclick="copyToClipboard('請幫我安裝 plugins/antigravity-toolbox 控制中心擴充套件', t('ai_prompt_copied'))">
-                    <span class="chat-quote">“</span>
-                    <span data-i18n="ai_prompt_2_text">請幫我安裝 plugins/antigravity-toolbox 控制中心擴充套件</span>
-                    <span class="chat-quote">”</span>
-                  </div>
+            <!-- Step 3: AI Dialog & Automated Execution -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">03</span>
+                <span data-i18n="install_ai_step3_title">跟隨 AI 引導並全自動安裝</span>
+              </h3>
+              <p class="step-desc" data-i18n="install_ai_step3_desc">AI Agent 將主動向您確認安裝項目與本機目錄，隨後全自動完成 Git Clone 與軟連結掛載：</p>
+              
+              <div class="ai-flow-steps">
+                <div class="ai-flow-item">
+                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q1_badge">步驟 A</span>
+                  <span class="ai-flow-text" data-i18n="install_ai_flow_q1_text">AI 主動詢問：安裝【全套 6 大插件】還是【自選特定套件】？</span>
+                </div>
+                <div class="ai-flow-item">
+                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q2_badge">步驟 B</span>
+                  <span class="ai-flow-text" data-i18n="install_ai_flow_q2_text">AI 主動詢問：希望將專案安裝在本機哪個資料夾？（預設建議 D:\antigravity-plugins）</span>
+                </div>
+                <div class="ai-flow-item success">
+                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q3_badge">步驟 C</span>
+                  <span class="ai-flow-text" data-i18n="install_ai_flow_q3_text">AI 自動執行：背景 Clone 倉庫 ➔ 建立 Junction 軟連結 ➔ 引導重載視窗即刻生效！</span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- Shared Step 3: Reload IDE Window -->
-        <div class="step-card" style="margin-top: 20px;">
-          <h3 class="step-title">
-            <span class="step-badge">STEP 03</span>
-            <span data-i18n="install_common_step3_title">重新載入 Antigravity IDE 視窗</span>
-          </h3>
-          <p class="step-desc" data-i18n="install_common_step3_desc" style="margin-bottom: 0;">
-            重新啟動 IDE，或是在 IDE 中按快捷鍵 Ctrl + Shift + P，輸入並執行 Developer: Reload Window 即可立即在側邊欄與狀態列看到全新擴充功能！
-          </p>
         </div>
 
         <!-- Technical & Uninstall Banner Info -->

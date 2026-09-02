@@ -181,12 +181,12 @@ function renderModalBody() {
               <span>📦</span> ${plugin.repoUrl} <span>↗</span>
             </a>
           </div>
-          <a href="${mainRepoUrl}" target="_blank" rel="noopener noreferrer" class="btn-github" style="padding: 6px 14px; font-size: 0.82rem;">
+          <a href="${plugin.repoUrl}" target="_blank" rel="noopener noreferrer" class="btn-github" style="padding: 6px 14px; font-size: 0.82rem;">
             前往 GitHub Star ⭐
           </a>
         </div>
 
-        <h4 style="margin-bottom: 12px; color: var(--text-primary);">步驟一：Clone 生態套件庫至本地</h4>
+        <h4 style="margin-bottom: 12px; color: var(--text-primary);">步驟一：Clone 插件倉庫至本地</h4>
         <div class="code-snippet" style="margin-bottom: 16px;">
           <code>${plugin.cloneCmd}</code>
           <button class="btn-copy" onclick="copyToClipboard('${plugin.cloneCmd}', '已複製 Clone 指令！')">${t('btn_copy_cmd')}</button>
