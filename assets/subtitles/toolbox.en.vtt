@@ -1,0 +1,225 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:03.860
+Next let's walk through how to use the Toolbox control center
+
+2
+00:00:03.860 --> 00:00:09.100
+When importing multiple projects into Antigravity IDE
+
+3
+00:00:09.100 --> 00:00:12.120
+if subfolder names across repositories are identical
+
+4
+00:00:12.120 --> 00:00:16.540
+it is difficult to quickly identify which project a folder belongs to
+
+5
+00:00:16.540 --> 00:00:18.200
+To solve this problem
+
+6
+00:00:18.200 --> 00:00:20.480
+I developed this Toolbox extension
+
+7
+00:00:20.480 --> 00:00:22.940
+integrated directly into the IDE left sidebar
+
+8
+00:00:23.560 --> 00:00:26.020
+First is the 'Multi-Workspace Management' feature
+
+9
+00:00:26.020 --> 00:00:30.500
+It allows us to alias the parent directory name
+
+10
+00:00:30.500 --> 00:00:34.020
+into a much more recognizable project title
+
+11
+00:00:34.020 --> 00:00:37.720
+and quickly switch file explorer scopes
+
+12
+00:00:38.260 --> 00:00:40.220
+During large project productions
+
+13
+00:00:40.220 --> 00:00:42.160
+it typically encompasses planning
+
+14
+00:00:42.160 --> 00:00:46.940
+concept design asset creation to post-processing pipelines
+
+15
+00:00:46.940 --> 00:00:49.380
+involving a large number of active directories
+
+16
+00:00:49.380 --> 00:00:52.180
+We can pre-import all workspaces at once
+
+17
+00:00:52.180 --> 00:00:54.560
+and for projects not currently in progress
+
+18
+00:00:55.060 --> 00:00:58.900
+use the quick-hide toggle button to collapse them
+
+19
+00:00:58.900 --> 00:01:00.920
+restoring them whenever needed
+
+20
+00:01:00.920 --> 00:01:05.320
+while supporting drag-and-drop to reorder projects flexibly
+
+21
+00:01:05.320 --> 00:01:08.560
+The second core feature is the 'Project Script Launcher
+
+22
+00:01:08.560 --> 00:01:10.240
+During development
+
+23
+00:01:10.240 --> 00:01:14.380
+we often have AI write various quick automation scripts
+
+24
+00:01:14.380 --> 00:01:19.240
+such as .bat batch files or .ps1 PowerShell scripts
+
+25
+00:01:19.240 --> 00:01:22.980
+However these scripts are scattered across folders
+
+26
+00:01:22.980 --> 00:01:25.480
+making locating and executing them inconvenient
+
+27
+00:01:25.480 --> 00:01:27.420
+With this feature
+
+28
+00:01:27.420 --> 00:01:33.120
+simply right-click any .bat or .ps1 file in the file explorer
+
+29
+00:01:33.120 --> 00:01:36.940
+to pin it directly into the Project Script Launcher
+
+30
+00:01:37.420 --> 00:01:40.480
+Scripts are automatically grouped by workspace
+
+31
+00:01:40.480 --> 00:01:43.380
+and considering filenames are often in English
+
+32
+00:01:43.380 --> 00:01:48.220
+the panel supports renaming with custom friendly aliases
+
+33
+00:01:48.220 --> 00:01:52.240
+You can click buttons to run them in the terminal with 1-click
+
+34
+00:01:52.240 --> 00:01:55.140
+or execute with Administrator privileges
+
+35
+00:01:55.140 --> 00:01:58.120
+significantly boosting operational efficiency
+
+36
+00:01:58.120 --> 00:02:01.400
+Below that practical utility toolchains are integrated
+
+37
+00:02:01.400 --> 00:02:04.360
+including 'IDE Preferences' shortcuts
+
+38
+00:02:04.360 --> 00:02:07.720
+to quickly adjust IDE settings
+
+39
+00:02:07.720 --> 00:02:12.380
+a toggle for hidden miscellaneous workspace files
+
+40
+00:02:12.380 --> 00:02:20.280
+and global customization shortcuts to open Antigravity's global config directory
+
+41
+00:02:20.280 --> 00:02:23.300
+for inspecting and editing core configuration files on the fly
+
+42
+00:02:23.820 --> 00:02:26.560
+Next is the 'Conversation Brain Snapshot & Disk Cleaner
+
+43
+00:02:27.120 --> 00:02:30.040
+Whenever we chat with an AI Agent
+
+44
+00:02:30.040 --> 00:02:35.040
+the system saves local conversation logs automatically
+
+45
+00:02:35.040 --> 00:02:37.120
+which are not cleaned up by default
+
+46
+00:02:37.120 --> 00:02:41.160
+Over long periods of time
+
+47
+00:02:41.160 --> 00:02:44.600
+these chat history logs consume substantial disk storage
+
+48
+00:02:44.600 --> 00:02:51.100
+With this utility we can audit and clean them up safely with ease
+
+49
+00:02:51.100 --> 00:02:56.920
+Finally at the very top of the panel
+
+50
+00:02:57.380 --> 00:03:00.500
+there is a handy 'Open as Editor Tab' button
+
+51
+00:03:00.500 --> 00:03:04.020
+Sometimes we want to use the Toolbox
+
+52
+00:03:04.540 --> 00:03:06.420
+while inspecting the left file explorer in real time
+
+53
+00:03:06.420 --> 00:03:11.040
+simply clicking this button
+
+54
+00:03:11.040 --> 00:03:14.000
+converts the sidebar panel directly into an editor workspace tab
+
+55
+00:03:14.000 --> 00:03:15.840
+keeping the explorer visible on the left
+
+56
+00:03:15.840 --> 00:03:20.080
+to enable a dual-pane workflow that maximizes productivity

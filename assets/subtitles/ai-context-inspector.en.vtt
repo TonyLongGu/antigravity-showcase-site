@@ -1,0 +1,149 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.380
+Next let's explore the features and usage of AI Context Inspector
+
+2
+00:00:04.380 --> 00:00:06.020
+The original motivation behind this tool
+
+3
+00:00:06.020 --> 00:00:12.000
+is that when creating Rules and Skills for AI
+
+4
+00:00:12.000 --> 00:00:15.880
+these files are scattered across different project folders
+
+5
+00:00:15.880 --> 00:00:18.600
+making them hard to inspect and manage centrally
+
+6
+00:00:18.600 --> 00:00:21.080
+as well as inconvenient to search or reference
+
+7
+00:00:21.080 --> 00:00:23.980
+More importantly during active conversations
+
+8
+00:00:23.980 --> 00:00:28.240
+it is difficult to verify whether AI successfully loaded our rules
+
+9
+00:00:28.240 --> 00:00:31.260
+or correctly invoked designated skills
+
+10
+00:00:31.260 --> 00:00:36.320
+Therefore I built this tool to provide full visibility into AI context
+
+11
+00:00:36.320 --> 00:00:38.940
+Opening this tool in the IDE left sidebar
+
+12
+00:00:38.940 --> 00:00:42.340
+the Active Environment Configuration panel appears first
+
+13
+00:00:42.340 --> 00:00:47.740
+Here you can see all active configurations at a glance
+
+14
+00:00:47.740 --> 00:00:49.940
+including Core Rules
+
+15
+00:00:49.940 --> 00:00:52.460
+Conditional Rules and Skill inventories
+
+16
+00:00:52.880 --> 00:00:57.240
+while all installed MCP servers are listed below in real time
+
+17
+00:00:57.240 --> 00:01:01.100
+keeping us fully informed of the current execution environment
+
+18
+00:01:01.100 --> 00:01:05.080
+Previously these rules and skills used short English IDs
+
+19
+00:01:05.080 --> 00:01:08.700
+making it hard to understand their contents at a glance
+
+20
+00:01:08.700 --> 00:01:13.100
+With this tool we can freely toggle between English and Chinese titles
+
+21
+00:01:13.100 --> 00:01:16.140
+quickly inspecting detailed documentation and notes
+
+22
+00:01:16.140 --> 00:01:18.200
+When expanding each item
+
+23
+00:01:18.200 --> 00:01:20.800
+the tool provides three practical features
+
+24
+00:01:20.800 --> 00:01:22.440
+First is 'Copy Name
+
+25
+00:01:22.440 --> 00:01:26.200
+click to paste directly into chat to quickly reference that skill
+
+26
+00:01:26.200 --> 00:01:27.780
+Second is 'Reveal in Explorer
+
+27
+00:01:27.780 --> 00:01:31.020
+highlighting the exact file location in the file tree
+
+28
+00:01:31.020 --> 00:01:32.620
+Third is 'Direct Open
+
+29
+00:01:32.620 --> 00:01:34.960
+click to immediately open the file for editing and modifications
+
+30
+00:01:34.960 --> 00:01:39.520
+Another powerful flagship feature is 'Recent Conversation Snapshots
+
+31
+00:01:39.520 --> 00:01:44.340
+To check which rules and skills were referenced in past AI chats
+
+32
+00:01:44.340 --> 00:01:48.380
+simply select a specific history session from the dropdown menu
+
+33
+00:01:48.380 --> 00:01:54.280
+and the panel automatically parses and lists all rules and context loaded for that turn
+
+34
+00:01:54.280 --> 00:01:56.180
+This feature is extremely practical
+
+35
+00:01:56.180 --> 00:01:58.800
+enabling us to audit rule behaviors
+
+36
+00:01:58.800 --> 00:02:02.080
+and fine-tune trigger conditions for conditional rules
+
+37
+00:02:02.080 --> 00:02:07.740
+ensuring AI loads the right skills and rules at the right time in every chat

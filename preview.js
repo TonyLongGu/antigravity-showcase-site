@@ -17,7 +17,9 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
   '.mov': 'video/mp4',
   '.mp4': 'video/mp4',
-  '.webm': 'video/webm'
+  '.webm': 'video/webm',
+  '.vtt': 'text/vtt; charset=utf-8',
+  '.srt': 'text/plain; charset=utf-8'
 };
 
 const server = http.createServer((req, res) => {

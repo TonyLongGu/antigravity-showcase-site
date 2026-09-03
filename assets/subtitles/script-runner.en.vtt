@@ -1,0 +1,45 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:04.110
+During development we often need to run Python
+
+2
+00:00:04.110 --> 00:00:08.320
+PowerShell or batch scripts which usually meant opening terminals
+
+3
+00:00:08.760 --> 00:00:11.980
+navigating directories or elevating permissions manually
+
+4
+00:00:12.740 --> 00:00:15.860
+So I built this Context Menu Script Runner
+
+5
+00:00:15.860 --> 00:00:17.680
+integrated directly into Antigravity IDE
+
+6
+00:00:17.680 --> 00:00:23.900
+Right-click in explorer or editor to run scripts with 1-click
+
+7
+00:00:23.900 --> 00:00:27.200
+It supports auto-saving before running Python scripts
+
+8
+00:00:27.540 --> 00:00:29.360
+automatically aligns CWD for batch files
+
+9
+00:00:29.360 --> 00:00:32.620
+and bypasses execution policy for PowerShell
+
+10
+00:00:32.620 --> 00:00:37.840
+with Run-as-Admin support and keeping windows open
+
+11
+00:00:37.840 --> 00:00:41.660
+making script testing and debugging super smooth

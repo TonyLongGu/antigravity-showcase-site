@@ -191,10 +191,195 @@ function getPlayerDOM() {
       fsEnter: document.getElementById('ctrl-icon-fullscreen-enter'),
       fsExit: document.getElementById('ctrl-icon-fullscreen-exit'),
       videoTitle: document.getElementById('tutorial-video-title'),
-      videoDesc: document.getElementById('tutorial-video-desc')
+      videoDesc: document.getElementById('tutorial-video-desc'),
+      subtitleOverlay: document.getElementById('player-subtitle-overlay'),
+      subtitleBubble: document.getElementById('subtitle-bubble'),
+      subtitleText: document.getElementById('subtitle-text'),
+      ccBtn: document.getElementById('ctrl-cc-btn')
     };
   }
   return domCache;
+}
+
+function getCurrentPlaybackTime() {
+  if (currentVideoMode === 'html5') {
+    const v = html5VideoEl || (domCache && domCache.html5Video);
+    return v ? (v.currentTime || 0) : 0;
+  } else if (currentVideoMode === 'youtube') {
+    if (customYtPlayer && isYtPlayerReady && typeof customYtPlayer.getCurrentTime === 'function') {
+      try { return customYtPlayer.getCurrentTime() || 0; } catch (e) { return 0; }
+    }
+  }
+  return 0;
+}
+
+/**
+ * Antigravity High-Precision Subtitle Engine (WebVTT Parser & Multi-Language Sync)
+ */
+const SubtitleManager = {
+  isEnabled: localStorage.getItem('antigravity_subtitle_enabled') !== 'false',
+  currentCues: [],
+  currentVideoId: '',
+  currentLang: '',
+  activeCueIndex: -1,
+
+  init() {
+    this.updateButtonUI();
+    const targetId = typeof currentActiveVideoId !== 'undefined' ? currentActiveVideoId : 'antigravity-design-philosophy';
+    const lang = typeof currentLang !== 'undefined' ? currentLang : 'zh-TW';
+    this.load(targetId, lang);
+  },
+
+  updateButtonUI() {
+    const dom = getPlayerDOM();
+    if (dom.ccBtn) {
+      dom.ccBtn.classList.toggle('active', this.isEnabled);
+      dom.ccBtn.setAttribute('aria-pressed', this.isEnabled ? 'true' : 'false');
+    }
+    if (!this.isEnabled) {
+      this.hideText();
+    }
+  },
+
+  toggle() {
+    this.isEnabled = !this.isEnabled;
+    localStorage.setItem('antigravity_subtitle_enabled', this.isEnabled ? 'true' : 'false');
+    this.updateButtonUI();
+    if (this.isEnabled) {
+      this.activeCueIndex = -1; // 重設快取索引，確保能立刻觸發當前語句渲染
+      this.sync(getCurrentPlaybackTime(), true); // 強制即時重新繪製
+    } else {
+      this.hideText();
+    }
+  },
+
+  async load(videoId, lang) {
+    if (!videoId) return;
+    this.currentVideoId = videoId;
+    const targetLang = lang || (typeof currentLang !== 'undefined' ? currentLang : 'zh-TW');
+    this.currentLang = targetLang;
+    this.currentCues = [];
+    this.activeCueIndex = -1;
+    this.hideText();
+
+    // 支援將插件 ID (如 antigravity-design-philosophy) 映射為檔案名稱 (design-philosophy)
+    const baseName = videoId.replace(/^antigravity-/, '');
+    const vttLang = (targetLang === 'en') ? 'en' : 'zh-TW';
+    const vttUrl = `assets/subtitles/${baseName}.${vttLang}.vtt`;
+
+    try {
+      const res = await fetch(vttUrl);
+      if (!res.ok) {
+        return;
+      }
+      const vttText = await res.text();
+      if (this.currentVideoId === videoId && this.currentLang === targetLang) {
+        this.currentCues = this.parseVTT(vttText);
+        this.sync(getCurrentPlaybackTime(), true);
+      }
+    } catch (err) {
+      console.warn('Subtitle load error:', err);
+    }
+  },
+
+  parseVTT(text) {
+    const cues = [];
+    if (!text) return cues;
+    const lines = text.replace(/\r\n/g, '\n').split('\n');
+    let i = 0;
+    
+    // 跳過開頭非時間戳行
+    while (i < lines.length && !lines[i].includes('-->')) {
+      i++;
+    }
+
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      if (line.includes('-->')) {
+        const parts = line.split('-->');
+        const startStr = parts[0].trim().split(' ')[0];
+        const endStr = parts[1].trim().split(' ')[0];
+        const start = this.timeToSeconds(startStr);
+        const end = this.timeToSeconds(endStr);
+        
+        i++;
+        let cueText = [];
+        while (i < lines.length && lines[i].trim() !== '') {
+          cueText.push(lines[i].trim());
+          i++;
+        }
+
+        if (!isNaN(start) && !isNaN(end) && cueText.length > 0) {
+          cues.push({
+            start,
+            end,
+            text: cueText.join(' ')
+          });
+        }
+      }
+      i++;
+    }
+    return cues;
+  },
+
+  timeToSeconds(timeStr) {
+    if (!timeStr) return 0;
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return 0;
+    let hours = 0, mins = 0, secs = 0;
+    if (parts.length === 3) {
+      hours = parseFloat(parts[0]) || 0;
+      mins = parseFloat(parts[1]) || 0;
+      secs = parseFloat(parts[2].replace(',', '.')) || 0;
+    } else {
+      mins = parseFloat(parts[0]) || 0;
+      secs = parseFloat(parts[1].replace(',', '.')) || 0;
+    }
+    return hours * 3600 + mins * 60 + secs;
+  },
+
+  sync(currentTime, forceUpdate = false) {
+    if (!this.isEnabled || !this.currentCues || this.currentCues.length === 0) {
+      this.hideText();
+      return;
+    }
+
+    const matchedIndex = this.currentCues.findIndex(c => currentTime >= c.start && currentTime <= c.end);
+    if (matchedIndex !== -1) {
+      if (forceUpdate || this.activeCueIndex !== matchedIndex) {
+        this.activeCueIndex = matchedIndex;
+        this.showText(this.currentCues[matchedIndex].text);
+      }
+    } else {
+      if (this.activeCueIndex !== -1) {
+        this.activeCueIndex = -1;
+        this.hideText();
+      }
+    }
+  },
+
+  showText(text) {
+    const dom = getPlayerDOM();
+    if (dom.subtitleText && dom.subtitleBubble) {
+      dom.subtitleText.textContent = text;
+      dom.subtitleBubble.style.display = 'inline-block';
+    }
+  },
+
+  hideText() {
+    this.activeCueIndex = -1; // 關鍵修正：隱藏時必須重設索引，否則重新開啟時若在同一句會被阻擋
+    const dom = getPlayerDOM();
+    if (dom.subtitleBubble) {
+      dom.subtitleBubble.style.display = 'none';
+    }
+    if (dom.subtitleText) {
+      dom.subtitleText.textContent = '';
+    }
+  }
+};
+
+function toggleSubtitles() {
+  SubtitleManager.toggle();
 }
 
 window.onYouTubeIframeAPIReady = function() {
@@ -750,6 +935,11 @@ function updateTimeAndDuration() {
     if (dom.thumbEl) dom.thumbEl.style.left = `${pct}%`;
     if (dom.bufBar) dom.bufBar.style.width = `${loadedPct}%`;
   }
+
+  // 同步字幕顯示
+  if (typeof SubtitleManager !== 'undefined') {
+    SubtitleManager.sync(curr);
+  }
 }
 
 let isCustomPlayerInited = false;
@@ -869,6 +1059,10 @@ function initCustomVideoPlayer() {
     } else if (e.key === 'm' || e.key === 'M') {
       e.preventDefault();
       toggleMute();
+      wakePlayerUI();
+    } else if (e.key === 'c' || e.key === 'C') {
+      e.preventDefault();
+      toggleSubtitles();
       wakePlayerUI();
     } else if (e.code === 'ArrowLeft') {
       e.preventDefault();
@@ -1043,6 +1237,11 @@ function initCustomVideoPlayer() {
 
   progContainer.addEventListener('pointerup', endDragSeek);
   progContainer.addEventListener('pointercancel', cancelDragSeek);
+
+  // 初始化字幕引擎 (載入預設字幕並還原設定)
+  if (typeof SubtitleManager !== 'undefined') {
+    SubtitleManager.init();
+  }
 }
 
 function getTutorialVideosList() {
@@ -1183,6 +1382,11 @@ function switchTutorialVideo(videoId) {
   }
 
   updateTutorialVideoMetaOnly(videoId);
+
+  // 切換載入對應影片之字幕
+  if (typeof SubtitleManager !== 'undefined') {
+    SubtitleManager.load(videoId, typeof currentLang !== 'undefined' ? currentLang : 'zh-TW');
+  }
 }
 
 /**

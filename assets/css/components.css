@@ -969,6 +969,109 @@ body.has-web-fullscreen .video-showcase-wrapper {
   height: 24px;
 }
 
+/* 自訂科技感外掛字幕圖層 */
+.player-subtitle-overlay {
+  position: absolute;
+  bottom: 68px; /* 位於控制列上方 */
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: 0 32px;
+  pointer-events: none;
+  z-index: 9;
+  transition: bottom 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 控制列隱藏時字幕自然下沉貼合畫面底端，提供沉浸式視野 */
+.video-player-container.hide-ui:not(.paused) .player-subtitle-overlay {
+  bottom: 24px;
+}
+
+/* 全螢幕下的字幕安全邊界與位置 */
+.video-player-container:fullscreen .player-subtitle-overlay,
+.video-player-container.is-fullscreen .player-subtitle-overlay,
+.video-player-container.is-web-fullscreen .player-subtitle-overlay {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
+  padding: 0 max(40px, calc(env(safe-area-inset-left, 0px) + 24px));
+}
+
+.video-player-container:fullscreen.hide-ui:not(.paused) .player-subtitle-overlay,
+.video-player-container.is-fullscreen.hide-ui:not(.paused) .player-subtitle-overlay,
+.video-player-container.is-web-fullscreen.hide-ui:not(.paused) .player-subtitle-overlay {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 32px);
+}
+
+/* 手機橫向螢幕專屬字幕適配 */
+@media (orientation: landscape) and (max-height: 520px) {
+  .player-subtitle-overlay {
+    bottom: 48px;
+    padding: 0 16px;
+  }
+  .video-player-container:fullscreen .player-subtitle-overlay,
+  .video-player-container.is-fullscreen .player-subtitle-overlay,
+  .video-player-container.is-web-fullscreen .player-subtitle-overlay {
+    bottom: 50px;
+  }
+}
+
+.subtitle-bubble {
+  display: inline-block;
+  max-width: min(860px, 90%);
+  background: rgba(8, 12, 22, 0.84);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.75), 0 0 16px rgba(56, 189, 248, 0.15);
+  border-radius: 8px;
+  padding: 8px 18px;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  animation: subtitleFadeIn 0.2s ease-out;
+}
+
+@keyframes subtitleFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.subtitle-text {
+  color: #ffffff;
+  font-family: var(--font-main, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  font-size: clamp(0.95rem, 1.6vw, 1.25rem);
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.6);
+  word-break: break-word;
+}
+
+/* [CC] 字幕控制按鈕狀態樣式 */
+.custom-ctrl-btn#ctrl-cc-btn {
+  opacity: 0.45;
+  transition: opacity 0.2s ease, color 0.2s ease, filter 0.2s ease;
+}
+
+.custom-ctrl-btn#ctrl-cc-btn.active {
+  opacity: 1;
+  color: #38bdf8;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+}
+
+.custom-ctrl-btn#ctrl-cc-btn:hover {
+  opacity: 1;
+  color: #7dd3fc;
+}
+
 /* 自訂玻璃態浮動控制列 */
 .custom-player-controls {
   position: absolute;

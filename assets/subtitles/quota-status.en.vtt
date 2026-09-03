@@ -1,0 +1,45 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:02.880
+When working with AI in the IDE
+
+2
+00:00:02.880 --> 00:00:04.940
+I really wanted to know in real time
+
+3
+00:00:04.940 --> 00:00:07.420
+how much quota I had left to use
+
+4
+00:00:07.420 --> 00:00:09.660
+So I built an IDE extension
+
+5
+00:00:09.660 --> 00:00:13.600
+to display live account status at the bottom of the IDE
+
+6
+00:00:13.600 --> 00:00:16.120
+showing how much quota is available
+
+7
+00:00:16.120 --> 00:00:19.960
+along with daily suggested pacing and bias variance
+
+8
+00:00:19.960 --> 00:00:23.900
+Clicking opens an advanced settings panel
+
+9
+00:00:23.900 --> 00:00:27.860
+to refresh balances and customize display themes
+
+10
+00:00:27.860 --> 00:00:30.820
+as well as set background auto-check intervals
+
+11
+00:00:30.820 --> 00:00:33.720
+allowing full control over daily AI usage

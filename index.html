@@ -189,6 +189,13 @@
             </div>
           </div>
 
+          <!-- 自訂科技感中英外掛字幕層 -->
+          <div class="player-subtitle-overlay" id="player-subtitle-overlay" aria-live="polite">
+            <div class="subtitle-bubble" id="subtitle-bubble" style="display:none;">
+              <span class="subtitle-text" id="subtitle-text"></span>
+            </div>
+          </div>
+
           <!-- 自訂高質感 Antigravity 播放控制列 -->
           <div class="custom-player-controls" id="custom-player-controls">
             <!-- 進度條 -->
@@ -218,6 +225,11 @@
                   </button>
                   <input type="range" class="custom-volume-slider" id="ctrl-volume-slider" min="0" max="100" value="100" oninput="changeVolume(this.value)" />
                 </div>
+                <button class="custom-ctrl-btn active" id="ctrl-cc-btn" onclick="toggleSubtitles()" title="字幕開關 (C)">
+                  <svg id="ctrl-icon-cc" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H5V6h14v12zM7 15h3c.55 0 1-.45 1-1v-1H9.5v.5h-2v-3h2v.5H11v-1c0-.55-.45-1-1-1H7c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1zm7 0h3c.55 0 1-.45 1-1v-1h-1.5v.5h-2v-3h2v.5H18v-1c0-.55-.45-1-1-1h-3c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1z"/>
+                  </svg>
+                </button>
                 <button class="custom-ctrl-btn" id="ctrl-fullscreen-btn" onclick="toggleFullscreen()" title="全螢幕">
                   <svg id="ctrl-icon-fullscreen-enter" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                   <svg id="ctrl-icon-fullscreen-exit" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/></svg>

@@ -1,0 +1,65 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.480
+Hello everyone today I'll introduce my Antigravity IDE setup
+
+2
+00:00:05.480 --> 00:00:08.540
+First of all my vision for this IDE
+
+3
+00:00:08.540 --> 00:00:12.620
+is to build it into an all-in-one multimedia development center
+
+4
+00:00:12.620 --> 00:00:15.020
+meaning this is a versatile
+
+5
+00:00:15.020 --> 00:00:17.260
+multi-project centralized workspace
+
+6
+00:00:17.740 --> 00:00:19.620
+Taking game development as an example
+
+7
+00:00:19.620 --> 00:00:22.220
+it involves many distinct workflows
+
+8
+00:00:22.220 --> 00:00:24.660
+and when working within the IDE
+
+9
+00:00:24.660 --> 00:00:27.900
+it can be organized into distinct folders for management
+
+10
+00:00:27.900 --> 00:00:33.180
+Here I structured multiple project folders for a streamlined pipeline
+
+11
+00:00:33.180 --> 00:00:36.640
+where each workspace has its dedicated AI folder
+
+12
+00:00:36.640 --> 00:00:40.400
+to manage AI Rules and Skills
+
+13
+00:00:40.400 --> 00:00:42.520
+However during actual production
+
+14
+00:00:42.520 --> 00:00:48.080
+relying solely on the vanilla IDE with AI for planning and creation
+
+15
+00:00:48.080 --> 00:00:51.060
+revealed many friction points and limitations
+
+16
+00:00:51.060 --> 00:00:55.140
+So I built several native tools to solve these workflow challenges

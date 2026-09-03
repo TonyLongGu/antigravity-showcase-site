@@ -41,6 +41,7 @@ const I18N = {
     section_video_title: '精選影音示範與實戰教學',
     section_video_desc: '透過生動詳細的影片解說，快速掌握 Antigravity IDE 擴充套件的最佳實踐與操作技巧。',
     video_playlist_prompt: '點擊切換各主題與插件教學影片：',
+    ctrl_cc_title: '字幕開關 (C)',
     
     nav_author: '關於作者',
     section_author_tag: '開發者簡介',
@@ -157,6 +158,7 @@ const I18N = {
     section_video_title: 'Featured Video Walkthroughs',
     section_video_desc: 'Master Antigravity IDE native extensions with step-by-step video tutorials and real-world workflows.',
     video_playlist_prompt: 'Click to switch tutorial video topics & plugins:',
+    ctrl_cc_title: 'Toggle Subtitles (C)',
     
     section_author_tag: 'Developer Profile',
     section_author_title: 'About the Creator',
@@ -251,6 +253,9 @@ function setLanguage(lang) {
   if (typeof initVideoShowcase === 'function') {
     initVideoShowcase(true);
   }
+  if (typeof SubtitleManager !== 'undefined' && typeof currentActiveVideoId !== 'undefined') {
+    SubtitleManager.load(currentActiveVideoId, lang);
+  }
 }
 
 function toggleLanguage() {
@@ -276,5 +281,10 @@ function updateDOMTranslations() {
   const langBtn = document.getElementById('btn-lang-toggle');
   if (langBtn) {
     langBtn.textContent = currentLang === 'zh-TW' ? 'EN' : '繁中';
+  }
+
+  const ccBtn = document.getElementById('ctrl-cc-btn');
+  if (ccBtn) {
+    ccBtn.setAttribute('title', t('ctrl_cc_title'));
   }
 }

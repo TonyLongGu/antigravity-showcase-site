@@ -1,0 +1,97 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:02.090
+In Antigravity IDE
+
+2
+00:00:02.090 --> 00:00:05.320
+we can install many MCP tools
+
+3
+00:00:05.320 --> 00:00:08.120
+to help control different external software
+
+4
+00:00:08.420 --> 00:00:11.080
+However after installing MCP tools
+
+5
+00:00:11.080 --> 00:00:14.080
+they are usually enabled by default
+
+6
+00:00:14.420 --> 00:00:16.340
+which leads to an issue
+
+7
+00:00:16.800 --> 00:00:19.290
+every time we chat with AI
+
+8
+00:00:19.290 --> 00:00:24.520
+the system automatically injects all MCP definitions into context
+
+9
+00:00:24.520 --> 00:00:26.820
+consuming extra AI token quota
+
+10
+00:00:26.820 --> 00:00:28.350
+In light of this problem
+
+11
+00:00:28.350 --> 00:00:31.610
+when specific MCP tools are not needed
+
+12
+00:00:31.610 --> 00:00:33.320
+we should turn them off
+
+13
+00:00:33.320 --> 00:00:35.100
+to effectively reduce token usage
+
+14
+00:00:35.100 --> 00:00:40.390
+While Antigravity IDE natively provides toggles for settings
+
+15
+00:00:40.390 --> 00:00:42.940
+the built-in panel occasionally runs into bugs—
+
+16
+00:00:42.940 --> 00:00:47.100
+such as failing to list all installed MCP tools
+
+17
+00:00:47.100 --> 00:00:50.520
+or disappearing entirely when checking connection errors
+
+18
+00:00:50.520 --> 00:00:55.400
+To solve this I developed a dedicated native MCP Manager extension
+
+19
+00:00:55.680 --> 00:00:59.380
+Once installed it displays in the IDE left sidebar
+
+20
+00:00:59.380 --> 00:01:01.480
+providing many practical workflow features
+
+21
+00:01:01.880 --> 00:01:04.160
+You can test connection health with 1-click
+
+22
+00:01:04.160 --> 00:01:07.200
+or toggle all servers ON or OFF instantly
+
+23
+00:01:07.560 --> 00:01:11.330
+This way during different AI tasks and conversations
+
+24
+00:01:11.330 --> 00:01:14.920
+we can quickly enable or disable the corresponding MCP tools

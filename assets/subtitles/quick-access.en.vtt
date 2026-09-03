@@ -1,0 +1,89 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:05.090
+Here we introduce the features and workflow of Quick Access & Staging
+
+2
+00:00:05.090 --> 00:00:07.320
+In our massive project structures
+
+3
+00:00:07.320 --> 00:00:11.660
+the file explorer contains deeply nested folder hierarchies
+
+4
+00:00:11.660 --> 00:00:15.580
+When we need to frequently edit specific files
+
+5
+00:00:15.580 --> 00:00:18.220
+we often have to dig deep through directories to find them
+
+6
+00:00:18.600 --> 00:00:22.040
+and once folders are collapsed to look for other files
+
+7
+00:00:22.040 --> 00:00:25.320
+recently edited paths are difficult to relocate
+
+8
+00:00:25.320 --> 00:00:27.060
+causing workflow interruptions and friction
+
+9
+00:00:27.060 --> 00:00:28.720
+To solve this pain point
+
+10
+00:00:28.720 --> 00:00:31.150
+I developed this Quick Access & Staging tool
+
+11
+00:00:31.150 --> 00:00:35.860
+Simply select common files in the explorer and right-click
+
+12
+00:00:35.860 --> 00:00:40.460
+to choose 'Add to Staging' or 'Pin as Favorite
+
+13
+00:00:40.820 --> 00:00:43.370
+After adding expand the toolbar panel below
+
+14
+00:00:43.370 --> 00:00:48.040
+and you can clearly see these files gathered in the staging area
+
+15
+00:00:48.040 --> 00:00:52.560
+making it effortless to jump back to active files anytime
+
+16
+00:00:52.560 --> 00:00:55.420
+Furthermore this tool supports very convenient interactions
+
+17
+00:00:55.420 --> 00:00:59.160
+You can drag files directly from the list into the AI chat box
+
+18
+00:00:59.160 --> 00:01:02.210
+to quickly inject file context
+
+19
+00:01:02.210 --> 00:01:04.680
+and right-clicking any item in the list
+
+20
+00:01:05.020 --> 00:01:08.240
+not only reveals the file in the file explorer with 1-click
+
+21
+00:01:08.240 --> 00:01:12.760
+but also lets you toggle between pinned favorites and temporary staging
+
+22
+00:01:13.120 --> 00:01:16.380
+greatly boosting productivity in multi-file collaborative workflows
