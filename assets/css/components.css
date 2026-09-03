@@ -1143,7 +1143,7 @@ body.has-web-fullscreen .video-showcase-wrapper {
   pointer-events: auto;
 }
 
-/* 播放中靜止自動隱藏：隱藏游標與控制列（懸停於控制列時永不強制隱藏） */
+/* 播放中靜止自動隱藏：隱藏游標與控制列 */
 .video-player-container.hide-ui:not(.paused) {
   cursor: none !important;
 }
@@ -1152,15 +1152,33 @@ body.has-web-fullscreen .video-showcase-wrapper {
   cursor: none !important;
 }
 
-.video-player-container.hide-ui:not(.paused) .custom-player-controls:hover,
-.video-player-container.hide-ui:not(.paused) .custom-player-controls:hover * {
-  cursor: default !important;
-}
-
-.video-player-container.hide-ui:not(.paused) .custom-player-controls:not(:hover) {
+/* 播放中靜止自動隱藏：控制列預設直接透明收合（手機觸控 100% 平滑隱藏，不受 Sticky Hover 阻擋） */
+.video-player-container.hide-ui:not(.paused) .custom-player-controls:not(.visible) {
   opacity: 0 !important;
   transform: translateY(12px) !important;
   pointer-events: none !important;
+}
+
+/* 僅在支援真正滑鼠懸停 (hover: hover) 的桌面設備上，滑鼠移至控制列才保持顯示 */
+@media (hover: hover) and (pointer: fine) {
+  .video-player-container.hide-ui:not(.paused) .custom-player-controls:hover {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+    cursor: default !important;
+  }
+  .video-player-container.hide-ui:not(.paused) .custom-player-controls:hover * {
+    cursor: default !important;
+  }
+}
+
+/* 消除手機點選控制按鈕時殘留的高亮外框（保留鍵盤使用者的 focus-visible） */
+.custom-ctrl-btn:focus:not(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+.custom-ctrl-btn {
+  -webkit-tap-highlight-color: transparent; /* 消除行動端點擊灰色高亮方塊 */
 }
 
 /* 進度條容器與擴大命中熱區 */

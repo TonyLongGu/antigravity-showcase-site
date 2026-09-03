@@ -378,8 +378,21 @@ const SubtitleManager = {
   }
 };
 
+let isMouseHoveringControls = false;
+
+function blurActiveControl() {
+  // 延遲微任務，讓原生事件派發完畢後立即解除焦點，消除手機觸控殘留的外框 (Focus Ring)
+  requestAnimationFrame(() => {
+    const el = document.activeElement;
+    if (el && (el.classList?.contains('custom-ctrl-btn') || el.id?.startsWith('ctrl-') || el.closest?.('.custom-player-controls'))) {
+      if (typeof el.blur === 'function') el.blur();
+    }
+  });
+}
+
 function toggleSubtitles() {
   SubtitleManager.toggle();
+  blurActiveControl();
 }
 
 window.onYouTubeIframeAPIReady = function() {
@@ -422,10 +435,16 @@ function hidePlayerUI() {
   const dom = getPlayerDOM();
   if (!dom.container || !dom.controls) return;
 
-  // 僅在播放中、未拖曳進度條、且滑鼠未懸停在控制列上時才隱藏
-  if (isPlaying && !isDraggingProgress && !dom.controls.matches(':hover')) {
+  // 僅在桌面環境且有真正的滑鼠懸停在控制列上時，才阻止自動隱藏
+  // 手機/平板觸控裝置絕不受 Sticky Hover 阻礙，時間到期強制平滑隱藏！
+  const isRealMouseHover = isMouseHoveringControls && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  if (isPlaying && !isDraggingProgress && !isRealMouseHover) {
     dom.container.classList.add('hide-ui');
     dom.controls.classList.remove('visible');
+
+    // 隱藏時主動釋放控制列內殘留的焦點，消除手機外框
+    blurActiveControl();
   }
 }
 
@@ -523,6 +542,8 @@ function toggleCustomPlayer() {
       dom.badge.classList.remove('flash');
     }, 300);
   }
+
+  blurActiveControl();
 }
 
 function toggleMute() {
@@ -565,6 +586,7 @@ function toggleMute() {
     }
   }
   wakePlayerUI();
+  blurActiveControl();
 }
 
 function updateVolumeSliderUI(val) {
@@ -648,6 +670,7 @@ function enterWebFullscreen() {
   tryLockLandscape();
   isDraggingProgress = false;
   wakePlayerUI();
+  blurActiveControl();
 }
 
 function exitWebFullscreen() {
@@ -667,13 +690,8 @@ function exitWebFullscreen() {
 
   tryUnlockOrientation();
 
-  // 釋放全螢幕按鈕焦點
-  const fsBtn = document.getElementById('ctrl-fullscreen-btn');
-  if (fsBtn && (document.activeElement === fsBtn || container.contains(document.activeElement))) {
-    if (document.activeElement && typeof document.activeElement.blur === 'function') {
-      document.activeElement.blur();
-    }
-  }
+  // 釋放全螢幕按鈕焦點，消除手機外框
+  blurActiveControl();
 
   // 退出時瞬間校準置中
   requestAnimationFrame(() => {
@@ -731,13 +749,7 @@ function updateFullscreenState() {
 
   // 退出全螢幕時的焦點釋放與無縫就位保障
   if (!isFs) {
-    // 1. 釋放全螢幕按鈕焦點，避免瀏覽器在恢復排版時強制滾動貼齊右下角按鈕
-    const fsBtn = document.getElementById('ctrl-fullscreen-btn');
-    if (fsBtn && (document.activeElement === fsBtn || (container && container.contains(document.activeElement)))) {
-      if (document.activeElement && typeof document.activeElement.blur === 'function') {
-        document.activeElement.blur();
-      }
-    }
+    blurActiveControl();
 
     // 2. 備用校準：以 instant (無動畫) 確保精準居中，徹底杜絕縮回後的二次滑動感
     requestAnimationFrame(() => {
@@ -753,6 +765,7 @@ function updateFullscreenState() {
 
   isDraggingProgress = false;
   wakePlayerUI();
+  blurActiveControl();
 }
 
 function toggleFullscreen() {
@@ -825,6 +838,7 @@ function toggleFullscreen() {
     console.warn('Native fullscreen exception, fallback to web fullscreen:', err);
     enterWebFullscreen();
   }
+  blurActiveControl();
 }
 
 let justDraggedProgress = false;
@@ -1013,11 +1027,19 @@ function initCustomVideoPlayer() {
   container.addEventListener('touchstart', wakePlayerUI, { passive: true });
   container.addEventListener('mouseleave', () => {
     clearTimeout(controlsHideTimer);
-    if (isPlaying && !isDraggingProgress && !controls.matches(':hover')) {
+    if (isPlaying && !isDraggingProgress && !isMouseHoveringControls) {
       controlsHideTimer = setTimeout(() => {
         hidePlayerUI();
       }, 500);
     }
+  });
+
+  // 精準追蹤桌面滑鼠的真實懸停（過濾觸控 touch，避免手機 sticky hover 阻擋自動隱藏）
+  controls.addEventListener('pointerenter', (e) => {
+    if (e.pointerType === 'mouse') isMouseHoveringControls = true;
+  });
+  controls.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'mouse') isMouseHoveringControls = false;
   });
 
   // 點擊容器時自動聚焦，確保滑鼠移出後鍵盤快捷鍵（如 Space）依然能精準控制且不發生全頁跳躍式滾動
