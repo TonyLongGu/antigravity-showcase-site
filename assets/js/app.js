@@ -392,19 +392,87 @@ function changeVolume(val) {
   wakePlayerUI();
 }
 
+let isWebFullscreen = false;
+
+function enterWebFullscreen() {
+  const container = document.getElementById('main-video-player');
+  const fsEnter = document.getElementById('ctrl-icon-fullscreen-enter');
+  const fsExit = document.getElementById('ctrl-icon-fullscreen-exit');
+  if (!container) return;
+
+  isWebFullscreen = true;
+  container.classList.add('is-web-fullscreen');
+  document.body.classList.add('has-web-fullscreen');
+
+  if (fsEnter && fsExit) {
+    fsEnter.style.display = 'none';
+    fsExit.style.display = 'block';
+  }
+
+  isDraggingProgress = false;
+  wakePlayerUI();
+}
+
+function exitWebFullscreen() {
+  const container = document.getElementById('main-video-player');
+  const fsEnter = document.getElementById('ctrl-icon-fullscreen-enter');
+  const fsExit = document.getElementById('ctrl-icon-fullscreen-exit');
+  if (!container) return;
+
+  isWebFullscreen = false;
+  container.classList.remove('is-web-fullscreen');
+  document.body.classList.remove('has-web-fullscreen');
+
+  if (fsEnter && fsExit) {
+    fsEnter.style.display = 'block';
+    fsExit.style.display = 'none';
+  }
+
+  // 釋放全螢幕按鈕焦點
+  const fsBtn = document.getElementById('ctrl-fullscreen-btn');
+  if (fsBtn && (document.activeElement === fsBtn || container.contains(document.activeElement))) {
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+  }
+
+  // 退出時瞬間校準置中
+  requestAnimationFrame(() => {
+    if (container) {
+      container.scrollIntoView({
+        behavior: 'instant',
+        block: 'center',
+        inline: 'nearest'
+      });
+    }
+  });
+
+  isDraggingProgress = false;
+  wakePlayerUI();
+}
+
 function updateFullscreenState() {
   const container = document.getElementById('main-video-player');
   const fsEnter = document.getElementById('ctrl-icon-fullscreen-enter');
   const fsExit = document.getElementById('ctrl-icon-fullscreen-exit');
-  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+  const isNativeFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
 
   if (container) {
-    if (isFs) {
+    if (isNativeFs) {
       container.classList.add('is-fullscreen');
     } else {
       container.classList.remove('is-fullscreen');
     }
   }
+
+  // 若退出原生全螢幕，同步清除 web 全螢幕殘留狀態
+  if (!isNativeFs && isWebFullscreen) {
+    isWebFullscreen = false;
+    if (container) container.classList.remove('is-web-fullscreen');
+    document.body.classList.remove('has-web-fullscreen');
+  }
+
+  const isFs = isNativeFs || isWebFullscreen;
 
   if (fsEnter && fsExit) {
     if (isFs) {
@@ -446,27 +514,15 @@ function toggleFullscreen() {
   const container = document.getElementById('main-video-player');
   if (!container) return;
 
-  const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+  // 1. 若當前已處於 Web 視窗滿版全螢幕模式，立即退出
+  if (isWebFullscreen) {
+    exitWebFullscreen();
+    return;
+  }
 
-  if (!isFs) {
-    // 方案 A：進入全螢幕前預先瞬間置中
-    // 瀏覽器記錄的捲動還原點即為正中央，當按下 ESC 退出時原生還原即在中心，零延遲、零位移
-    container.scrollIntoView({
-      behavior: 'instant',
-      block: 'center',
-      inline: 'nearest'
-    });
-
-    if (container.requestFullscreen) {
-      container.requestFullscreen().catch(err => console.warn(err));
-    } else if (container.webkitRequestFullscreen) {
-      container.webkitRequestFullscreen();
-    } else if (container.mozRequestFullScreen) {
-      container.mozRequestFullScreen();
-    } else if (container.msRequestFullscreen) {
-      container.msRequestFullscreen();
-    }
-  } else {
+  // 2. 若當前已處於原生全螢幕模式，調用原生退出
+  const isNativeFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+  if (isNativeFs) {
     if (document.exitFullscreen) {
       document.exitFullscreen().catch(err => console.warn(err));
     } else if (document.webkitExitFullscreen) {
@@ -476,6 +532,53 @@ function toggleFullscreen() {
     } else if (document.msExitFullscreen) {
       document.msExitFullscreen();
     }
+    return;
+  }
+
+  // 3. 進入全螢幕檢測：檢查環境是否具備原生 Fullscreen API
+  // 在 iPhone (iOS Safari) 與部分社群 App 內嵌 WebView (LINE / FB / IG) 中，一般 div 不支援原生全螢幕
+  const hasNativeFsSupport = typeof (
+    container.requestFullscreen ||
+    container.webkitRequestFullscreen ||
+    container.mozRequestFullScreen ||
+    container.msRequestFullscreen
+  ) === 'function' && document.fullscreenEnabled !== false;
+
+  if (!hasNativeFsSupport) {
+    // 行動端無痛切換至 Web 視窗滿版全螢幕
+    enterWebFullscreen();
+    return;
+  }
+
+  // 4. 支援原生全螢幕之環境（桌機、Android Chrome、iPad 等）：
+  // 進入全螢幕前預先瞬間置中（方案 A）
+  container.scrollIntoView({
+    behavior: 'instant',
+    block: 'center',
+    inline: 'nearest'
+  });
+
+  try {
+    if (container.requestFullscreen) {
+      const p = container.requestFullscreen();
+      if (p && p.catch) {
+        p.catch(err => {
+          console.warn('Native requestFullscreen denied, fallback to web fullscreen:', err);
+          enterWebFullscreen();
+        });
+      }
+    } else if (container.webkitRequestFullscreen) {
+      container.webkitRequestFullscreen();
+    } else if (container.mozRequestFullScreen) {
+      container.mozRequestFullScreen();
+    } else if (container.msRequestFullscreen) {
+      container.msRequestFullscreen();
+    } else {
+      enterWebFullscreen();
+    }
+  } catch (err) {
+    console.warn('Native fullscreen exception, fallback to web fullscreen:', err);
+    enterWebFullscreen();
   }
 }
 
@@ -693,9 +796,16 @@ function initCustomVideoPlayer() {
 
   // 全域/播放器鍵盤快捷鍵 (全螢幕或播放中均可極速操控)
   document.addEventListener('keydown', (e) => {
-    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    const isNativeFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    const isFs = isNativeFs || isWebFullscreen;
     const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
     if (isInput) return;
+
+    if (e.key === 'Escape' && isWebFullscreen) {
+      e.preventDefault();
+      exitWebFullscreen();
+      return;
+    }
 
     const isHovered = container.matches(':hover');
     if (!isFs && !isHovered) return;
