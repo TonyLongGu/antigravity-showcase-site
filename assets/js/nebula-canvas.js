@@ -121,9 +121,12 @@
     }
   }
 
-  let animationFrameId;
+  let isPaused = false;
+  let animationFrameId = null;
 
   function animate() {
+    if (isPaused) return;
+
     ctx.clearRect(0, 0, width, height);
 
     for (let p of particles) {
@@ -137,13 +140,36 @@
     animationFrameId = requestAnimationFrame(animate);
   }
 
+  function pause() {
+    if (isPaused) return;
+    isPaused = true;
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  }
+
+  function resume() {
+    if (!isPaused) return;
+    isPaused = false;
+    if (!document.hidden) {
+      animate();
+    }
+  }
+
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
     } else {
-      animate();
+      if (!isPaused) animate();
     }
   });
 
+  window.NebulaEngine = {
+    pause,
+    resume
+  };
+
   animate();
 })();
+

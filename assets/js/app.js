@@ -195,10 +195,18 @@ function getPlayerDOM() {
       subtitleOverlay: document.getElementById('player-subtitle-overlay'),
       subtitleBubble: document.getElementById('subtitle-bubble'),
       subtitleText: document.getElementById('subtitle-text'),
-      ccBtn: document.getElementById('ctrl-cc-btn')
+      ccBtn: document.getElementById('ctrl-cc-btn'),
+      bufferingIndicator: document.getElementById('player-buffering-indicator')
     };
   }
   return domCache;
+}
+
+function showBufferingIndicator(show) {
+  const dom = getPlayerDOM();
+  if (dom && dom.bufferingIndicator) {
+    dom.bufferingIndicator.style.display = show ? 'flex' : 'none';
+  }
 }
 
 function getCurrentPlaybackTime() {
@@ -419,8 +427,12 @@ function wakePlayerUI() {
   const dom = getPlayerDOM();
   if (!dom.container || !dom.controls) return;
 
-  dom.container.classList.remove('hide-ui');
-  dom.controls.classList.add('visible');
+  if (dom.container.classList.contains('hide-ui')) {
+    dom.container.classList.remove('hide-ui');
+  }
+  if (!dom.controls.classList.contains('visible')) {
+    dom.controls.classList.add('visible');
+  }
 
   clearTimeout(controlsHideTimer);
 
@@ -487,9 +499,8 @@ function onYtPlayerStateChange(event) {
 }
 
 function toggleCustomPlayer() {
-  // 防止進度條拖曳後的 ghost click、拖曳中的穿透、以及 seek 過程中的誤觸
+  // 防止進度條拖曳後的 ghost click 與拖曳中的穿透
   if (justDraggedProgress || isDraggingProgress) return;
-  if (html5VideoEl && html5VideoEl.seeking) return;
   const dom = getPlayerDOM();
 
   if (currentVideoMode === 'html5') {
@@ -503,6 +514,7 @@ function toggleCustomPlayer() {
           console.warn('HTML5 Video Play:', e);
           isPlaying = false;
           updatePlayPauseUI(false);
+          showBufferingIndicator(false);
         });
       }
       isPlaying = true;
@@ -513,6 +525,7 @@ function toggleCustomPlayer() {
     } else {
       html5VideoEl.pause();
       isPlaying = false;
+      showBufferingIndicator(false);
       if (dom.badgePlay) dom.badgePlay.style.display = 'none';
       if (dom.badgePause) dom.badgePause.style.display = 'block';
       updatePlayPauseUI(false);
@@ -743,8 +756,14 @@ function updateFullscreenState() {
 
   if (isFs) {
     tryLockLandscape();
+    if (window.NebulaEngine && typeof window.NebulaEngine.pause === 'function') {
+      window.NebulaEngine.pause();
+    }
   } else {
     tryUnlockOrientation();
+    if (window.NebulaEngine && typeof window.NebulaEngine.resume === 'function') {
+      window.NebulaEngine.resume();
+    }
   }
 
   // 退出全螢幕時的焦點釋放與無縫就位保障
@@ -990,7 +1009,7 @@ function initCustomVideoPlayer() {
     }, 120);
   });
 
-  // HTML5 Video 原生事件監聽
+  // HTML5 Video 原生事件監聽與緩衝狀態管理
   if (html5VideoEl) {
     html5VideoEl.addEventListener('timeupdate', updateTimeAndDuration);
     html5VideoEl.addEventListener('loadedmetadata', updateTimeAndDuration);
@@ -1002,14 +1021,37 @@ function initCustomVideoPlayer() {
     html5VideoEl.addEventListener('pause', () => {
       isPlaying = false;
       updatePlayPauseUI(false);
+      showBufferingIndicator(false);
     });
     html5VideoEl.addEventListener('ended', () => {
       isPlaying = false;
       updatePlayPauseUI(false);
+      showBufferingIndicator(false);
+    });
+    html5VideoEl.addEventListener('waiting', () => {
+      showBufferingIndicator(true);
+    });
+    html5VideoEl.addEventListener('playing', () => {
+      showBufferingIndicator(false);
+      isPlaying = true;
+      updatePlayPauseUI(true);
+    });
+    html5VideoEl.addEventListener('canplay', () => {
+      showBufferingIndicator(false);
+    });
+    html5VideoEl.addEventListener('seeking', () => {
+      showBufferingIndicator(true);
+    });
+    html5VideoEl.addEventListener('seeked', () => {
+      showBufferingIndicator(false);
+    });
+    html5VideoEl.addEventListener('stalled', () => {
+      showBufferingIndicator(true);
     });
 
     // 容錯降級：若 HTML5 載入失敗（格式不支援或檔案異常），平滑切換至 YouTube 備用播放
     html5VideoEl.addEventListener('error', (e) => {
+      showBufferingIndicator(false);
       console.warn('HTML5 Video 解碼或載入失敗，自動降級切換至 YouTube 備援線路', e);
       const videoList = getTutorialVideosList();
       const videoItem = videoList.find(v => v.id === currentActiveVideoId);
@@ -1020,11 +1062,19 @@ function initCustomVideoPlayer() {
     });
   }
 
-  // 控制列與滑鼠游標喚醒/自動隱藏監聽
-  container.addEventListener('mousemove', wakePlayerUI);
-  container.addEventListener('pointermove', wakePlayerUI);
-  container.addEventListener('mouseenter', wakePlayerUI);
-  container.addEventListener('touchstart', wakePlayerUI, { passive: true });
+  // 控制列與滑鼠游標喚醒/自動隱藏監聽 (以 requestAnimationFrame 節流高輪詢率滑鼠)
+  let wakeRafId = null;
+  const throttledWakePlayerUI = () => {
+    if (wakeRafId) return;
+    wakeRafId = requestAnimationFrame(() => {
+      wakePlayerUI();
+      wakeRafId = null;
+    });
+  };
+
+  container.addEventListener('pointermove', throttledWakePlayerUI);
+  container.addEventListener('pointerenter', throttledWakePlayerUI);
+  container.addEventListener('touchstart', throttledWakePlayerUI, { passive: true });
   container.addEventListener('mouseleave', () => {
     clearTimeout(controlsHideTimer);
     if (isPlaying && !isDraggingProgress && !isMouseHoveringControls) {
@@ -1106,13 +1156,14 @@ function initCustomVideoPlayer() {
   });
 
   // click-surface 使用 pointerdown+pointerup 精確判定「有意按下並釋放」才觸發播放/暫停
-  // 同時支援快速雙擊（Double Click/Tap）平滑切換全螢幕手勢
+  // 雙擊防競態：利用 260ms 計時器解耦單擊與雙擊，徹底杜絕快速點擊產生的 Play Promise 中斷報錯
   const clickSurface = dom.clickSurface || document.getElementById('player-click-surface');
   if (clickSurface) {
     let surfacePointerDownTime = 0;
     let surfacePointerDownX = 0;
     let surfacePointerDownY = 0;
     let lastTapTime = 0;
+    let singleTapTimer = null;
 
     clickSurface.addEventListener('pointerdown', (e) => {
       surfacePointerDownTime = Date.now();
@@ -1127,14 +1178,21 @@ function initCustomVideoPlayer() {
       // 僅在快速按下並釋放（<400ms）且未移動（<10px）時才視為有效手勢
       if (dt < 400 && dx < 10 && dy < 10) {
         const now = Date.now();
-        if (now - lastTapTime < 320) {
-          // 雙擊全螢幕：抵消第一次點擊的播放反轉並切換全螢幕
+        if (now - lastTapTime < 280) {
+          // 雙擊全螢幕：立即取消待執行的單擊播放/暫停，平滑切換全螢幕，零播放衝突
           lastTapTime = 0;
-          toggleCustomPlayer(); // 復原第一次單擊造成的暫停/播放反轉
+          if (singleTapTimer) {
+            clearTimeout(singleTapTimer);
+            singleTapTimer = null;
+          }
           toggleFullscreen();
         } else {
           lastTapTime = now;
-          toggleCustomPlayer();
+          if (singleTapTimer) clearTimeout(singleTapTimer);
+          singleTapTimer = setTimeout(() => {
+            toggleCustomPlayer();
+            singleTapTimer = null;
+          }, 260);
         }
       }
     });
@@ -1380,6 +1438,7 @@ function switchTutorialVideo(videoId) {
   isPlaying = false;
   clearTimeout(controlsHideTimer);
   updatePlayPauseUI(false);
+  showBufferingIndicator(false);
 
   if (dom.filledBar) dom.filledBar.style.width = '0%';
   if (dom.thumbEl) dom.thumbEl.style.left = '0%';

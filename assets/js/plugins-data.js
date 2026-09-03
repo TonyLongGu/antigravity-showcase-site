@@ -21,7 +21,7 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-ai-context-inspector`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-ai-context-inspector && .\\install-extension.bat',
-    videoSrc: 'assets/videos/ai-context-inspector.mov',
+    videoSrc: 'assets/videos/ai-context-inspector.mp4',
     videoUrl: 'https://youtu.be/LbbEhPD-LE0',
     videoEmbedUrl: 'https://www.youtube.com/embed/LbbEhPD-LE0',
     name: {
@@ -62,7 +62,7 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-mcp-manager`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-mcp-manager && .\\install-extension.bat',
-    videoSrc: 'assets/videos/mcp-manager.mov',
+    videoSrc: 'assets/videos/mcp-manager.mp4',
     videoUrl: 'https://youtu.be/zJDDg9SsjQI',
     videoEmbedUrl: 'https://www.youtube.com/embed/zJDDg9SsjQI',
     name: {
@@ -103,7 +103,7 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quick-access`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-quick-access && .\\install-extension.bat',
-    videoSrc: 'assets/videos/quick-access.mov',
+    videoSrc: 'assets/videos/quick-access.mp4',
     videoUrl: 'https://youtu.be/7sCUQ5e8VEE',
     videoEmbedUrl: 'https://www.youtube.com/embed/7sCUQ5e8VEE',
     name: {
@@ -148,7 +148,7 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quota-status`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-quota-status && .\\install-extension.bat',
-    videoSrc: 'assets/videos/quota-status.mov',
+    videoSrc: 'assets/videos/quota-status.mp4',
     videoUrl: 'https://youtu.be/NLgUHA1G-Kw',
     videoEmbedUrl: 'https://www.youtube.com/embed/NLgUHA1G-Kw',
     name: {
@@ -220,7 +220,7 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-script-runner && .\\install-extension.bat',
-    videoSrc: 'assets/videos/script-runner.mov',
+    videoSrc: 'assets/videos/script-runner.mp4',
     videoUrl: 'https://youtu.be/ibyt48Tulu4',
     videoEmbedUrl: 'https://www.youtube.com/embed/ibyt48Tulu4',
     name: {
@@ -281,7 +281,7 @@ const PLUGINS_DATA = [
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-toolbox`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
     installCmd: 'cd antigravity-toolbox && .\\install-extension.bat',
-    videoSrc: 'assets/videos/toolbox.mov',
+    videoSrc: 'assets/videos/toolbox.mp4',
     videoUrl: 'https://youtu.be/OSNrBl1BBCo',
     videoEmbedUrl: 'https://www.youtube.com/embed/OSNrBl1BBCo',
     name: {
@@ -332,7 +332,7 @@ const TUTORIAL_VIDEOS = [
       'en': 'In-depth breakdown of Antigravity native extensions philosophy: minimal footprint, seamless IDE integration, and AI-driven workflows.'
     },
     icon: 'assets/icons/philosophy.svg?v=2',
-    videoSrc: 'assets/videos/design-philosophy.mov',
+    videoSrc: 'assets/videos/design-philosophy.mp4',
     videoUrl: 'https://youtu.be/HSYWa4WkBe0',
     videoEmbedUrl: 'https://www.youtube.com/embed/HSYWa4WkBe0'
   },
