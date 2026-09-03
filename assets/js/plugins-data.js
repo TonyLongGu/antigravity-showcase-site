@@ -23,7 +23,7 @@ const PLUGINS_DATA = [
     installCmd: 'cd antigravity-ai-context-inspector && .\\install-extension.bat',
     videoSrc: 'assets/videos/ai-context-inspector.mov',
     videoUrl: 'https://youtu.be/LbbEhPD-LE0',
-    videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
+    videoEmbedUrl: 'https://www.youtube.com/embed/LbbEhPD-LE0',
     name: {
       'zh-TW': 'AI 上下文檢視器 (AI Context Inspector)',
       'en': 'AI Context Inspector'
@@ -64,7 +64,7 @@ const PLUGINS_DATA = [
     installCmd: 'cd antigravity-mcp-manager && .\\install-extension.bat',
     videoSrc: 'assets/videos/mcp-manager.mov',
     videoUrl: 'https://youtu.be/zJDDg9SsjQI',
-    videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
+    videoEmbedUrl: 'https://www.youtube.com/embed/zJDDg9SsjQI',
     name: {
       'zh-TW': 'Antigravity MCP 管理儀表板 (MCP Manager)',
       'en': 'Antigravity MCP Manager Dashboard'
@@ -105,7 +105,7 @@ const PLUGINS_DATA = [
     installCmd: 'cd antigravity-quick-access && .\\install-extension.bat',
     videoSrc: 'assets/videos/quick-access.mov',
     videoUrl: 'https://youtu.be/7sCUQ5e8VEE',
-    videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
+    videoEmbedUrl: 'https://www.youtube.com/embed/7sCUQ5e8VEE',
     name: {
       'zh-TW': '常用捷徑與暫存清單 (Quick Access)',
       'en': 'Quick Access & Scratchpad'
@@ -150,7 +150,7 @@ const PLUGINS_DATA = [
     installCmd: 'cd antigravity-quota-status && .\\install-extension.bat',
     videoSrc: 'assets/videos/quota-status.mov',
     videoUrl: 'https://youtu.be/NLgUHA1G-Kw',
-    videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
+    videoEmbedUrl: 'https://www.youtube.com/embed/NLgUHA1G-Kw',
     name: {
       'zh-TW': 'AI 模型額度狀態監控 (Quota Status)',
       'en': 'AI Model Quota Status Monitor'
@@ -222,7 +222,7 @@ const PLUGINS_DATA = [
     installCmd: 'cd antigravity-script-runner && .\\install-extension.bat',
     videoSrc: 'assets/videos/script-runner.mov',
     videoUrl: 'https://youtu.be/ibyt48Tulu4',
-    videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
+    videoEmbedUrl: 'https://www.youtube.com/embed/ibyt48Tulu4',
     name: {
       'zh-TW': '腳本右鍵執行工具 (Script Runner)',
       'en': 'Context Script Runner'
@@ -283,7 +283,7 @@ const PLUGINS_DATA = [
     installCmd: 'cd antigravity-toolbox && .\\install-extension.bat',
     videoSrc: 'assets/videos/toolbox.mov',
     videoUrl: 'https://youtu.be/OSNrBl1BBCo',
-    videoEmbedUrl: 'https://www.youtube.com/embed/fgDIeYi-NCo',
+    videoEmbedUrl: 'https://www.youtube.com/embed/OSNrBl1BBCo',
     name: {
       'zh-TW': 'Antigravity 控制中心 (Toolbox)',
       'en': 'Antigravity Control Center (Toolbox)'

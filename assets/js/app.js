@@ -164,6 +164,39 @@ let updateProgressInterval = null;
 let controlsHideTimer = null;
 let isDraggingProgress = false;
 
+// DOM 元素快取物件，大幅降低每秒高頻 timeupdate 的 DOM 查詢與 GC 開銷
+let domCache = null;
+function getPlayerDOM() {
+  if (!domCache) {
+    domCache = {
+      container: document.getElementById('main-video-player'),
+      html5Video: document.getElementById('tutorial-html5-video'),
+      iframe: document.getElementById('tutorial-video-iframe'),
+      controls: document.getElementById('custom-player-controls'),
+      clickSurface: document.getElementById('player-click-surface'),
+      progContainer: document.getElementById('player-progress-container'),
+      filledBar: document.getElementById('player-progress-filled'),
+      thumbEl: document.getElementById('player-progress-thumb'),
+      bufBar: document.getElementById('player-progress-buffered'),
+      timeCurrent: document.getElementById('time-current'),
+      timeDuration: document.getElementById('time-duration'),
+      playIcon: document.getElementById('ctrl-icon-play'),
+      pauseIcon: document.getElementById('ctrl-icon-pause'),
+      volHigh: document.getElementById('ctrl-icon-vol-high'),
+      volMute: document.getElementById('ctrl-icon-vol-mute'),
+      volSlider: document.getElementById('ctrl-volume-slider'),
+      badge: document.getElementById('player-feedback-badge'),
+      badgePlay: document.getElementById('badge-icon-play'),
+      badgePause: document.getElementById('badge-icon-pause'),
+      fsEnter: document.getElementById('ctrl-icon-fullscreen-enter'),
+      fsExit: document.getElementById('ctrl-icon-fullscreen-exit'),
+      videoTitle: document.getElementById('tutorial-video-title'),
+      videoDesc: document.getElementById('tutorial-video-desc')
+    };
+  }
+  return domCache;
+}
+
 window.onYouTubeIframeAPIReady = function() {
   try {
     customYtPlayer = new YT.Player('tutorial-video-iframe', {
@@ -185,12 +218,11 @@ function onYtPlayerReady(event) {
 }
 
 function wakePlayerUI() {
-  const container = document.getElementById('main-video-player');
-  const controls = document.getElementById('custom-player-controls');
-  if (!container || !controls) return;
+  const dom = getPlayerDOM();
+  if (!dom.container || !dom.controls) return;
 
-  container.classList.remove('hide-ui');
-  controls.classList.add('visible');
+  dom.container.classList.remove('hide-ui');
+  dom.controls.classList.add('visible');
 
   clearTimeout(controlsHideTimer);
 
@@ -202,46 +234,50 @@ function wakePlayerUI() {
 }
 
 function hidePlayerUI() {
-  const container = document.getElementById('main-video-player');
-  const controls = document.getElementById('custom-player-controls');
-  if (!container || !controls) return;
+  const dom = getPlayerDOM();
+  if (!dom.container || !dom.controls) return;
 
-  // 僅在播放中且未拖曳進度條時才隱藏
-  if (isPlaying && !isDraggingProgress) {
-    container.classList.add('hide-ui');
-    controls.classList.remove('visible');
+  // 僅在播放中、未拖曳進度條、且滑鼠未懸停在控制列上時才隱藏
+  if (isPlaying && !isDraggingProgress && !dom.controls.matches(':hover')) {
+    dom.container.classList.add('hide-ui');
+    dom.controls.classList.remove('visible');
+  }
+}
+
+function updatePlayPauseUI(playing) {
+  const dom = getPlayerDOM();
+  if (playing) {
+    if (dom.playIcon) dom.playIcon.style.display = 'none';
+    if (dom.pauseIcon) dom.pauseIcon.style.display = 'block';
+    if (dom.controls) dom.controls.classList.remove('paused');
+    if (dom.container) dom.container.classList.remove('paused');
+    if (currentVideoMode === 'youtube') startProgressLoop();
+  } else {
+    clearTimeout(controlsHideTimer);
+    if (dom.playIcon) dom.playIcon.style.display = 'block';
+    if (dom.pauseIcon) dom.pauseIcon.style.display = 'none';
+    if (dom.controls) {
+      dom.controls.classList.add('paused');
+      dom.controls.classList.add('visible');
+    }
+    if (dom.container) {
+      dom.container.classList.add('paused');
+      dom.container.classList.remove('hide-ui');
+    }
+    stopProgressLoop();
   }
 }
 
 function onYtPlayerStateChange(event) {
   if (currentVideoMode !== 'youtube') return;
-  const playIcon = document.getElementById('ctrl-icon-play');
-  const pauseIcon = document.getElementById('ctrl-icon-pause');
-  const controls = document.getElementById('custom-player-controls');
-  const container = document.getElementById('main-video-player');
 
   if (event.data === YT.PlayerState.PLAYING) {
     isPlaying = true;
-    if (playIcon) playIcon.style.display = 'none';
-    if (pauseIcon) pauseIcon.style.display = 'block';
-    if (controls) controls.classList.remove('paused');
-    if (container) container.classList.remove('paused');
-    startProgressLoop();
+    updatePlayPauseUI(true);
     wakePlayerUI();
   } else {
     isPlaying = false;
-    clearTimeout(controlsHideTimer);
-    if (playIcon) playIcon.style.display = 'block';
-    if (pauseIcon) pauseIcon.style.display = 'none';
-    if (controls) {
-      controls.classList.add('paused');
-      controls.classList.add('visible');
-    }
-    if (container) {
-      container.classList.add('paused');
-      container.classList.remove('hide-ui');
-    }
-    stopProgressLoop();
+    updatePlayPauseUI(false);
     updateTimeAndDuration();
   }
 }
@@ -250,46 +286,32 @@ function toggleCustomPlayer() {
   // 防止進度條拖曳後的 ghost click、拖曳中的穿透、以及 seek 過程中的誤觸
   if (justDraggedProgress || isDraggingProgress) return;
   if (html5VideoEl && html5VideoEl.seeking) return;
-  const badge = document.getElementById('player-feedback-badge');
-  const badgePlay = document.getElementById('badge-icon-play');
-  const badgePause = document.getElementById('badge-icon-pause');
-  const playIcon = document.getElementById('ctrl-icon-play');
-  const pauseIcon = document.getElementById('ctrl-icon-pause');
-  const controls = document.getElementById('custom-player-controls');
-  const container = document.getElementById('main-video-player');
+  const dom = getPlayerDOM();
 
   if (currentVideoMode === 'html5') {
-    if (!html5VideoEl) html5VideoEl = document.getElementById('tutorial-html5-video');
+    if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
     if (!html5VideoEl) return;
 
     if (html5VideoEl.paused) {
-      html5VideoEl.play().catch(e => console.warn('HTML5 Video Play:', e));
+      const p = html5VideoEl.play();
+      if (p && p.catch) {
+        p.catch(e => {
+          console.warn('HTML5 Video Play:', e);
+          isPlaying = false;
+          updatePlayPauseUI(false);
+        });
+      }
       isPlaying = true;
-      if (badgePlay) badgePlay.style.display = 'block';
-      if (badgePause) badgePause.style.display = 'none';
-      if (playIcon) playIcon.style.display = 'none';
-      if (pauseIcon) pauseIcon.style.display = 'block';
-      if (controls) controls.classList.remove('paused');
-      if (container) container.classList.remove('paused');
-      startProgressLoop();
+      if (dom.badgePlay) dom.badgePlay.style.display = 'block';
+      if (dom.badgePause) dom.badgePause.style.display = 'none';
+      updatePlayPauseUI(true);
       wakePlayerUI();
     } else {
       html5VideoEl.pause();
       isPlaying = false;
-      clearTimeout(controlsHideTimer);
-      if (badgePlay) badgePlay.style.display = 'none';
-      if (badgePause) badgePause.style.display = 'block';
-      if (playIcon) playIcon.style.display = 'block';
-      if (pauseIcon) pauseIcon.style.display = 'none';
-      if (controls) {
-        controls.classList.add('paused');
-        controls.classList.add('visible');
-      }
-      if (container) {
-        container.classList.add('paused');
-        container.classList.remove('hide-ui');
-      }
-      stopProgressLoop();
+      if (dom.badgePlay) dom.badgePlay.style.display = 'none';
+      if (dom.badgePause) dom.badgePause.style.display = 'block';
+      updatePlayPauseUI(false);
     }
   } else if (currentVideoMode === 'youtube') {
     if (!customYtPlayer || !isYtPlayerReady) return;
@@ -297,12 +319,12 @@ function toggleCustomPlayer() {
       const state = customYtPlayer.getPlayerState();
       if (state === YT.PlayerState.PLAYING) {
         customYtPlayer.pauseVideo();
-        if (badgePlay) badgePlay.style.display = 'none';
-        if (badgePause) badgePause.style.display = 'block';
+        if (dom.badgePlay) dom.badgePlay.style.display = 'none';
+        if (dom.badgePause) dom.badgePause.style.display = 'block';
       } else {
         customYtPlayer.playVideo();
-        if (badgePlay) badgePlay.style.display = 'block';
-        if (badgePause) badgePause.style.display = 'none';
+        if (dom.badgePlay) dom.badgePlay.style.display = 'block';
+        if (dom.badgePause) dom.badgePause.style.display = 'none';
       }
     } catch (err) {
       console.warn('toggleCustomPlayer YT:', err);
@@ -310,44 +332,50 @@ function toggleCustomPlayer() {
   }
 
   // 0.3 秒極速淡出微提示
-  if (badge) {
-    badge.classList.add('flash');
+  if (dom.badge) {
+    dom.badge.classList.add('flash');
     setTimeout(() => {
-      badge.classList.remove('flash');
+      dom.badge.classList.remove('flash');
     }, 300);
   }
 }
 
 function toggleMute() {
-  const volHigh = document.getElementById('ctrl-icon-vol-high');
-  const volMute = document.getElementById('ctrl-icon-vol-mute');
+  const dom = getPlayerDOM();
 
   if (currentVideoMode === 'html5') {
-    if (!html5VideoEl) html5VideoEl = document.getElementById('tutorial-html5-video');
+    if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
     if (!html5VideoEl) return;
     html5VideoEl.muted = !html5VideoEl.muted;
     if (!html5VideoEl.muted) {
-      if (volHigh) volHigh.style.display = 'block';
-      if (volMute) volMute.style.display = 'none';
+      if (html5VideoEl.volume === 0) {
+        html5VideoEl.volume = 1;
+      }
+      if (dom.volHigh) dom.volHigh.style.display = 'block';
+      if (dom.volMute) dom.volMute.style.display = 'none';
       const targetVol = (html5VideoEl.volume * 100) || 100;
       updateVolumeSliderUI(targetVol);
     } else {
-      if (volHigh) volHigh.style.display = 'none';
-      if (volMute) volMute.style.display = 'block';
+      if (dom.volHigh) dom.volHigh.style.display = 'none';
+      if (dom.volMute) dom.volMute.style.display = 'block';
       updateVolumeSliderUI(0);
     }
   } else if (currentVideoMode === 'youtube') {
     if (!customYtPlayer || !isYtPlayerReady) return;
     if (customYtPlayer.isMuted()) {
       customYtPlayer.unMute();
-      if (volHigh) volHigh.style.display = 'block';
-      if (volMute) volMute.style.display = 'none';
-      const targetVol = customYtPlayer.getVolume() || 100;
+      let targetVol = customYtPlayer.getVolume();
+      if (targetVol === 0) {
+        targetVol = 100;
+        customYtPlayer.setVolume(100);
+      }
+      if (dom.volHigh) dom.volHigh.style.display = 'block';
+      if (dom.volMute) dom.volMute.style.display = 'none';
       updateVolumeSliderUI(targetVol);
     } else {
       customYtPlayer.mute();
-      if (volHigh) volHigh.style.display = 'none';
-      if (volMute) volMute.style.display = 'block';
+      if (dom.volHigh) dom.volHigh.style.display = 'none';
+      if (dom.volMute) dom.volMute.style.display = 'block';
       updateVolumeSliderUI(0);
     }
   }
@@ -355,7 +383,8 @@ function toggleMute() {
 }
 
 function updateVolumeSliderUI(val) {
-  const slider = document.getElementById('ctrl-volume-slider');
+  const dom = getPlayerDOM();
+  const slider = dom.volSlider || document.getElementById('ctrl-volume-slider');
   if (!slider) return;
   const num = Math.max(0, Math.min(100, parseInt(val, 10) || 0));
   slider.value = num;
@@ -363,15 +392,14 @@ function updateVolumeSliderUI(val) {
 }
 
 function changeVolume(val) {
-  const volHigh = document.getElementById('ctrl-icon-vol-high');
-  const volMute = document.getElementById('ctrl-icon-vol-mute');
+  const dom = getPlayerDOM();
   val = parseInt(val, 10);
   if (isNaN(val)) val = 100;
 
   updateVolumeSliderUI(val);
 
   if (currentVideoMode === 'html5') {
-    if (!html5VideoEl) html5VideoEl = document.getElementById('tutorial-html5-video');
+    if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
     if (!html5VideoEl) return;
     html5VideoEl.volume = val / 100;
     html5VideoEl.muted = (val === 0);
@@ -383,11 +411,11 @@ function changeVolume(val) {
   }
 
   if (val === 0) {
-    if (volHigh) volHigh.style.display = 'none';
-    if (volMute) volMute.style.display = 'block';
+    if (dom.volHigh) dom.volHigh.style.display = 'none';
+    if (dom.volMute) dom.volMute.style.display = 'block';
   } else {
-    if (volHigh) volHigh.style.display = 'block';
-    if (volMute) volMute.style.display = 'none';
+    if (dom.volHigh) dom.volHigh.style.display = 'block';
+    if (dom.volMute) dom.volMute.style.display = 'none';
   }
   wakePlayerUI();
 }
@@ -638,7 +666,10 @@ function formatTime(seconds) {
 
 function startProgressLoop() {
   stopProgressLoop();
-  updateProgressInterval = setInterval(updateTimeAndDuration, 200);
+  // 僅在 YouTube 模式下才需要定時器輪詢（HTML5 模式完全由原生 timeupdate 高效驅動）
+  if (currentVideoMode === 'youtube') {
+    updateProgressInterval = setInterval(updateTimeAndDuration, 200);
+  }
 }
 
 function stopProgressLoop() {
@@ -650,13 +681,14 @@ function stopProgressLoop() {
 
 function updateTimeAndDuration() {
   if (isDraggingProgress) return;
+  const dom = getPlayerDOM();
 
   let curr = 0;
   let dur = 0;
   let loadedPct = 0;
 
   if (currentVideoMode === 'html5') {
-    if (!html5VideoEl) html5VideoEl = document.getElementById('tutorial-html5-video');
+    if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
     if (!html5VideoEl) return;
     curr = html5VideoEl.currentTime || 0;
     dur = html5VideoEl.duration || 0;
@@ -677,20 +709,14 @@ function updateTimeAndDuration() {
     } catch (e) {}
   }
 
-  const timeCurrEl = document.getElementById('time-current');
-  const timeDurEl = document.getElementById('time-duration');
-  const filledBar = document.getElementById('player-progress-filled');
-  const thumbEl = document.getElementById('player-progress-thumb');
-  const bufBar = document.getElementById('player-progress-buffered');
-
-  if (timeCurrEl) timeCurrEl.textContent = formatTime(curr);
-  if (timeDurEl && dur > 0) timeDurEl.textContent = formatTime(dur);
+  if (dom.timeCurrent) dom.timeCurrent.textContent = formatTime(curr);
+  if (dom.timeDuration && dur > 0) dom.timeDuration.textContent = formatTime(dur);
 
   if (dur > 0) {
     const pct = (curr / dur) * 100;
-    if (filledBar) filledBar.style.width = `${pct}%`;
-    if (thumbEl) thumbEl.style.left = `${pct}%`;
-    if (bufBar) bufBar.style.width = `${loadedPct}%`;
+    if (dom.filledBar) dom.filledBar.style.width = `${pct}%`;
+    if (dom.thumbEl) dom.thumbEl.style.left = `${pct}%`;
+    if (dom.bufBar) dom.bufBar.style.width = `${loadedPct}%`;
   }
 }
 
@@ -700,11 +726,12 @@ function initCustomVideoPlayer() {
   if (isCustomPlayerInited) return;
   isCustomPlayerInited = true;
 
-  html5VideoEl = document.getElementById('tutorial-html5-video');
-  const container = document.getElementById('main-video-player');
-  const progContainer = document.getElementById('player-progress-container');
-  const controls = document.getElementById('custom-player-controls');
-  const volSlider = document.getElementById('ctrl-volume-slider');
+  const dom = getPlayerDOM();
+  html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
+  const container = dom.container;
+  const progContainer = dom.progContainer;
+  const controls = dom.controls;
+  const volSlider = dom.volSlider;
   if (!container || !progContainer) return;
 
   // 初始化音量滑桿雙色進度填充
@@ -723,59 +750,26 @@ function initCustomVideoPlayer() {
     html5VideoEl.addEventListener('loadedmetadata', updateTimeAndDuration);
     html5VideoEl.addEventListener('play', () => {
       isPlaying = true;
-      const playIcon = document.getElementById('ctrl-icon-play');
-      const pauseIcon = document.getElementById('ctrl-icon-pause');
-      if (playIcon) playIcon.style.display = 'none';
-      if (pauseIcon) pauseIcon.style.display = 'block';
-      if (controls) controls.classList.remove('paused');
-      if (container) container.classList.remove('paused');
-      startProgressLoop();
+      updatePlayPauseUI(true);
       wakePlayerUI();
     });
     html5VideoEl.addEventListener('pause', () => {
       isPlaying = false;
-      clearTimeout(controlsHideTimer);
-      const playIcon = document.getElementById('ctrl-icon-play');
-      const pauseIcon = document.getElementById('ctrl-icon-pause');
-      if (playIcon) playIcon.style.display = 'block';
-      if (pauseIcon) pauseIcon.style.display = 'none';
-      if (controls) {
-        controls.classList.add('paused');
-        controls.classList.add('visible');
-      }
-      if (container) {
-        container.classList.add('paused');
-        container.classList.remove('hide-ui');
-      }
-      stopProgressLoop();
+      updatePlayPauseUI(false);
     });
     html5VideoEl.addEventListener('ended', () => {
       isPlaying = false;
-      clearTimeout(controlsHideTimer);
-      const playIcon = document.getElementById('ctrl-icon-play');
-      const pauseIcon = document.getElementById('ctrl-icon-pause');
-      if (playIcon) playIcon.style.display = 'block';
-      if (pauseIcon) pauseIcon.style.display = 'none';
-      if (controls) {
-        controls.classList.add('paused');
-        controls.classList.add('visible');
-      }
-      if (container) {
-        container.classList.add('paused');
-        container.classList.remove('hide-ui');
-      }
-      stopProgressLoop();
+      updatePlayPauseUI(false);
     });
 
-    // 全螢幕 Seek 卡頓自動恢復：偵測 waiting 狀態並在就緒時確保播放
-    html5VideoEl.addEventListener('waiting', () => {
-      if (isPlaying && !html5VideoEl.paused) {
-        setTimeout(() => {
-          if (html5VideoEl && isPlaying && html5VideoEl.readyState >= 2) {
-            const p = html5VideoEl.play();
-            if (p && p.catch) p.catch(() => {});
-          }
-        }, 500);
+    // 容錯降級：若 HTML5 載入失敗（格式不支援或檔案異常），平滑切換至 YouTube 備用播放
+    html5VideoEl.addEventListener('error', (e) => {
+      console.warn('HTML5 Video 解碼或載入失敗，自動降級切換至 YouTube 備援線路', e);
+      const videoList = getTutorialVideosList();
+      const videoItem = videoList.find(v => v.id === currentActiveVideoId);
+      if (videoItem) {
+        fallbackToYouTubeMode(videoItem);
+        showToast('已為您切換至 YouTube 備用播放線路');
       }
     });
   }
@@ -787,14 +781,21 @@ function initCustomVideoPlayer() {
   container.addEventListener('touchstart', wakePlayerUI, { passive: true });
   container.addEventListener('mouseleave', () => {
     clearTimeout(controlsHideTimer);
-    if (isPlaying && !isDraggingProgress) {
+    if (isPlaying && !isDraggingProgress && !controls.matches(':hover')) {
       controlsHideTimer = setTimeout(() => {
         hidePlayerUI();
       }, 500);
     }
   });
 
-  // 全域/播放器鍵盤快捷鍵 (全螢幕或播放中均可極速操控)
+  // 點擊容器時自動聚焦，確保滑鼠移出後鍵盤快捷鍵（如 Space）依然能精準控制且不發生全頁跳躍式滾動
+  container.addEventListener('pointerdown', () => {
+    if (document.activeElement !== container && !container.contains(document.activeElement)) {
+      container.focus();
+    }
+  });
+
+  // 全域/播放器鍵盤快捷鍵 (全螢幕、滑鼠懸停、或播放中均可極速操控)
   document.addEventListener('keydown', (e) => {
     const isNativeFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
     const isFs = isNativeFs || isWebFullscreen;
@@ -808,7 +809,13 @@ function initCustomVideoPlayer() {
     }
 
     const isHovered = container.matches(':hover');
-    if (!isFs && !isHovered) return;
+    const isFocused = container === document.activeElement || container.contains(document.activeElement);
+    const rect = container.getBoundingClientRect();
+    const isVisibleOnScreen = rect.top < window.innerHeight && rect.bottom > 0;
+    
+    // 當處於全螢幕、或滑鼠懸停、或播放器持有焦點、或正在可視範圍內播放時，接管影音快捷鍵
+    const isPlayerActive = isFs || isHovered || isFocused || (isPlaying && isVisibleOnScreen);
+    if (!isPlayerActive) return;
 
     if (e.code === 'Space' || e.key === 'k' || e.key === 'K') {
       e.preventDefault();
@@ -841,12 +848,13 @@ function initCustomVideoPlayer() {
   });
 
   // click-surface 使用 pointerdown+pointerup 精確判定「有意按下並釋放」才觸發播放/暫停
-  // 取代 inline onclick，徹底避免全螢幕下各種 ghost click 穿透暫停
-  const clickSurface = document.getElementById('player-click-surface');
+  // 同時支援快速雙擊（Double Click/Tap）平滑切換全螢幕手勢
+  const clickSurface = dom.clickSurface || document.getElementById('player-click-surface');
   if (clickSurface) {
     let surfacePointerDownTime = 0;
     let surfacePointerDownX = 0;
     let surfacePointerDownY = 0;
+    let lastTapTime = 0;
 
     clickSurface.addEventListener('pointerdown', (e) => {
       surfacePointerDownTime = Date.now();
@@ -858,9 +866,18 @@ function initCustomVideoPlayer() {
       const dt = Date.now() - surfacePointerDownTime;
       const dx = Math.abs(e.clientX - surfacePointerDownX);
       const dy = Math.abs(e.clientY - surfacePointerDownY);
-      // 僅在快速按下並釋放（<400ms）且未移動（<10px）時才視為有效點擊
+      // 僅在快速按下並釋放（<400ms）且未移動（<10px）時才視為有效手勢
       if (dt < 400 && dx < 10 && dy < 10) {
-        toggleCustomPlayer();
+        const now = Date.now();
+        if (now - lastTapTime < 320) {
+          // 雙擊全螢幕：抵消第一次點擊的播放反轉並切換全螢幕
+          lastTapTime = 0;
+          toggleCustomPlayer(); // 復原第一次單擊造成的暫停/播放反轉
+          toggleFullscreen();
+        } else {
+          lastTapTime = now;
+          toggleCustomPlayer();
+        }
       }
     });
 
@@ -898,13 +915,9 @@ function initCustomVideoPlayer() {
       dur = customYtPlayer.getDuration() || 0;
     }
 
-    const filledBar = document.getElementById('player-progress-filled');
-    const thumbEl = document.getElementById('player-progress-thumb');
-    const timeCurrEl = document.getElementById('time-current');
-
-    if (filledBar) filledBar.style.width = `${pos * 100}%`;
-    if (thumbEl) thumbEl.style.left = `${pos * 100}%`;
-    if (timeCurrEl && dur > 0) timeCurrEl.textContent = formatTime(pos * dur);
+    if (dom.filledBar) dom.filledBar.style.width = `${pos * 100}%`;
+    if (dom.thumbEl) dom.thumbEl.style.left = `${pos * 100}%`;
+    if (dom.timeCurrent && dur > 0) dom.timeCurrent.textContent = formatTime(pos * dur);
   };
 
   // 真正執行跳轉（僅在點擊釋放或拖曳結束時執行一次）
@@ -968,9 +981,28 @@ function initCustomVideoPlayer() {
     applySeek(lastPointerPos);
   };
 
+  // 觸控中斷保護：若被手勢或來電 cancel，僅釋放指標捕獲，絕不執行無效跳轉
+  const cancelDragSeek = (e) => {
+    if (!isDraggingProgress) return;
+    e.stopPropagation();
+    try {
+      if (progContainer.hasPointerCapture(e.pointerId)) {
+        progContainer.releasePointerCapture(e.pointerId);
+      }
+    } catch (err) {}
+    isDraggingProgress = false;
+    justDraggedProgress = true;
+    clearTimeout(dragCooldownTimer);
+    dragCooldownTimer = setTimeout(() => {
+      justDraggedProgress = false;
+    }, 280);
+    updateTimeAndDuration();
+  };
+
   progContainer.addEventListener('pointerup', endDragSeek);
-  progContainer.addEventListener('pointercancel', endDragSeek);
+  progContainer.addEventListener('pointercancel', cancelDragSeek);
 }
+
 function getTutorialVideosList() {
   if (typeof TUTORIAL_VIDEOS !== 'undefined' && Array.isArray(TUTORIAL_VIDEOS) && TUTORIAL_VIDEOS.length > 0) {
     return TUTORIAL_VIDEOS;
@@ -980,7 +1012,7 @@ function getTutorialVideosList() {
 
 let currentActiveVideoId = 'antigravity-design-philosophy';
 
-function initVideoShowcase() {
+function initVideoShowcase(preservePlayback = false) {
   const playlistPills = document.getElementById('video-playlist-pills');
   const videoList = getTutorialVideosList();
   if (!playlistPills || videoList.length === 0) return;
@@ -992,15 +1024,56 @@ function initVideoShowcase() {
     const shortName = name.split('(')[0].trim();
     const isActive = item.id === targetId;
     return `
-      <button class="playlist-btn ${isActive ? 'active' : ''}" onclick="switchTutorialVideo('${item.id}')">
+      <button class="playlist-btn ${isActive ? 'active' : ''}" data-video-id="${item.id}" onclick="switchTutorialVideo('${item.id}')">
         <img src="${item.icon || 'assets/icons/philosophy.svg'}" style="width: 16px; height: 16px;" alt="" />
-        ${shortName}
+        <span>${shortName}</span>
       </button>
     `;
   }).join('');
 
   if (targetId) {
-    switchTutorialVideo(targetId);
+    if (preservePlayback) {
+      // 僅更新文字標題與說明，不中斷當前影片、不重設時間軸
+      updateTutorialVideoMetaOnly(targetId);
+    } else {
+      switchTutorialVideo(targetId);
+    }
+  }
+}
+
+function updateTutorialVideoMetaOnly(videoId) {
+  const videoList = getTutorialVideosList();
+  const videoItem = videoList.find(v => v.id === videoId) || (typeof PLUGINS_DATA !== 'undefined' ? PLUGINS_DATA.find(p => p.id === videoId) : null);
+  if (!videoItem) return;
+  const dom = getPlayerDOM();
+  if (dom.videoTitle) {
+    const rawName = videoItem.name ? (videoItem.name[currentLang] || videoItem.name['zh-TW']) : (videoItem.title || '');
+    dom.videoTitle.textContent = rawName;
+  }
+  if (dom.videoDesc) {
+    dom.videoDesc.textContent = videoItem.shortDesc ? (videoItem.shortDesc[currentLang] || videoItem.shortDesc['zh-TW']) : '';
+  }
+}
+
+function fallbackToYouTubeMode(videoItem) {
+  currentVideoMode = 'youtube';
+  const dom = getPlayerDOM();
+  if (dom.html5Video) {
+    dom.html5Video.pause();
+    dom.html5Video.style.display = 'none';
+  }
+  if (dom.iframe) dom.iframe.style.display = 'block';
+
+  const parsed = parseYouTubeUrls(videoItem.videoUrl || videoItem.videoEmbedUrl || 'HSYWa4WkBe0');
+  if (customYtPlayer && isYtPlayerReady && typeof customYtPlayer.cueVideoById === 'function') {
+    try {
+      customYtPlayer.cueVideoById(parsed.videoId);
+    } catch (e) {
+      if (dom.iframe) dom.iframe.src = parsed.embedUrl;
+    }
+  } else if (dom.iframe) {
+    dom.iframe.dataset.src = parsed.embedUrl;
+    dom.iframe.src = parsed.embedUrl;
   }
 }
 
@@ -1032,86 +1105,42 @@ function switchTutorialVideo(videoId) {
   if (!videoItem) return;
 
   currentActiveVideoId = videoId;
+  const dom = getPlayerDOM();
 
-  const html5Video = document.getElementById('tutorial-html5-video');
-  const videoIframe = document.getElementById('tutorial-video-iframe');
-  const videoTitle = document.getElementById('tutorial-video-title');
-  const videoDesc = document.getElementById('tutorial-video-desc');
+  // 使用 data-video-id 精準高亮對應按鈕
   const buttons = document.querySelectorAll('.playlist-btn');
-  const playIcon = document.getElementById('ctrl-icon-play');
-  const pauseIcon = document.getElementById('ctrl-icon-pause');
-  const controls = document.getElementById('custom-player-controls');
-  const filledBar = document.getElementById('player-progress-filled');
-  const thumbEl = document.getElementById('player-progress-thumb');
-  const bufBar = document.getElementById('player-progress-buffered');
-  const timeCurrEl = document.getElementById('time-current');
-
-  const shortName = videoItem.name ? ((videoItem.name['zh-TW'] || '').split('(')[0].trim()) : '';
-  const shortNameEn = videoItem.name ? ((videoItem.name['en'] || '').split('(')[0].trim()) : '';
-
   buttons.forEach(btn => {
-    if ((shortName && btn.textContent.includes(shortName)) || (shortNameEn && btn.textContent.includes(shortNameEn))) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
+    btn.classList.toggle('active', btn.getAttribute('data-video-id') === videoId);
   });
 
   // 重設播放狀態與進度條
   isPlaying = false;
   clearTimeout(controlsHideTimer);
-  const container = document.getElementById('main-video-player');
-  if (container) {
-    container.classList.add('paused');
-    container.classList.remove('hide-ui');
-  }
-  if (playIcon) playIcon.style.display = 'block';
-  if (pauseIcon) pauseIcon.style.display = 'none';
-  if (controls) {
-    controls.classList.add('paused');
-    controls.classList.add('visible');
-  }
-  if (filledBar) filledBar.style.width = '0%';
-  if (thumbEl) thumbEl.style.left = '0%';
-  if (bufBar) bufBar.style.width = '0%';
-  if (timeCurrEl) timeCurrEl.textContent = '0:00';
+  updatePlayPauseUI(false);
+
+  if (dom.filledBar) dom.filledBar.style.width = '0%';
+  if (dom.thumbEl) dom.thumbEl.style.left = '0%';
+  if (dom.bufBar) dom.bufBar.style.width = '0%';
+  if (dom.timeCurrent) dom.timeCurrent.textContent = '0:00';
+  if (dom.timeDuration) dom.timeDuration.textContent = '0:00';
 
   // 優先使用本機原生影片 (HTML5 Video)
-  if (videoItem.videoSrc && html5Video) {
+  if (videoItem.videoSrc && dom.html5Video) {
     currentVideoMode = 'html5';
-    html5Video.style.display = 'block';
-    if (videoIframe) videoIframe.style.display = 'none';
+    dom.html5Video.style.display = 'block';
+    if (dom.iframe) dom.iframe.style.display = 'none';
     if (customYtPlayer && isYtPlayerReady && typeof customYtPlayer.pauseVideo === 'function') {
-      customYtPlayer.pauseVideo();
+      try { customYtPlayer.pauseVideo(); } catch (e) {}
     }
 
-    html5Video.src = videoItem.videoSrc;
-    html5Video.load();
+    dom.html5Video.src = videoItem.videoSrc;
+    dom.html5Video.load();
     updateTimeAndDuration();
   } else {
-    currentVideoMode = 'youtube';
-    if (html5Video) {
-      html5Video.pause();
-      html5Video.style.display = 'none';
-    }
-    if (videoIframe) videoIframe.style.display = 'block';
-
-    const parsed = parseYouTubeUrls(videoItem.videoUrl || videoItem.videoEmbedUrl || 'HSYWa4WkBe0');
-    if (customYtPlayer && isYtPlayerReady && typeof customYtPlayer.loadVideoById === 'function') {
-      customYtPlayer.cueVideoById(parsed.videoId);
-    } else if (videoIframe) {
-      videoIframe.dataset.src = parsed.embedUrl;
-      videoIframe.src = parsed.embedUrl;
-    }
+    fallbackToYouTubeMode(videoItem);
   }
 
-  if (videoTitle) {
-    const rawName = videoItem.name ? (videoItem.name[currentLang] || videoItem.name['zh-TW']) : (videoItem.title || '');
-    videoTitle.textContent = rawName;
-  }
-  if (videoDesc) {
-    videoDesc.textContent = videoItem.shortDesc ? (videoItem.shortDesc[currentLang] || videoItem.shortDesc['zh-TW']) : '';
-  }
+  updateTutorialVideoMetaOnly(videoId);
 }
 
 /**

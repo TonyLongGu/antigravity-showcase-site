@@ -249,7 +249,7 @@ function setLanguage(lang) {
     renderPlugins();
   }
   if (typeof initVideoShowcase === 'function') {
-    initVideoShowcase();
+    initVideoShowcase(true);
   }
 }
 
