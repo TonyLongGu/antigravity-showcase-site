@@ -422,6 +422,29 @@ function changeVolume(val) {
 
 let isWebFullscreen = false;
 
+// 嘗試鎖定或解鎖行動端橫向螢幕 (Screen Orientation API)
+function tryLockLandscape() {
+  try {
+    if (screen.orientation && typeof screen.orientation.lock === 'function') {
+      screen.orientation.lock('landscape').catch(() => {
+        // 行動裝置不支援或使用者未旋轉時靜默忽略
+      });
+    }
+  } catch (e) {
+    // 忽略異常
+  }
+}
+
+function tryUnlockOrientation() {
+  try {
+    if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+      screen.orientation.unlock();
+    }
+  } catch (e) {
+    // 忽略異常
+  }
+}
+
 function enterWebFullscreen() {
   const container = document.getElementById('main-video-player');
   const fsEnter = document.getElementById('ctrl-icon-fullscreen-enter');
@@ -437,6 +460,7 @@ function enterWebFullscreen() {
     fsExit.style.display = 'block';
   }
 
+  tryLockLandscape();
   isDraggingProgress = false;
   wakePlayerUI();
 }
@@ -455,6 +479,8 @@ function exitWebFullscreen() {
     fsEnter.style.display = 'block';
     fsExit.style.display = 'none';
   }
+
+  tryUnlockOrientation();
 
   // 釋放全螢幕按鈕焦點
   const fsBtn = document.getElementById('ctrl-fullscreen-btn');
@@ -510,6 +536,12 @@ function updateFullscreenState() {
       fsEnter.style.display = 'block';
       fsExit.style.display = 'none';
     }
+  }
+
+  if (isFs) {
+    tryLockLandscape();
+  } else {
+    tryUnlockOrientation();
   }
 
   // 退出全螢幕時的焦點釋放與無縫就位保障
@@ -742,6 +774,16 @@ function initCustomVideoPlayer() {
   // 監聽跨瀏覽器全螢幕切換事件
   ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
     document.addEventListener(evt, updateFullscreenState);
+  });
+
+  // 監聽手機螢幕橫直向旋轉，即時重算與自適應佈局
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      wakePlayerUI();
+      if (typeof updateTimeAndDuration === 'function') {
+        updateTimeAndDuration();
+      }
+    }, 120);
   });
 
   // HTML5 Video 原生事件監聽
