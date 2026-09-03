@@ -321,7 +321,6 @@ function toggleCustomPlayer() {
 function toggleMute() {
   const volHigh = document.getElementById('ctrl-icon-vol-high');
   const volMute = document.getElementById('ctrl-icon-vol-mute');
-  const slider = document.getElementById('ctrl-volume-slider');
 
   if (currentVideoMode === 'html5') {
     if (!html5VideoEl) html5VideoEl = document.getElementById('tutorial-html5-video');
@@ -330,11 +329,12 @@ function toggleMute() {
     if (!html5VideoEl.muted) {
       if (volHigh) volHigh.style.display = 'block';
       if (volMute) volMute.style.display = 'none';
-      if (slider) slider.value = (html5VideoEl.volume * 100) || 100;
+      const targetVol = (html5VideoEl.volume * 100) || 100;
+      updateVolumeSliderUI(targetVol);
     } else {
       if (volHigh) volHigh.style.display = 'none';
       if (volMute) volMute.style.display = 'block';
-      if (slider) slider.value = 0;
+      updateVolumeSliderUI(0);
     }
   } else if (currentVideoMode === 'youtube') {
     if (!customYtPlayer || !isYtPlayerReady) return;
@@ -342,21 +342,33 @@ function toggleMute() {
       customYtPlayer.unMute();
       if (volHigh) volHigh.style.display = 'block';
       if (volMute) volMute.style.display = 'none';
-      if (slider) slider.value = customYtPlayer.getVolume() || 100;
+      const targetVol = customYtPlayer.getVolume() || 100;
+      updateVolumeSliderUI(targetVol);
     } else {
       customYtPlayer.mute();
       if (volHigh) volHigh.style.display = 'none';
       if (volMute) volMute.style.display = 'block';
-      if (slider) slider.value = 0;
+      updateVolumeSliderUI(0);
     }
   }
   wakePlayerUI();
+}
+
+function updateVolumeSliderUI(val) {
+  const slider = document.getElementById('ctrl-volume-slider');
+  if (!slider) return;
+  const num = Math.max(0, Math.min(100, parseInt(val, 10) || 0));
+  slider.value = num;
+  slider.style.setProperty('--vol-percent', `${num}%`);
 }
 
 function changeVolume(val) {
   const volHigh = document.getElementById('ctrl-icon-vol-high');
   const volMute = document.getElementById('ctrl-icon-vol-mute');
   val = parseInt(val, 10);
+  if (isNaN(val)) val = 100;
+
+  updateVolumeSliderUI(val);
 
   if (currentVideoMode === 'html5') {
     if (!html5VideoEl) html5VideoEl = document.getElementById('tutorial-html5-video');
@@ -404,6 +416,28 @@ function updateFullscreenState() {
     }
   }
 
+  // 退出全螢幕時的焦點釋放與無縫就位保障
+  if (!isFs) {
+    // 1. 釋放全螢幕按鈕焦點，避免瀏覽器在恢復排版時強制滾動貼齊右下角按鈕
+    const fsBtn = document.getElementById('ctrl-fullscreen-btn');
+    if (fsBtn && (document.activeElement === fsBtn || (container && container.contains(document.activeElement)))) {
+      if (document.activeElement && typeof document.activeElement.blur === 'function') {
+        document.activeElement.blur();
+      }
+    }
+
+    // 2. 備用校準：以 instant (無動畫) 確保精準居中，徹底杜絕縮回後的二次滑動感
+    requestAnimationFrame(() => {
+      if (container) {
+        container.scrollIntoView({
+          behavior: 'instant',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }
+    });
+  }
+
   isDraggingProgress = false;
   wakePlayerUI();
 }
@@ -415,6 +449,14 @@ function toggleFullscreen() {
   const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
 
   if (!isFs) {
+    // 方案 A：進入全螢幕前預先瞬間置中
+    // 瀏覽器記錄的捲動還原點即為正中央，當按下 ESC 退出時原生還原即在中心，零延遲、零位移
+    container.scrollIntoView({
+      behavior: 'instant',
+      block: 'center',
+      inline: 'nearest'
+    });
+
     if (container.requestFullscreen) {
       container.requestFullscreen().catch(err => console.warn(err));
     } else if (container.webkitRequestFullscreen) {
@@ -559,7 +601,13 @@ function initCustomVideoPlayer() {
   const container = document.getElementById('main-video-player');
   const progContainer = document.getElementById('player-progress-container');
   const controls = document.getElementById('custom-player-controls');
+  const volSlider = document.getElementById('ctrl-volume-slider');
   if (!container || !progContainer) return;
+
+  // 初始化音量滑桿雙色進度填充
+  if (volSlider) {
+    updateVolumeSliderUI(volSlider.value || 100);
+  }
 
   // 監聽跨瀏覽器全螢幕切換事件
   ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {

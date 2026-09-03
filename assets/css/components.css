@@ -1087,12 +1087,20 @@
 }
 
 .custom-volume-slider {
+  --vol-percent: 100%;
+  --vol-color: #3892ce; /* 微調後：亮度與彩度適度降低，柔和不刺眼、沉穩且清晰可辨 */
   -webkit-appearance: none;
   appearance: none;
   width: 65px;
   height: 4px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(
+    to right,
+    var(--vol-color) 0%,
+    var(--vol-color) var(--vol-percent, 100%),
+    rgba(255, 255, 255, 0.18) var(--vol-percent, 100%),
+    rgba(255, 255, 255, 0.18) 100%
+  );
   outline: none;
   cursor: pointer;
   transition: opacity 0.2s ease;
@@ -1104,9 +1112,31 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #38bdf8;
+  background: var(--vol-color);
   cursor: pointer;
-  box-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+  box-shadow: 0 0 4px rgba(56, 146, 206, 0.45);
+}
+
+.custom-volume-slider::-moz-range-progress {
+  background: var(--vol-color);
+  height: 4px;
+  border-radius: 2px;
+}
+
+.custom-volume-slider::-moz-range-track {
+  background: rgba(255, 255, 255, 0.18);
+  height: 4px;
+  border-radius: 2px;
+}
+
+.custom-volume-slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--vol-color);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(56, 146, 206, 0.45);
 }
 
 .video-meta-bar {
