@@ -3,6 +3,7 @@
  */
 const I18N = {
   'zh-TW': {
+    page_title: 'Antigravity IDE Plugins - 開源擴充套件展示與使用指南',
     brand_title: 'Antigravity',
     brand_subtitle: '擴充套件生態系',
     nav_home: '首頁',
@@ -14,6 +15,7 @@ const I18N = {
     lang_btn: 'EN',
     
     hero_badge: '專為 Google Antigravity IDE 打造的原生擴充套件生態系',
+    hero_last_updated_label: '網站更新時間：',
     hero_title_1: '極致擴展你的',
     hero_title_gradient: 'AI 協同開發體驗',
     hero_subtitle: '無縫整合 Antigravity IDE 側邊欄面板、狀態列即時監控、工作區同名修正與腳本一鍵直達，免編譯 Junction 掛載即刻生效。',
@@ -42,6 +44,12 @@ const I18N = {
     section_video_desc: '透過生動詳細的影片解說，快速掌握 Antigravity IDE 擴充套件的最佳實踐與操作技巧。',
     video_playlist_prompt: '點擊切換各主題與插件教學影片：',
     ctrl_cc_title: '字幕開關 (C)',
+    ctrl_play_title: '播放 / 暫停 (Space)',
+    ctrl_mute_title: '靜音 / 取消靜音 (M)',
+    ctrl_fullscreen_title: '全螢幕 (F)',
+    copied_cmd_prefix: '已複製指令',
+    copy_failed: '複製失敗，請手動選取',
+    btn_card_github_title: '前往 GitHub 插件源碼目錄',
     
     nav_author: '關於作者',
     section_author_tag: '開發者簡介',
@@ -67,19 +75,20 @@ const I18N = {
     
     install_zip_step1_title: '下載全套套件包並解壓縮',
     install_zip_step1_desc: '點擊下方按鈕下載最新版全套套件 ZIP，並解壓縮至本機任意目錄（例如 D:\\antigravity-plugins）：',
-    btn_download_zip_action: '📦 下載全套插件包 (.zip)',
+    btn_download_zip_action: '下載全套插件包 (.zip)',
     
     install_submode_title: '執行安裝腳本（一鍵全安裝 或 單獨安裝）',
     install_submode_full_title: '一鍵安裝全部插件',
-    install_submode_full_desc: '雙擊專案根目錄下的「雙擊一鍵安裝.bat」，腳本將自動以目前解壓目錄為路徑基底，一次性批次為 6 大擴充套件建立免編譯掛載：',
+    install_submode_full_desc: '雙擊專案根目錄下的「install-all.bat」（或以 PowerShell 執行 install-all.ps1），腳本將自動以目前解壓目錄為路徑基底，一次性批次為 6 大擴充套件建立免編譯掛載：',
     install_submode_custom_title: '單獨安裝特定插件',
     install_submode_custom_desc: '進入欲啟用的插件目錄（例如 antigravity-toolbox/），雙擊該目錄下的「install-extension.bat」即可單獨啟用：',
+    install_submode_custom_code: '<插件名稱>/install-extension.bat',
     install_common_step3_title: '重新載入 Antigravity IDE 視窗',
     install_common_step3_desc: '重新啟動 IDE，或是在 IDE 中按快捷鍵 Ctrl + Shift + P，輸入並執行 Developer: Reload Window 即可立即在側邊欄與狀態列看到全新擴充功能！',
     
     install_ai_step1_title: '複製 AI 智能安裝提示詞',
     install_ai_step1_desc: '點擊下方按鈕複製結構化安裝 Prompt，提示詞內建 GitHub 倉庫來源與全流程對話引導：',
-    install_ai_prompt_copy_btn: '📋 複製 AI 智能安裝提示詞',
+    install_ai_prompt_copy_btn: '複製 AI 智能安裝提示詞',
     install_ai_prompt_copied: '已複製提示詞！請直接貼到 Antigravity IDE 的 AI Chat 對話框',
     install_ai_step2_title: '貼入 Antigravity AI Chat 對話框',
     install_ai_step2_desc: '在 Antigravity IDE 任意視窗打開 AI Chat 對話框，貼上剛剛複製的提示詞並發送。',
@@ -95,7 +104,7 @@ const I18N = {
     install_feature_junction_title: 'Windows Junction 免編譯技術',
     install_feature_junction_desc: '以原生目錄連接點掛載至 Antigravity 擴充目錄，零磁碟重複空間，修改代碼即時熱生效。',
     install_feature_safe_title: '無痕卸載安全無殘留',
-    install_feature_safe_desc: '隨時雙擊「雙擊一鍵解除安裝.bat」或個別目錄下的「uninstall-extension.bat」秒級乾淨卸載。',
+    install_feature_safe_desc: '隨時雙擊根目錄下的「uninstall-all.bat」或個別目錄下的「uninstall-extension.bat」秒級乾淨卸載。',
     
     install_zip_note_badge: '無需 Git 環境 • 解壓即用',
     install_submode_full_badge: '雙擊執行腳本',
@@ -119,6 +128,7 @@ const I18N = {
   },
   
   'en': {
+    page_title: 'Antigravity IDE Plugins - Native Extensions Suite & Guide',
     brand_title: 'Antigravity',
     brand_subtitle: 'PLUGINS ECOSYSTEM',
     nav_home: 'Home',
@@ -131,6 +141,7 @@ const I18N = {
     lang_btn: '繁中',
     
     hero_badge: 'Native Extension Ecosystem for Google Antigravity IDE',
+    hero_last_updated_label: 'Site Updated:',
     hero_title_1: 'Supercharge Your',
     hero_title_gradient: 'AI Pair Programming Flow',
     hero_subtitle: 'Seamlessly integrate Antigravity IDE sidebar webviews, real-time status bar quota metrics, workspace fixers, and 1-click script execution via hot-reloaded Junction mounts.',
@@ -158,7 +169,13 @@ const I18N = {
     section_video_title: 'Featured Video Walkthroughs',
     section_video_desc: 'Master Antigravity IDE native extensions with step-by-step video tutorials and real-world workflows.',
     video_playlist_prompt: 'Click to switch tutorial video topics & plugins:',
-    ctrl_cc_title: 'Toggle Subtitles (C)',
+    ctrl_cc_title: 'Subtitles Toggle (C)',
+    ctrl_play_title: 'Play / Pause (Space)',
+    ctrl_mute_title: 'Mute / Unmute (M)',
+    ctrl_fullscreen_title: 'Fullscreen (F)',
+    copied_cmd_prefix: 'Copied command',
+    copy_failed: 'Copy failed, please copy manually',
+    btn_card_github_title: 'View plugin source on GitHub',
     
     section_author_tag: 'Developer Profile',
     section_author_title: 'About the Creator',
@@ -183,20 +200,21 @@ const I18N = {
     
     install_zip_step1_title: 'Download Suite Package & Extract',
     install_zip_step1_desc: 'Click the button below to download the latest suite ZIP and extract it to any local directory (e.g. D:\\antigravity-plugins):',
-    btn_download_zip_action: '📦 Download Suite (.zip)',
+    btn_download_zip_action: 'Download Suite (.zip)',
     
     install_submode_title: 'Run Installation Script (All or Specific)',
     install_submode_full_title: 'Install All Plugins',
-    install_submode_full_desc: 'Double-click "雙擊一鍵安裝.bat" in the root directory. The script automatically mounts all 6 extensions hot-reloaded with zero manual path input:',
+    install_submode_full_desc: 'Double-click "install-all.bat" (or run install-all.ps1 via PowerShell) in the root directory. The script automatically mounts all 6 extensions hot-reloaded with zero manual path input:',
     install_submode_custom_title: 'Install Specific Plugin',
     install_submode_custom_desc: 'Navigate to your desired plugin (e.g. antigravity-toolbox/), and double-click "install-extension.bat" to mount it individually:',
+    install_submode_custom_code: '<plugin-folder>/install-extension.bat',
     
     install_common_step3_title: 'Reload Antigravity IDE Window',
     install_common_step3_desc: 'Restart the IDE, or press Ctrl + Shift + P in IDE and run "Developer: Reload Window", and all new extensions will appear immediately in your sidebar and status bar!',
     
     install_ai_step1_title: 'Copy AI Guided Install Prompt',
     install_ai_step1_desc: 'Click the button below to copy the structured installation prompt, embedded with GitHub repository source and conversational workflow instructions:',
-    install_ai_prompt_copy_btn: '📋 Copy AI Installation Prompt',
+    install_ai_prompt_copy_btn: 'Copy AI Installation Prompt',
     install_ai_prompt_copied: 'Prompt copied! Paste it directly into Antigravity IDE AI Chat.',
     install_ai_step2_title: 'Paste into Antigravity AI Chat',
     install_ai_step2_desc: 'Open AI Chat in any Antigravity IDE workspace, paste the copied prompt and send it.',
@@ -212,7 +230,7 @@ const I18N = {
     install_feature_junction_title: 'Windows Junction Hot-Reload',
     install_feature_junction_desc: 'Directly mounted to Antigravity extension directory via Directory Junction. Zero disk redundancy, edits hot-reload immediately.',
     install_feature_safe_title: 'Clean & Zero-Trace Uninstall',
-    install_feature_safe_desc: 'Double-click "雙擊一鍵解除安裝.bat" or "uninstall-extension.bat" in individual folders anytime for instant clean removal.',
+    install_feature_safe_desc: 'Double-click "uninstall-all.bat" or "uninstall-extension.bat" in individual folders anytime for instant clean removal.',
     
     install_zip_note_badge: 'No Git Required • Extract & Use',
     install_submode_full_badge: 'Double-click to run script',
@@ -278,13 +296,40 @@ function updateDOMTranslations() {
     el.innerHTML = t(key);
   });
 
+  document.title = t('page_title');
+
   const langBtn = document.getElementById('btn-lang-toggle');
   if (langBtn) {
     langBtn.textContent = currentLang === 'zh-TW' ? 'EN' : '繁中';
   }
 
+  const playBtn = document.getElementById('ctrl-play-btn');
+  if (playBtn) playBtn.setAttribute('title', t('ctrl_play_title'));
+
+  const muteBtn = document.getElementById('ctrl-mute-btn');
+  if (muteBtn) muteBtn.setAttribute('title', t('ctrl_mute_title'));
+
   const ccBtn = document.getElementById('ctrl-cc-btn');
   if (ccBtn) {
     ccBtn.setAttribute('title', t('ctrl_cc_title'));
+  }
+
+  const fsBtn = document.getElementById('ctrl-fullscreen-btn');
+  if (fsBtn) fsBtn.setAttribute('title', t('ctrl_fullscreen_title'));
+
+  const dateEl = document.getElementById('hero-last-updated-date');
+  if (dateEl) {
+    let dateStr = (typeof SITE_CONFIG !== 'undefined' && SITE_CONFIG.lastUpdated) ? SITE_CONFIG.lastUpdated : '';
+    if (!dateStr && typeof document !== 'undefined' && document.lastModified) {
+      const d = new Date(document.lastModified);
+      if (!isNaN(d.getTime())) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        dateStr = `${y}-${m}-${day} ${hh}:${mm}`;
+      }
+    }
+    dateEl.textContent = dateStr || '2026-09-04 21:00';
   }
 }

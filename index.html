@@ -69,9 +69,19 @@
   <!-- 2. Hero Section -->
   <section id="hero" class="hero">
     <div class="container">
-      <div class="hero-badge">
-        <span class="badge-dot"></span>
-        <span data-i18n="hero_badge">專為 Google Antigravity IDE 打造的原生擴充套件生態系</span>
+      <div class="hero-badge-group">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span data-i18n="hero_badge">專為 Google Antigravity IDE 打造的原生擴充套件生態系</span>
+        </div>
+        <div class="hero-badge-update">
+          <svg class="hero-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+            <path d="M21 3v5h-5"/>
+          </svg>
+          <span data-i18n="hero_last_updated_label">網站更新時間：</span>
+          <span id="hero-last-updated-date" class="hero-update-time">2026-09-04 11:03</span>
+        </div>
       </div>
 
       <h1 class="hero-title">
@@ -85,13 +95,16 @@
 
       <div class="hero-cta-group">
         <a href="https://github.com/TonyLongGu/antigravity-plugins/archive/refs/heads/main.zip" class="btn-primary" style="background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%); color: #07090e; font-weight: 700;">
-          <span data-i18n="btn_download_all_zip">📦 下載全套插件包 (.zip)</span>
+          <span class="btn-icon">📦</span>
+          <span data-i18n="btn_download_all_zip">下載全套插件包 (.zip)</span>
         </a>
         <a href="#explore" class="btn-secondary">
-          <span data-i18n="btn_explore">瀏覽 6 大插件</span> ➔
+          <span data-i18n="btn_explore">瀏覽 6 大插件</span>
+          <span class="btn-icon">➔</span>
         </a>
         <a href="#tutorials" class="btn-secondary" style="border-color: rgba(0, 242, 254, 0.4);">
-          ▶ <span data-i18n="btn_watch_video">觀看教學影片</span>
+          <span class="btn-icon">▶</span>
+          <span data-i18n="btn_watch_video">觀看教學影片</span>
         </a>
       </div>
 
@@ -320,7 +333,8 @@
               <p class="step-desc" data-i18n="install_zip_step1_desc">點擊下方按鈕下載最新版全套套件 ZIP，並解壓縮至本機任意目錄（例如 D:\antigravity-plugins）：</p>
               <div class="install-action-row">
                 <a href="https://github.com/TonyLongGu/antigravity-plugins/archive/refs/heads/main.zip" class="btn-primary install-dl-btn">
-                  <span data-i18n="btn_download_zip_action">📦 下載全套插件包 (.zip)</span>
+                  <span class="btn-icon">📦</span>
+                  <span data-i18n="btn_download_zip_action">下載全套插件包 (.zip)</span>
                 </a>
                 <span class="install-note-badge" data-i18n="install_zip_note_badge">無需 Git 環境 • 解壓即用</span>
               </div>
@@ -344,10 +358,10 @@
                     <span style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="install_submode_full_badge">雙擊執行腳本</span>
                   </div>
                   <p class="step-desc" data-i18n="install_submode_full_desc" style="margin-bottom: 10px;">
-                    雙擊專案根目錄下的「雙擊一鍵安裝.bat」，腳本將自動以目前解壓目錄為路徑基底，一次性批次為 6 大擴充套件建立免編譯掛載：
+                    雙擊專案根目錄下的「install-all.bat」，腳本將自動以目前解壓目錄為路徑基底，一次性批次為 6 大擴充套件建立免編譯掛載：
                   </p>
                   <div class="install-action-bubble">
-                    <code>.\雙擊一鍵安裝.bat</code>
+                    <code>.\install-all.bat</code>
                   </div>
                 </div>
 
@@ -364,7 +378,7 @@
                     進入欲啟用的插件目錄（例如 antigravity-toolbox/），雙擊該目錄下的「install-extension.bat」即可單獨啟用：
                   </p>
                   <div class="install-action-bubble">
-                    <code>&lt;插件名稱&gt;/install-extension.bat</code>
+                    <code data-i18n="install_submode_custom_code">&lt;插件名稱&gt;/install-extension.bat</code>
                   </div>
                 </div>
               </div>
@@ -414,7 +428,8 @@
                   </div>
                   <div class="install-action-row" style="margin-top: 14px;">
                     <button class="btn-primary install-dl-btn" onclick="copyAiInstallPrompt()">
-                      <span data-i18n="install_ai_prompt_copy_btn">📋 複製 AI 智能安裝提示詞</span>
+                      <span class="btn-icon">📋</span>
+                      <span data-i18n="install_ai_prompt_copy_btn">複製 AI 智能安裝提示詞</span>
                     </button>
                     <span class="install-note-badge" data-i18n="install_ai_note_badge">零終端機操作 • AI 互動引導</span>
                   </div>
@@ -496,7 +511,7 @@
             </div>
             <div class="info-card-body">
               <h4 class="info-card-title" data-i18n="install_feature_safe_title">無痕卸載安全無殘留</h4>
-              <p class="info-card-desc" data-i18n="install_feature_safe_desc">隨時雙擊「雙擊一鍵解除安裝.bat」或個別目錄下的「uninstall-extension.bat」秒級乾淨卸載。</p>
+              <p class="info-card-desc" data-i18n="install_feature_safe_desc">隨時雙擊根目錄下的「uninstall-all.bat」或個別目錄下的「uninstall-extension.bat」秒級乾淨卸載。</p>
             </div>
           </div>
         </div>

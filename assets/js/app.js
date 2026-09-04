@@ -120,13 +120,14 @@ function fallbackCopy(text, successMsg) {
     document.execCommand('copy');
     showToast(successMsg || t('btn_copied'));
   } catch (err) {
-    showToast('複製失敗，請手動選取');
+    showToast(t('copy_failed') || '複製失敗，請手動選取');
   }
   document.body.removeChild(textArea);
 }
 
 function copyInstallCmd(cmd) {
-  copyToClipboard(cmd, `已複製指令: ${cmd}`);
+  const prefix = t('copied_cmd_prefix') || '已複製指令';
+  copyToClipboard(cmd, `${prefix}: ${cmd}`);
 }
 
 function copyAiInstallPrompt() {
