@@ -264,6 +264,9 @@ function setLanguage(lang) {
   if (!I18N[lang]) return;
   currentLang = lang;
   localStorage.setItem('antigravity_lang', lang);
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.lang = lang === 'zh-TW' ? 'zh-TW' : 'en';
+  }
   updateDOMTranslations();
   if (typeof renderPlugins === 'function') {
     renderPlugins();
@@ -281,6 +284,10 @@ function toggleLanguage() {
 }
 
 function updateDOMTranslations() {
+  if (typeof document !== 'undefined' && document.documentElement) {
+    document.documentElement.lang = currentLang === 'zh-TW' ? 'zh-TW' : 'en';
+  }
+
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     el.textContent = t(key);

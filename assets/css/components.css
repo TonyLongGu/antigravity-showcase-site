@@ -20,6 +20,7 @@
 }
 
 .navbar .container {
+  position: relative;
   height: 100%;
   display: flex;
   align-items: center;
@@ -91,6 +92,9 @@
 }
 
 .nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 32px;
@@ -160,30 +164,33 @@
   color: var(--accent-cyan);
 }
 
-/* GitHub Star Button */
+/* GitHub Icon Button */
 .btn-github {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 16px;
+  justify-content: center;
+  width: 34px;
+  height: 32px;
+  padding: 0;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-full);
   color: var(--text-primary);
-  font-size: 0.9rem;
-  font-weight: 600;
   transition: all var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .btn-github svg {
   width: 18px;
   height: 18px;
+  display: block;
 }
 
 .btn-github:hover {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.3);
   box-shadow: var(--shadow-neon);
+  color: var(--accent-cyan);
 }
 
 /* --------------------------------------------------------------------------
@@ -345,6 +352,22 @@
   font-size: 1.05em;
   line-height: 1;
   flex-shrink: 0;
+}
+
+.btn-icon svg {
+  display: block;
+  width: 1.1em;
+  height: 1.1em;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.btn-secondary:hover .btn-icon:last-child svg {
+  transform: translateX(3px);
+}
+
+.btn-secondary:hover .btn-icon:first-child svg {
+  transform: scale(1.1);
 }
 
 /* Quick Terminal Widget */
@@ -2503,6 +2526,12 @@ body.has-web-fullscreen .video-showcase-wrapper {
 /* --------------------------------------------------------------------------
    10. Responsive Breakpoints
    -------------------------------------------------------------------------- */
+@media (max-width: 992px) and (min-width: 769px) {
+  .nav-links {
+    gap: 18px;
+  }
+}
+
 @media (max-width: 768px) {
   .nav-links {
     display: none;
