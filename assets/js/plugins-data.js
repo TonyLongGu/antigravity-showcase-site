@@ -15,7 +15,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-ai-context-inspector',
     category: 'sidebar',
-    version: '1.1.3',
+    version: '1.1.6',
     icon: 'assets/icons/inspector.svg?v=2',
     themeClass: 'icon-theme-purple',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-ai-context-inspector`,
@@ -56,7 +56,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-mcp-manager',
     category: 'sidebar',
-    version: '1.1.3',
+    version: '1.1.5',
     icon: 'assets/icons/mcp.svg?v=2',
     themeClass: 'icon-theme-cyan',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-mcp-manager`,
@@ -97,7 +97,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-quick-access',
     category: 'explorer',
-    version: '1.2.0',
+    version: '1.2.2',
     icon: 'assets/icons/quick-access.svg?v=2',
     themeClass: 'icon-theme-emerald',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quick-access`,
@@ -142,7 +142,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-quota-status',
     category: 'status',
-    version: '1.0.1',
+    version: '1.0.3',
     icon: 'assets/icons/quota-status.svg?v=2',
     themeClass: 'icon-theme-amber',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quota-status`,
@@ -214,7 +214,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-script-runner',
     category: 'script',
-    version: '1.2.0',
+    version: '1.2.2',
     icon: 'assets/icons/script-runner.svg?v=2',
     themeClass: 'icon-theme-lime',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
@@ -275,7 +275,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-toolbox',
     category: 'script',
-    version: '1.3.2',
+    version: '1.3.5',
     icon: 'assets/icons/toolbox.svg?v=2',
     themeClass: 'icon-theme-indigo',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-toolbox`,
