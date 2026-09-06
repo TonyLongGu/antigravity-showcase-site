@@ -10,7 +10,7 @@ const SITE_CONFIG = {
   githubUrl: 'https://github.com/TonyLongGu/antigravity-plugins',
   defaultLang: 'zh-TW',
   version: '1.3.5',
-  lastUpdated: '2026-09-06 09:43',
+  lastUpdated: '2026-09-06 13:09',
   license: 'MIT',
   supportIdeVersion: 'Google Antigravity IDE (VS Code 1.80+)'
 };
