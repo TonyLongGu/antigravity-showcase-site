@@ -29,20 +29,20 @@ const PLUGINS_DATA = [
       'en': 'AI Context Inspector'
     },
     shortDesc: {
-      'zh-TW': '即時檢視每次對話 AI 載入之 Rules、Skills、MCP API 與工作區綁定狀態，支援即時配置掃描與對話快照歷史還原。',
-      'en': 'Inspect active Rules, Skills, MCP APIs, and Workspace bindings injected into AI context with real-time scanning and conversation snapshot restore.'
+      'zh-TW': '原生側邊欄即時檢視 AI 生效上下文：精準掌握 Rules、Skills 與 MCP 工具綁定，支援即時配置掃描與歷史記憶還原。',
+      'en': 'Native sidebar for real-time AI context inspection: scan active Rules, Skills, and MCP tools with historic snapshot restore and jump-to-source.'
     },
     tags: ['Webview', 'Rules & Skills', 'Brain Snapshot', 'Sidebar'],
     features: {
       'zh-TW': [
-        '雙模式切換：當前環境配置掃描 vs 歷史對話快照還原',
-        '精準解析 transcript.jsonl，100% 還原該次對話注入的完整記憶',
-        '一鍵跳轉開啟：點擊項目直達對應的 .md 規範或技能檔案'
+        '雙模式記憶掃描：當前環境配置即時掃描 vs 歷史對話快照還原，精準解析 transcript.jsonl 注入記憶',
+        '歷史任務切換復盤：支援下拉切換歷史對話任務與復盤，完整對比各階段 Rules 與 Skills 規範生效差異',
+        '一鍵直達與摘要複製：點擊直達開啟對應 .md 技能檔案，頂部支援一鍵將生效上下文複製為 Markdown 格式'
       ],
       'en': [
-        'Dual Mode: Active Environment Scan vs Historic Conversation Snapshot Restore',
-        'Accurately parses transcript.jsonl to reconstruct exact injected memory context',
-        '1-Click jump to open referenced .md rule and skill files directly in editor'
+        'Dual Mode Memory Scanning: Live workspace config scan vs historic snapshot restore from transcript.jsonl logs',
+        'Historical Task Switching: Dropdown selector for historic conversation replay and multi-stage active rule comparison',
+        '1-Click Navigation & Export: Click to open referenced .md rule files directly, with 1-click Markdown context export'
       ]
     },
     commands: [
@@ -68,20 +68,20 @@ const PLUGINS_DATA = [
       'en': 'Antigravity MCP Manager Dashboard'
     },
     shortDesc: {
-      'zh-TW': '原生 MCP 伺服器視覺化管理、單項/批次開關控制、CLI 進程探針與 HTTP/SSE 即時連線測速側邊欄。',
-      'en': 'Native sidebar for visual MCP server management, batch toggle controls, CLI process probing, and HTTP/SSE latency testing.'
+      'zh-TW': '原生側邊欄全域 MCP 伺服器儀表板：提供視覺化單項與批次開關、CLI 進程探針測速、狀態列常駐指示與熱監聽備份。',
+      'en': 'Native sidebar dashboard for global MCP server management: visual batch toggles, CLI process probes, status bar live counter, and auto-backups.'
     },
     tags: ['Webview', 'MCP Control', 'Probe Ping', 'Status Bar'],
     features: {
       'zh-TW': [
-        '無縫嵌入 IDE 左側活動列，專注管理 ~/.gemini/config/mcp_config.json',
-        'CLI 進程探針（支援 JSON-RPC ping 與 Windows 進程樹安全回收）與遠端測速',
-        '底部狀態列常駐顯示即時啟用計數（如 ⚡ MCP: 1/9）與熱監聽備份'
+        '全域伺服器視覺管理：無縫嵌入左側活動列，專注維護 ~/.gemini/config 配置，支援視覺化單項與批次開關',
+        '進程探針與延遲測速：內建 CLI 進程探針（支援 JSON-RPC ping 與進程樹回收）以及 HTTP/SSE 測速',
+        '狀態指示與熱重載監聽：底部狀態列常駐顯示啟用計數（如 ⚡ MCP: 1/9），支援配置自動備份與檔案熱監聽'
       ],
       'en': [
-        'Native Activity Bar integration for managing ~/.gemini/config/mcp_config.json',
-        'CLI Process Probe with JSON-RPC ping, process tree recycling, and SSE latency tests',
-        'Status bar live counter indicator (e.g. ⚡ MCP: 1/9) and live file watcher'
+        'Global Server Management: Embedded into Activity Bar to manage ~/.gemini/config with visual single/batch toggles',
+        'Process Probe & Latency Test: CLI probe supporting JSON-RPC ping and process tree recycling, plus HTTP/SSE speed tests',
+        'Status Bar Counter & Live Watcher: Real-time status bar count (⚡ MCP: 1/9) with automatic .bak backup and file watcher'
       ]
     },
     commands: [
@@ -107,20 +107,20 @@ const PLUGINS_DATA = [
       'en': 'Quick Access & Scratchpad'
     },
     shortDesc: {
-      'zh-TW': '檔案總管專屬快速存取與暫存視窗：支援滑鼠拖曳引用至 Chat 對話框、多選批次操作與雙擊快速開啟。',
-      'en': 'Dedicated Explorer quick access & scratchpad view: drag-and-drop to Chat inputs, multi-select batch actions, and tree browsing.'
+      'zh-TW': '檔案總管專屬快速存取視窗：支援檔案與資料夾雙分組暫存、滑鼠拖曳引用至 Chat 對話框、多選批次與原地層級展開。',
+      'en': 'Dedicated Explorer quick access & scratchpad view: dual-group pinning, drag-and-drop Chat mentions, multi-select, and in-place tree expansion.'
     },
     tags: ['Explorer View', 'Drag & Drop', 'Chat Mention', 'Multi-Select'],
     features: {
       'zh-TW': [
-        '檔案總管獨立視圖：雙分組管理（常規釘選 Pinned 與 臨時暫存 Scratchpad）',
-        '滑鼠拖曳支援：直接拖入 Chat 對話框自動轉化為 @檔案 或絕對路徑引用',
-        '多選與批次操作：支援 Ctrl / Shift 複選批次釘選/移除，支援資料夾原地展開'
+        '雙分組獨立暫存視圖：常駐檔案總管側邊欄，提供常規釘選 (Pinned) 與臨時暫存 (Scratchpad) 雙軌管理',
+        '滑鼠拖曳對話框引用：支援單選或多選檔案直接拖入 Antigravity Chat 對話框，自動轉化為 @檔案 引用',
+        '多選批次與原地目錄展開：支援 Ctrl/Shift 複選批次切換釘選、資料夾原地展開子層級並獨立釘選內部檔案'
       ],
       'en': [
-        'Explorer native tree view: Dual grouping (Pinned items & temporary Scratchpad)',
-        'Drag & Drop integration: drag files into Chat prompt box for instant @file references',
-        'Multi-Select & batch actions: Ctrl / Shift selection for batch toggle and in-place folder expand'
+        'Dual-Group Tree View: Resident Explorer sidebar panel providing Pinned items and temporary Scratchpad workspaces',
+        'Drag & Drop Chat Mentions: Drag single or multi-selected files into Antigravity Chat box for instant @file references',
+        'Multi-Select & In-Place Expansion: Ctrl/Shift batch actions, in-place directory expansion, and independent child item pinning'
       ]
     },
     commands: [
@@ -150,20 +150,20 @@ const PLUGINS_DATA = [
       'en': 'AI Model Quota Status Monitor'
     },
     shortDesc: {
-      'zh-TW': '狀態列極致簡約純文字監控：常駐顯示 Gemini 與 Claude 模型每週與 5 小時剩餘額度、重置倒數與消耗偏差值。',
-      'en': 'Ultra-compact plain-text status bar monitor: tracks weekly and 5-hour quota, reset countdowns, and consumption deviation algorithms.'
+      'zh-TW': '狀態列極簡純文字 AI 配額監控：常駐顯示 Gemini 與 Claude 每週與 5 小時額度，獨家勻速消耗偏差值演算與倒數。',
+      'en': 'Ultra-compact plain-text status bar monitor: tracks weekly and 5-hour AI quotas with unique linear consumption deviation and countdowns.'
     },
     tags: ['Status Bar', 'Quota Algorithm', 'Countdown', 'QuickPick'],
     features: {
       'zh-TW': [
-        '極致乾淨狀態列：預設極簡雙欄 (59%, 53% | 7%, 100%)，零 Emoji、零干擾',
-        '獨家消耗偏差值演算：以 168 小時勻速模型計算「建議今日餘額」與正負偏差值',
-        '豐富 Tooltip 懸浮提示：完整列出日時分重置倒數、模型分類與檢查時間'
+        '極致乾淨純文字狀態列：預設極簡雙欄 (59%, 53% | 7%, 100%)，零 Emoji、零干擾，原生無縫融合底部',
+        '獨家消耗偏差值演算：以 168 小時勻速消耗模型動態計算「建議今日餘額」，即時呈現進度結餘或超支偏差數值',
+        '詳細懸浮提示與快捷選單：懸停即覽日時分重置倒數，點擊 QuickPick 彈出選單切換顯示模式與自訂警示底色'
       ],
       'en': [
-        'Ultra-clean status bar: Compact dual-column (59%, 53% | 7%, 100%) with zero noise',
-        'Unique Deviation Algorithm: Calculates theoretical safe allowance and deficit/surplus',
-        'Rich Hover Tooltip: Lists precise reset countdowns (D/H/M) and detailed model tiers'
+        'Ultra-Clean Plain Text Bar: Compact dual-column (59%, 53% | 7%, 100%) with zero Emoji and noise, seamlessly embedded',
+        'Linear Consumption Deviation: Dynamically calculates daily safe allowance and surplus/deficit deviations based on 168h models',
+        'Rich Tooltip & QuickPick Menu: Precise D/H/M reset countdowns on hover, and QuickPick menu for format toggles and alert colors'
       ]
     },
     commands: [
@@ -284,20 +284,20 @@ const PLUGINS_DATA = [
       'en': 'Antigravity Control Center (Toolbox)'
     },
     shortDesc: {
-      'zh-TW': '側邊欄多功能控制中心：多專案工作區同名修正、專案腳本執行器、全域設定直達捷徑與 Brain 歷史快取清理。',
-      'en': 'Sidebar control center: workspace duplicate name fixer, project script runner, global config shortcuts, and Brain cache cleaner.'
+      'zh-TW': '側邊欄多功能控制中心：提供工作區同名專案修正、專案腳本聯動排序執行器、全域自訂設定直達捷徑與 Brain 快取清理。',
+      'en': 'Sidebar multi-tool control center: workspace duplicate name fixer, linked project script runner, global config shortcuts, and Brain cache cleaner.'
     },
     tags: ['Sidebar Panel', 'Workspace Fixer', 'Brain Cleaner', 'Global Config'],
     features: {
       'zh-TW': [
-        '多專案工作區管理：智慧偵測 .code-workspace 同名專案，一鍵自動修復名稱衝突',
-        '專案腳本執行器：右鍵快速加入腳本，並隨工作區專案排序動態聯動排列',
-        '全域自訂目錄直達：一鍵開啟 ~/.gemini/config 根目錄、Rules、Skills、Plugins 與 Brain 清理'
+        '多專案工作區與同名修正：智慧標記 .code-workspace 同名衝突，一鍵自動補齊父層路徑前綴維持命名一致性',
+        '專案腳本聯動排序執行器：檔案總管右鍵快速加入腳本，隨工作區專案排序動態聯動次序，支援一般與管理員提權執行',
+        '全域目錄直達與記憶庫清理：一鍵直達 ~/.gemini 自訂目錄與過濾開關，提供動態時間滑桿安全釋放對話快取'
       ],
       'en': [
-        'Multi-root Workspace Manager: auto-detects name collisions and fixes them in 1-click',
-        'Project Script Runner: add scripts from Explorer with workspace-linked dynamic sorting',
-        'Global Config Shortcuts: instant navigation to ~/.gemini/config, Rules, Skills, Plugins & Brain cleaner'
+        'Multi-Project Workspace Fixer: Auto-detects .code-workspace name collisions and applies parent folder prefixes in 1-click',
+        'Project Script Dynamic Runner: Right-click add scripts with workspace-linked dynamic sorting, supporting normal and Admin execution',
+        'Global Shortcuts & Brain Cleaner: 1-Click access to ~/.gemini configs, Explorer filter toggles, and dynamic Brain cache cleanup'
       ]
     },
     commands: [
