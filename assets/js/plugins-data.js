@@ -37,14 +37,12 @@ const PLUGINS_DATA = [
       'zh-TW': [
         '雙模式切換：當前環境配置掃描 vs 歷史對話快照還原',
         '精準解析 transcript.jsonl，100% 還原該次對話注入的完整記憶',
-        '一鍵跳轉開啟：點擊項目直達對應的 .md 規範或技能檔案',
-        '即時過濾搜尋與一鍵複製整份生效上下文為 Markdown 格式'
+        '一鍵跳轉開啟：點擊項目直達對應的 .md 規範或技能檔案'
       ],
       'en': [
         'Dual Mode: Active Environment Scan vs Historic Conversation Snapshot Restore',
         'Accurately parses transcript.jsonl to reconstruct exact injected memory context',
-        '1-Click jump to open referenced .md rule and skill files directly in editor',
-        'Live search filtering and 1-click Markdown context export to clipboard'
+        '1-Click jump to open referenced .md rule and skill files directly in editor'
       ]
     },
     commands: [
@@ -78,14 +76,12 @@ const PLUGINS_DATA = [
       'zh-TW': [
         '無縫嵌入 IDE 左側活動列，專注管理 ~/.gemini/config/mcp_config.json',
         'CLI 進程探針（支援 JSON-RPC ping 與 Windows 進程樹安全回收）與遠端測速',
-        '底部狀態列常駐顯示即時啟用計數（如 ⚡ MCP: 1/9）',
-        '支援配置自動備份（.bak）與外部檔案變更即時熱監聽（File Watcher）'
+        '底部狀態列常駐顯示即時啟用計數（如 ⚡ MCP: 1/9）與熱監聽備份'
       ],
       'en': [
         'Native Activity Bar integration for managing ~/.gemini/config/mcp_config.json',
         'CLI Process Probe with JSON-RPC ping, process tree recycling, and SSE latency tests',
-        'Status bar live counter indicator (e.g. ⚡ MCP: 1/9)',
-        'Automatic config backups (.bak) and real-time external file change watcher'
+        'Status bar live counter indicator (e.g. ⚡ MCP: 1/9) and live file watcher'
       ]
     },
     commands: [
@@ -119,14 +115,12 @@ const PLUGINS_DATA = [
       'zh-TW': [
         '檔案總管獨立視圖：雙分組管理（常規釘選 Pinned 與 臨時暫存 Scratchpad）',
         '滑鼠拖曳支援：直接拖入 Chat 對話框自動轉化為 @檔案 或絕對路徑引用',
-        '多選與批次操作：支援 Ctrl / Shift 複選，一鍵批次切換釘選或移除',
-        '資料夾原地展開：直接展開子層級目錄，無須在深層目錄反覆翻找'
+        '多選與批次操作：支援 Ctrl / Shift 複選批次釘選/移除，支援資料夾原地展開'
       ],
       'en': [
         'Explorer native tree view: Dual grouping (Pinned items & temporary Scratchpad)',
         'Drag & Drop integration: drag files into Chat prompt box for instant @file references',
-        'Multi-Select & batch actions: Ctrl / Shift selection for batch toggle and removal',
-        'In-place folder expansion: explore sub-folders without scrolling the main tree'
+        'Multi-Select & batch actions: Ctrl / Shift selection for batch toggle and in-place folder expand'
       ]
     },
     commands: [
@@ -164,14 +158,12 @@ const PLUGINS_DATA = [
       'zh-TW': [
         '極致乾淨狀態列：預設極簡雙欄 (59%, 53% | 7%, 100%)，零 Emoji、零干擾',
         '獨家消耗偏差值演算：以 168 小時勻速模型計算「建議今日餘額」與正負偏差值',
-        '豐富 Tooltip 懸浮提示：完整列出日時分重置倒數、模型分類與檢查時間',
-        '點擊 QuickPick 彈出選單：快速切換顯示格式、自訂背景色彩與自動刷新間隔'
+        '豐富 Tooltip 懸浮提示：完整列出日時分重置倒數、模型分類與檢查時間'
       ],
       'en': [
         'Ultra-clean status bar: Compact dual-column (59%, 53% | 7%, 100%) with zero noise',
         'Unique Deviation Algorithm: Calculates theoretical safe allowance and deficit/surplus',
-        'Rich Hover Tooltip: Lists precise reset countdowns (D/H/M) and detailed model tiers',
-        'Interactive QuickPick Menu: Fast format toggle, background colors, and refresh timers'
+        'Rich Hover Tooltip: Lists precise reset countdowns (D/H/M) and detailed model tiers'
       ]
     },
     commands: [
@@ -228,28 +220,31 @@ const PLUGINS_DATA = [
       'en': 'Context Script Runner'
     },
     shortDesc: {
-      'zh-TW': '檔案總管與編輯器右鍵選單直達：一鍵以專屬終端機或管理員提權視窗執行 .py、.ps1、.bat、.cmd 腳本。',
-      'en': 'Context menu & editor play button runner: 1-click execution for .py, .ps1, .bat, and .cmd with terminal or Admin UAC elevation.'
+      'zh-TW': '檔案總管與編輯器右鍵直達：一鍵執行 Python、PowerShell 與批次檔（支援管理員提權），並內建圖片、聲音與影片資料夾高效能檢視工具。',
+      'en': 'Context menu & editor 1-click runner for Python, PowerShell, and Batch (with Admin UAC), plus high-performance folder Image, Audio, and Video viewers.'
     },
-    tags: ['Context Menu', 'PowerShell Bypass', 'UAC Admin', 'Python/Batch'],
+    tags: ['Context Menu', 'Media Viewer', 'PowerShell Bypass', 'UAC Admin'],
     features: {
       'zh-TW': [
-        '支援三大多元格式：Python (.py)、PowerShell (.ps1)、批次檔 (.bat / .cmd)',
-        '雙入口操作：檔案總管右鍵選單 ＋ 程式碼編輯器右上角專屬 ▶ 播放按鈕',
-        '安全權限繞過：PowerShell 腳本自動附帶 -ExecutionPolicy Bypass 執行',
-        '管理員提權選項：可切換以 Windows UAC 系統管理員獨立視窗執行並保持開啟'
+        '多語言腳本執行：檔案總管右鍵與編輯器右上角 ▶ 一鍵執行 Python、PowerShell（自動 Bypass）與批次檔，支援 UAC 提權',
+        '資料夾圖片檢視工具：4.5x 右鍵抓手滾動、游標錨點無損縮放 (Cursor-Anchored Zoom)、全域指針鎖定與右鍵/Esc 極速退出',
+        '資料夾聲音與影片檢視工具：懸停預覽試聽、Web Audio API 動態霓虹頻譜、高性能解耦 Seek 尋道播放器（杜絕解碼死鎖）'
       ],
       'en': [
-        'Supports 3 major script types: Python (.py), PowerShell (.ps1), Batch (.bat/.cmd)',
-        'Dual Entrypoints: Explorer right-click context menu + Editor top-right ▶ play button',
-        'Automatic execution policy bypass: seamlessly runs .ps1 scripts without terminal errors',
-        'UAC Elevation Support: configurable Administrator window mode with auto-keep-open'
+        'Multi-Language Script Runner: Explorer context menu & Editor ▶ button for Python, PowerShell (auto Bypass), and Batch with UAC Admin elevation',
+        'Folder Image Viewer: 4.5x right-click hand scrolling, cursor-anchored zoom lightbox, global pointer capture, and instant right-click/Esc exit',
+        'Folder Audio & Video Viewers: Hover preview, Web Audio API dynamic neon spectrum visualizer, and high-performance decoupled seek player'
       ]
     },
     commands: [
+      { id: 'scriptRunner.viewFolderImages', name: '檢視圖片 (View Images)' },
+      { id: 'scriptRunner.viewFolderAudios', name: '檢視聲音 (View Audio)' },
+      { id: 'scriptRunner.viewFolderVideos', name: '檢視影片 (View Videos)' },
       { id: 'scriptRunner.runPy', name: '執行 Python 腳本 (Run Python)' },
       { id: 'scriptRunner.runPs1', name: '執行 PowerShell 腳本 (Run PowerShell)' },
-      { id: 'scriptRunner.runBat', name: '執行批次檔 (Run Batch Script)' }
+      { id: 'scriptRunner.runPs1Admin', name: '執行 PowerShell 腳本 (系統管理員) (Run PowerShell Admin)' },
+      { id: 'scriptRunner.runBat', name: '執行批次檔 (Run Batch Script)' },
+      { id: 'scriptRunner.runBatAdmin', name: '執行批次檔 (系統管理員) (Run Batch File Admin)' }
     ],
     configurations: [
       {
@@ -297,14 +292,12 @@ const PLUGINS_DATA = [
       'zh-TW': [
         '多專案工作區管理：智慧偵測 .code-workspace 同名專案，一鍵自動修復名稱衝突',
         '專案腳本執行器：右鍵快速加入腳本，並隨工作區專案排序動態聯動排列',
-        '全域自訂目錄直達：一鍵開啟 ~/.gemini/config 根目錄、Rules、Skills 與 Plugins',
-        'Brain 對話記憶清理：動態調整時間週期（2~4個月），安全釋放對話快取容量'
+        '全域自訂目錄直達：一鍵開啟 ~/.gemini/config 根目錄、Rules、Skills、Plugins 與 Brain 清理'
       ],
       'en': [
         'Multi-root Workspace Manager: auto-detects name collisions and fixes them in 1-click',
         'Project Script Runner: add scripts from Explorer with workspace-linked dynamic sorting',
-        'Global Config Shortcuts: instant navigation to ~/.gemini/config, Rules, Skills & Plugins',
-        'Brain Cache Cleaner: dynamic age slider (2-4 months) for safe storage reclamation'
+        'Global Config Shortcuts: instant navigation to ~/.gemini/config, Rules, Skills, Plugins & Brain cleaner'
       ]
     },
     commands: [

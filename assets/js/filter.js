@@ -50,12 +50,14 @@ function renderPlugins() {
     const id = plugin.id.toLowerCase();
     const tags = plugin.tags.map(t => t.toLowerCase()).join(' ');
     const commands = plugin.commands.map(c => (c.name + ' ' + c.id).toLowerCase()).join(' ');
+    const featuresStr = (plugin.features[currentLang] || []).join(' ').toLowerCase();
 
     return name.includes(searchQuery) || 
            desc.includes(searchQuery) || 
            id.includes(searchQuery) || 
            tags.includes(searchQuery) ||
-           commands.includes(searchQuery);
+           commands.includes(searchQuery) ||
+           featuresStr.includes(searchQuery);
   });
 
   if (filtered.length === 0) {
