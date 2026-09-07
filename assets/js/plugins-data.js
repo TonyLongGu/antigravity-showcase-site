@@ -97,7 +97,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-quick-access',
     category: 'explorer',
-    version: '1.2.2',
+    version: '1.2.5',
     icon: 'assets/icons/quick-access.svg?v=2',
     themeClass: 'icon-theme-emerald',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quick-access`,
@@ -214,7 +214,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-script-runner',
     category: 'script',
-    version: '1.4.0',
+    version: '1.5.0',
     icon: 'assets/icons/script-runner.svg?v=2',
     themeClass: 'icon-theme-lime',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
