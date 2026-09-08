@@ -154,14 +154,9 @@ Please guide me through the following interactive workflow:
 /**
  * Antigravity High-Performance Video Player Engine
  * 支援 HTML5 原生影片 (.mov/.mp4，0 秒無延遲、0 暫停黑幕、0.3s 極速微提示)
- * 同時相容 YouTube IFrame API
  */
-let currentVideoMode = 'html5'; // 'html5' or 'youtube'
 let html5VideoEl = null;
-let customYtPlayer = null;
-let isYtPlayerReady = false;
 let isPlaying = false;
-let updateProgressInterval = null;
 let controlsHideTimer = null;
 let isDraggingProgress = false;
 
@@ -172,7 +167,6 @@ function getPlayerDOM() {
     domCache = {
       container: document.getElementById('main-video-player'),
       html5Video: document.getElementById('tutorial-html5-video'),
-      iframe: document.getElementById('tutorial-video-iframe'),
       controls: document.getElementById('custom-player-controls'),
       clickSurface: document.getElementById('player-click-surface'),
       progContainer: document.getElementById('player-progress-container'),
@@ -211,15 +205,8 @@ function showBufferingIndicator(show) {
 }
 
 function getCurrentPlaybackTime() {
-  if (currentVideoMode === 'html5') {
-    const v = html5VideoEl || (domCache && domCache.html5Video);
-    return v ? (v.currentTime || 0) : 0;
-  } else if (currentVideoMode === 'youtube') {
-    if (customYtPlayer && isYtPlayerReady && typeof customYtPlayer.getCurrentTime === 'function') {
-      try { return customYtPlayer.getCurrentTime() || 0; } catch (e) { return 0; }
-    }
-  }
-  return 0;
+  const v = html5VideoEl || (domCache && domCache.html5Video);
+  return v ? (v.currentTime || 0) : 0;
 }
 
 /**
@@ -404,26 +391,6 @@ function toggleSubtitles() {
   blurActiveControl();
 }
 
-window.onYouTubeIframeAPIReady = function() {
-  try {
-    customYtPlayer = new YT.Player('tutorial-video-iframe', {
-      events: {
-        'onReady': onYtPlayerReady,
-        'onStateChange': onYtPlayerStateChange
-      }
-    });
-  } catch (err) {
-    console.warn('YouTube IFrame API Init:', err);
-  }
-};
-
-function onYtPlayerReady(event) {
-  isYtPlayerReady = true;
-  if (currentVideoMode === 'youtube') {
-    updateTimeAndDuration();
-  }
-}
-
 function wakePlayerUI() {
   const dom = getPlayerDOM();
   if (!dom.container || !dom.controls) return;
@@ -468,7 +435,6 @@ function updatePlayPauseUI(playing) {
     if (dom.pauseIcon) dom.pauseIcon.style.display = 'block';
     if (dom.controls) dom.controls.classList.remove('paused');
     if (dom.container) dom.container.classList.remove('paused');
-    if (currentVideoMode === 'youtube') startProgressLoop();
   } else {
     clearTimeout(controlsHideTimer);
     if (dom.playIcon) dom.playIcon.style.display = 'block';
@@ -481,21 +447,6 @@ function updatePlayPauseUI(playing) {
       dom.container.classList.add('paused');
       dom.container.classList.remove('hide-ui');
     }
-    stopProgressLoop();
-  }
-}
-
-function onYtPlayerStateChange(event) {
-  if (currentVideoMode !== 'youtube') return;
-
-  if (event.data === YT.PlayerState.PLAYING) {
-    isPlaying = true;
-    updatePlayPauseUI(true);
-    wakePlayerUI();
-  } else {
-    isPlaying = false;
-    updatePlayPauseUI(false);
-    updateTimeAndDuration();
   }
 }
 
@@ -504,49 +455,31 @@ function toggleCustomPlayer() {
   if (justDraggedProgress || isDraggingProgress) return;
   const dom = getPlayerDOM();
 
-  if (currentVideoMode === 'html5') {
-    if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
-    if (!html5VideoEl) return;
+  if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
+  if (!html5VideoEl) return;
 
-    if (html5VideoEl.paused) {
-      const p = html5VideoEl.play();
-      if (p && p.catch) {
-        p.catch(e => {
-          console.warn('HTML5 Video Play:', e);
-          isPlaying = false;
-          updatePlayPauseUI(false);
-          showBufferingIndicator(false);
-        });
-      }
-      isPlaying = true;
-      if (dom.badgePlay) dom.badgePlay.style.display = 'block';
-      if (dom.badgePause) dom.badgePause.style.display = 'none';
-      updatePlayPauseUI(true);
-      wakePlayerUI();
-    } else {
-      html5VideoEl.pause();
-      isPlaying = false;
-      showBufferingIndicator(false);
-      if (dom.badgePlay) dom.badgePlay.style.display = 'none';
-      if (dom.badgePause) dom.badgePause.style.display = 'block';
-      updatePlayPauseUI(false);
+  if (html5VideoEl.paused) {
+    const p = html5VideoEl.play();
+    if (p && p.catch) {
+      p.catch(e => {
+        console.warn('HTML5 Video Play:', e);
+        isPlaying = false;
+        updatePlayPauseUI(false);
+        showBufferingIndicator(false);
+      });
     }
-  } else if (currentVideoMode === 'youtube') {
-    if (!customYtPlayer || !isYtPlayerReady) return;
-    try {
-      const state = customYtPlayer.getPlayerState();
-      if (state === YT.PlayerState.PLAYING) {
-        customYtPlayer.pauseVideo();
-        if (dom.badgePlay) dom.badgePlay.style.display = 'none';
-        if (dom.badgePause) dom.badgePause.style.display = 'block';
-      } else {
-        customYtPlayer.playVideo();
-        if (dom.badgePlay) dom.badgePlay.style.display = 'block';
-        if (dom.badgePause) dom.badgePause.style.display = 'none';
-      }
-    } catch (err) {
-      console.warn('toggleCustomPlayer YT:', err);
-    }
+    isPlaying = true;
+    if (dom.badgePlay) dom.badgePlay.style.display = 'block';
+    if (dom.badgePause) dom.badgePause.style.display = 'none';
+    updatePlayPauseUI(true);
+    wakePlayerUI();
+  } else {
+    html5VideoEl.pause();
+    isPlaying = false;
+    showBufferingIndicator(false);
+    if (dom.badgePlay) dom.badgePlay.style.display = 'none';
+    if (dom.badgePause) dom.badgePause.style.display = 'block';
+    updatePlayPauseUI(false);
   }
 
   // 0.3 秒極速淡出微提示
@@ -563,41 +496,21 @@ function toggleCustomPlayer() {
 function toggleMute() {
   const dom = getPlayerDOM();
 
-  if (currentVideoMode === 'html5') {
-    if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
-    if (!html5VideoEl) return;
-    html5VideoEl.muted = !html5VideoEl.muted;
-    if (!html5VideoEl.muted) {
-      if (html5VideoEl.volume === 0) {
-        html5VideoEl.volume = 1;
-      }
-      if (dom.volHigh) dom.volHigh.style.display = 'block';
-      if (dom.volMute) dom.volMute.style.display = 'none';
-      const targetVol = (html5VideoEl.volume * 100) || 100;
-      updateVolumeSliderUI(targetVol);
-    } else {
-      if (dom.volHigh) dom.volHigh.style.display = 'none';
-      if (dom.volMute) dom.volMute.style.display = 'block';
-      updateVolumeSliderUI(0);
+  if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
+  if (!html5VideoEl) return;
+  html5VideoEl.muted = !html5VideoEl.muted;
+  if (!html5VideoEl.muted) {
+    if (html5VideoEl.volume === 0) {
+      html5VideoEl.volume = 1;
     }
-  } else if (currentVideoMode === 'youtube') {
-    if (!customYtPlayer || !isYtPlayerReady) return;
-    if (customYtPlayer.isMuted()) {
-      customYtPlayer.unMute();
-      let targetVol = customYtPlayer.getVolume();
-      if (targetVol === 0) {
-        targetVol = 100;
-        customYtPlayer.setVolume(100);
-      }
-      if (dom.volHigh) dom.volHigh.style.display = 'block';
-      if (dom.volMute) dom.volMute.style.display = 'none';
-      updateVolumeSliderUI(targetVol);
-    } else {
-      customYtPlayer.mute();
-      if (dom.volHigh) dom.volHigh.style.display = 'none';
-      if (dom.volMute) dom.volMute.style.display = 'block';
-      updateVolumeSliderUI(0);
-    }
+    if (dom.volHigh) dom.volHigh.style.display = 'block';
+    if (dom.volMute) dom.volMute.style.display = 'none';
+    const targetVol = (html5VideoEl.volume * 100) || 100;
+    updateVolumeSliderUI(targetVol);
+  } else {
+    if (dom.volHigh) dom.volHigh.style.display = 'none';
+    if (dom.volMute) dom.volMute.style.display = 'block';
+    updateVolumeSliderUI(0);
   }
   wakePlayerUI();
   blurActiveControl();
@@ -619,17 +532,10 @@ function changeVolume(val) {
 
   updateVolumeSliderUI(val);
 
-  if (currentVideoMode === 'html5') {
-    if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
-    if (!html5VideoEl) return;
-    html5VideoEl.volume = val / 100;
-    html5VideoEl.muted = (val === 0);
-  } else if (currentVideoMode === 'youtube') {
-    if (!customYtPlayer || !isYtPlayerReady) return;
-    customYtPlayer.setVolume(val);
-    if (val === 0) customYtPlayer.mute();
-    else if (customYtPlayer.isMuted()) customYtPlayer.unMute();
-  }
+  if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
+  if (!html5VideoEl) return;
+  html5VideoEl.volume = val / 100;
+  html5VideoEl.muted = (val === 0);
 
   if (val === 0) {
     if (dom.volHigh) dom.volHigh.style.display = 'none';
@@ -874,34 +780,19 @@ function safeSeekHtml5Video(targetTime) {
 }
 
 function seekRelative(seconds) {
-  let dur = 0;
-  let curr = 0;
-  if (currentVideoMode === 'html5' && html5VideoEl) {
-    dur = html5VideoEl.duration || 0;
-    curr = html5VideoEl.currentTime || 0;
-    const target = Math.max(0, Math.min(dur, curr + seconds));
-    safeSeekHtml5Video(target);
-    updateTimeAndDuration();
-  } else if (currentVideoMode === 'youtube' && customYtPlayer && isYtPlayerReady) {
-    try {
-      dur = customYtPlayer.getDuration() || 0;
-      curr = customYtPlayer.getCurrentTime() || 0;
-      const target = Math.max(0, Math.min(dur, curr + seconds));
-      customYtPlayer.seekTo(target, true);
-      updateTimeAndDuration();
-    } catch (e) {}
-  }
+  if (!html5VideoEl) return;
+  const dur = html5VideoEl.duration || 0;
+  const curr = html5VideoEl.currentTime || 0;
+  const target = Math.max(0, Math.min(dur, curr + seconds));
+  safeSeekHtml5Video(target);
+  updateTimeAndDuration();
 }
 
 function adjustVolumeRelative(delta) {
   const slider = document.getElementById('ctrl-volume-slider');
   let currentVol = 100;
-  if (currentVideoMode === 'html5' && html5VideoEl) {
+  if (html5VideoEl) {
     currentVol = html5VideoEl.muted ? 0 : Math.round(html5VideoEl.volume * 100);
-  } else if (currentVideoMode === 'youtube' && customYtPlayer && isYtPlayerReady) {
-    try {
-      currentVol = customYtPlayer.isMuted() ? 0 : customYtPlayer.getVolume();
-    } catch (e) {}
   }
   const newVol = Math.max(0, Math.min(100, currentVol + delta));
   if (slider) slider.value = newVol;
@@ -915,49 +806,23 @@ function formatTime(seconds) {
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
-function startProgressLoop() {
-  stopProgressLoop();
-  // 僅在 YouTube 模式下才需要定時器輪詢（HTML5 模式完全由原生 timeupdate 高效驅動）
-  if (currentVideoMode === 'youtube') {
-    updateProgressInterval = setInterval(updateTimeAndDuration, 200);
-  }
-}
-
-function stopProgressLoop() {
-  if (updateProgressInterval) {
-    clearInterval(updateProgressInterval);
-    updateProgressInterval = null;
-  }
-}
-
 function updateTimeAndDuration() {
   if (isDraggingProgress) return;
   const dom = getPlayerDOM();
 
-  let curr = 0;
-  let dur = 0;
+  if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
+  if (!html5VideoEl) return;
+  const curr = html5VideoEl.currentTime || 0;
+  const dur = html5VideoEl.duration || 0;
   let loadedPct = 0;
 
-  if (currentVideoMode === 'html5') {
-    if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
-    if (!html5VideoEl) return;
-    curr = html5VideoEl.currentTime || 0;
-    dur = html5VideoEl.duration || 0;
-    if (html5VideoEl.buffered && html5VideoEl.buffered.length > 0 && dur > 0) {
-      for (let i = 0; i < html5VideoEl.buffered.length; i++) {
-        if (curr >= html5VideoEl.buffered.start(i) && curr <= html5VideoEl.buffered.end(i)) {
-          loadedPct = (html5VideoEl.buffered.end(i) / dur) * 100;
-          break;
-        }
+  if (html5VideoEl.buffered && html5VideoEl.buffered.length > 0 && dur > 0) {
+    for (let i = 0; i < html5VideoEl.buffered.length; i++) {
+      if (curr >= html5VideoEl.buffered.start(i) && curr <= html5VideoEl.buffered.end(i)) {
+        loadedPct = (html5VideoEl.buffered.end(i) / dur) * 100;
+        break;
       }
     }
-  } else if (currentVideoMode === 'youtube') {
-    if (!customYtPlayer || !isYtPlayerReady) return;
-    try {
-      curr = customYtPlayer.getCurrentTime() || 0;
-      dur = customYtPlayer.getDuration() || 0;
-      loadedPct = (customYtPlayer.getVideoLoadedFraction() || 0) * 100;
-    } catch (e) {}
   }
 
   if (dom.timeCurrent) dom.timeCurrent.textContent = formatTime(curr);
@@ -1050,16 +915,11 @@ function initCustomVideoPlayer() {
       showBufferingIndicator(true);
     });
 
-    // 容錯降級：若 HTML5 載入失敗（格式不支援或檔案異常），平滑切換至 YouTube 備用播放
+    // 若 HTML5 載入失敗（格式不支援或檔案異常），提供明確提示
     html5VideoEl.addEventListener('error', (e) => {
       showBufferingIndicator(false);
-      console.warn('HTML5 Video 解碼或載入失敗，自動降級切換至 YouTube 備援線路', e);
-      const videoList = getTutorialVideosList();
-      const videoItem = videoList.find(v => v.id === currentActiveVideoId);
-      if (videoItem) {
-        fallbackToYouTubeMode(videoItem);
-        showToast('已為您切換至 YouTube 備用播放線路');
-      }
+      console.warn('HTML5 Video 解碼或載入失敗:', e);
+      showToast('影片載入失敗，請確認影片檔案是否存在');
     });
   }
 
@@ -1225,13 +1085,7 @@ function initCustomVideoPlayer() {
 
   // 僅即時更新 UI（不頻繁請求影片解碼，保證 60fps 極速響應與 0 卡頓）
   const updateSeekUI = (pos) => {
-    let dur = 0;
-    if (currentVideoMode === 'html5' && html5VideoEl) {
-      dur = html5VideoEl.duration || 0;
-    } else if (currentVideoMode === 'youtube' && customYtPlayer && isYtPlayerReady) {
-      dur = customYtPlayer.getDuration() || 0;
-    }
-
+    const dur = html5VideoEl ? (html5VideoEl.duration || 0) : 0;
     if (dom.filledBar) dom.filledBar.style.width = `${pos * 100}%`;
     if (dom.thumbEl) dom.thumbEl.style.left = `${pos * 100}%`;
     if (dom.timeCurrent && dur > 0) dom.timeCurrent.textContent = formatTime(pos * dur);
@@ -1239,19 +1093,10 @@ function initCustomVideoPlayer() {
 
   // 真正執行跳轉（僅在點擊釋放或拖曳結束時執行一次）
   const applySeek = (pos) => {
-    let dur = 0;
-    if (currentVideoMode === 'html5' && html5VideoEl) {
-      dur = html5VideoEl.duration || 0;
+    if (html5VideoEl) {
+      const dur = html5VideoEl.duration || 0;
       const targetTime = pos * dur;
       safeSeekHtml5Video(targetTime);
-    } else if (currentVideoMode === 'youtube' && customYtPlayer && isYtPlayerReady) {
-      dur = customYtPlayer.getDuration() || 0;
-      const targetTime = pos * dur;
-      try {
-        customYtPlayer.seekTo(targetTime, true);
-      } catch (e) {
-        console.warn('YouTube Seek Error:', e);
-      }
     }
     updateSeekUI(pos);
     wakePlayerUI();
@@ -1377,50 +1222,6 @@ function updateTutorialVideoMetaOnly(videoId) {
   }
 }
 
-function fallbackToYouTubeMode(videoItem) {
-  currentVideoMode = 'youtube';
-  const dom = getPlayerDOM();
-  if (dom.html5Video) {
-    dom.html5Video.pause();
-    dom.html5Video.style.display = 'none';
-  }
-  if (dom.iframe) dom.iframe.style.display = 'block';
-
-  const parsed = parseYouTubeUrls(videoItem.videoUrl || videoItem.videoEmbedUrl || 'HSYWa4WkBe0');
-  if (customYtPlayer && isYtPlayerReady && typeof customYtPlayer.cueVideoById === 'function') {
-    try {
-      customYtPlayer.cueVideoById(parsed.videoId);
-    } catch (e) {
-      if (dom.iframe) dom.iframe.src = parsed.embedUrl;
-    }
-  } else if (dom.iframe) {
-    dom.iframe.dataset.src = parsed.embedUrl;
-    dom.iframe.src = parsed.embedUrl;
-  }
-}
-
-/**
- * Smart YouTube URL Parser
- */
-function parseYouTubeUrls(input) {
-  if (!input) return { videoId: '', watchUrl: '', embedUrl: '', thumbUrl: '' };
-  
-  let videoId = input.trim();
-  const match = input.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-  if (match && match[1]) {
-    videoId = match[1];
-  } else if (videoId.includes('embed/')) {
-    videoId = videoId.split('embed/')[1].split('?')[0];
-  }
-
-  return {
-    videoId: videoId,
-    watchUrl: `https://youtu.be/${videoId}`,
-    embedUrl: `https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&rel=0&enablejsapi=1&iv_load_policy=3&disablekb=1&playsinline=1`,
-    thumbUrl: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
-  };
-}
-
 function switchTutorialVideo(videoId) {
   const videoList = getTutorialVideosList();
   const videoItem = videoList.find(v => v.id === videoId) || (typeof PLUGINS_DATA !== 'undefined' ? PLUGINS_DATA.find(p => p.id === videoId) : null);
@@ -1447,20 +1248,13 @@ function switchTutorialVideo(videoId) {
   if (dom.timeCurrent) dom.timeCurrent.textContent = '0:00';
   if (dom.timeDuration) dom.timeDuration.textContent = '0:00';
 
-  // 優先使用本機原生影片 (HTML5 Video)
-  if (videoItem.videoSrc && dom.html5Video) {
-    currentVideoMode = 'html5';
-    dom.html5Video.style.display = 'block';
-    if (dom.iframe) dom.iframe.style.display = 'none';
-    if (customYtPlayer && isYtPlayerReady && typeof customYtPlayer.pauseVideo === 'function') {
-      try { customYtPlayer.pauseVideo(); } catch (e) {}
-    }
+  if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
 
-    dom.html5Video.src = videoItem.videoSrc;
-    dom.html5Video.load();
+  // 載入原生影片 (HTML5 Video)
+  if (videoItem.videoSrc && html5VideoEl) {
+    html5VideoEl.src = videoItem.videoSrc;
+    html5VideoEl.load();
     updateTimeAndDuration();
-  } else {
-    fallbackToYouTubeMode(videoItem);
   }
 
   updateTutorialVideoMetaOnly(videoId);

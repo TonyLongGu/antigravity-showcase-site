@@ -908,7 +908,7 @@
 }
 
 /* ==========================================================================
-   Antigravity Custom YouTube Video Player
+   Antigravity Custom High-Performance Video Player
    ========================================================================== */
 .video-player-container {
   position: relative;
@@ -1018,15 +1018,6 @@ body.has-web-fullscreen .video-showcase-wrapper {
   z-index: auto !important;
 }
 
-.video-player-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  pointer-events: none; /* 阻隔 YouTube 原生 hover/click，徹底根除 5 秒大暫停圖示 */
-}
 
 /* 點擊播放/暫停透明交互層 */
 .player-click-surface {
@@ -1278,7 +1269,6 @@ body.has-web-fullscreen .video-showcase-wrapper {
 /* 播放中靜止自動隱藏：精準隱藏容器、影片與點擊層游標，杜絕萬用字元 * 的 Style Recalculation 掉幀 */
 .video-player-container.hide-ui:not(.paused),
 .video-player-container.hide-ui:not(.paused) video,
-.video-player-container.hide-ui:not(.paused) iframe,
 .video-player-container.hide-ui:not(.paused) .player-click-surface {
   cursor: none !important;
 }

@@ -113,7 +113,7 @@ server.listen(PORT, () => {
   console.log(`\n======================================================`);
   console.log(`  Antigravity IDE Plugins 展示網站本機預覽伺服器`);
   console.log(`  本機網址: ${url}`);
-  console.log(`  (具備 HTTP Referer，YouTube 影片可直接在網頁內播放)`);
+  console.log(`  (支援 HTTP 206 串流傳輸，原生影片極速流暢播放)`);
   console.log(`======================================================\n`);
   
   exec(`start ${url}`);
