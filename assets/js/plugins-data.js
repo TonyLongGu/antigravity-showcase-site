@@ -14,7 +14,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-ai-context-inspector',
     category: 'sidebar',
-    version: '1.1.6',
+    version: '1.1.7',
     icon: 'assets/icons/inspector.svg?v=2',
     themeClass: 'icon-theme-purple',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-ai-context-inspector`,
