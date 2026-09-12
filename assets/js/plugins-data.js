@@ -129,7 +129,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-quota-status',
     category: 'status',
-    version: '1.0.3',
+    version: '1.0.4',
     icon: 'assets/icons/quota-status.svg?v=2',
     themeClass: 'icon-theme-amber',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quota-status`,
@@ -197,7 +197,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-script-runner',
     category: 'script',
-    version: '1.5.0',
+    version: '1.6.1',
     icon: 'assets/icons/script-runner.svg?v=2',
     themeClass: 'icon-theme-lime',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
