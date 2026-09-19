@@ -4,15 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google" content="notranslate">
-  <title>Antigravity IDE Plugins - 開源擴充套件展示與使用指南</title>
-  <meta name="description" content="Google Antigravity IDE 專屬原生擴充套件生態系：AI 上下文檢視器、MCP 管理儀表板、檔案總管常用暫存視窗、AI 配額監控、腳本右鍵執行工具與控制中心。">
-  <meta name="keywords" content="Antigravity, Google Antigravity, Antigravity IDE, VS Code Extension, MCP Manager, AI Context, Gemini Quota">
+  <title>VS Code Plugins - AI Agent IDE 專案管理插件</title>
+  <meta name="description" content="源於 VS Code 的開源擴充套件，支援掛載到 VS Code、Antigravity、Cursor：AI 上下文檢視器、MCP 管理、檔案暫存、額度監控、腳本執行與控制中心。">
+  <meta name="keywords" content="Antigravity, Cursor, VS Code, Google Antigravity, VS Code Extension, MCP Manager, AI Context, Gemini Quota">
   <meta name="author" content="TonyLongGu">
   
   <!-- OpenGraph / Social Cards -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Antigravity IDE Plugins - 開源擴充套件展示與使用指南">
-  <meta property="og:description" content="極致擴展你的 AI 協同開發體驗，6 大原生擴充套件無縫整合側邊欄、狀態列與工作區。">
+  <meta property="og:title" content="VS Code Plugins - AI Agent IDE 專案管理插件">
+  <meta property="og:description" content="源於 VS Code，相容多款 AI Agent IDE。支援掛載到 VS Code、Antigravity、Cursor。">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,10 +20,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=2.1">
-  <link rel="stylesheet" href="assets/css/base.css?v=2.1">
-  <link rel="stylesheet" href="assets/css/components.css?v=2.1">
-  <link rel="stylesheet" href="assets/css/animations.css?v=2.1">
+  <link rel="stylesheet" href="assets/css/variables.css?v=2.2">
+  <link rel="stylesheet" href="assets/css/base.css?v=2.2">
+  <link rel="stylesheet" href="assets/css/components.css?v=2.2">
+  <link rel="stylesheet" href="assets/css/animations.css?v=2.2">
   <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=3">
 </head>
 <body>
@@ -37,11 +37,11 @@
   <header class="navbar">
     <div class="container">
       <a href="#" class="nav-brand">
-        <img src="assets/icons/logo.png?v=3" alt="Antigravity Logo" class="nav-logo" />
+        <img src="assets/icons/logo.png?v=3" alt="VS Code Plugins Logo" class="nav-logo" />
         <div class="nav-title-group">
           <div class="nav-main-title">
-            <span data-i18n="brand_title">Antigravity</span>
-            <span class="badge-ide">IDE</span>
+            <span data-i18n="brand_title">VS Code</span>
+            <span class="badge-ide" data-i18n="brand_badge">Plugins</span>
           </div>
           <span class="nav-sub-title" data-i18n="brand_subtitle">擴充套件生態系</span>
         </div>
@@ -71,7 +71,12 @@
       <div class="hero-badge-group">
         <div class="hero-badge">
           <span class="badge-dot"></span>
-          <span data-i18n="hero_badge">專為 Google Antigravity IDE 打造的原生擴充套件生態系</span>
+          <span data-i18n="hero_badge">AI Agent IDE 專案管理插件</span>
+        </div>
+        <div class="hero-ide-pills" aria-label="Supported IDEs">
+          <span class="hero-ide-pill">VS Code</span>
+          <span class="hero-ide-pill">Antigravity</span>
+          <span class="hero-ide-pill">Cursor</span>
         </div>
         <div class="hero-badge-update">
           <svg class="hero-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -79,7 +84,7 @@
             <path d="M21 3v5h-5"/>
           </svg>
           <span data-i18n="hero_last_updated_label">網站更新時間：</span>
-          <span id="hero-last-updated-date" class="hero-update-time">2026-09-07 17:56</span>
+          <span id="hero-last-updated-date" class="hero-update-time">2026-09-19 11:05</span>
         </div>
       </div>
 
@@ -89,7 +94,7 @@
       </h1>
 
       <p class="hero-subtitle" data-i18n="hero_subtitle">
-        無縫整合 Antigravity IDE 側邊欄面板、狀態列即時監控、工作區同名修正與腳本一鍵直達，免編譯 Junction 掛載即刻生效。
+        側邊欄、狀態列與右鍵工具可掛到各 IDE 擴充目錄；Windows Junction 免編譯，改完即生效。不相容套件會自動略過。
       </p>
 
       <div class="hero-cta-group">
@@ -140,8 +145,8 @@
     <div class="container">
       <div class="section-header">
         <span class="section-tag" data-i18n="section_plugins_tag">探索插件</span>
-        <h2 class="section-title" data-i18n="section_plugins_title">全方位 Antigravity IDE 擴充套件</h2>
-        <p class="section-desc" data-i18n="section_plugins_desc">即時搜尋、分類過濾，探索各項專屬功能並一鍵前往 GitHub 倉庫。</p>
+        <h2 class="section-title" data-i18n="section_plugins_title">相容多款 IDE，打造多功能應用插件</h2>
+        <p class="section-desc" data-i18n="section_plugins_desc">即時搜尋、依分類或 IDE 過濾。每張卡片標示實際支援環境，再一鍵前往 GitHub。</p>
       </div>
 
       <!-- Search & Filters -->
@@ -164,6 +169,13 @@
           <button class="tab-btn" data-category="explorer" data-i18n="tab_explorer">檔案總管視圖</button>
           <button class="tab-btn" data-category="script" data-i18n="tab_script">腳本與工具箱</button>
         </div>
+        <div class="ide-filter-row">
+          <span class="ide-filter-label" data-i18n="ide_filter_label">依 IDE</span>
+          <button class="ide-tab-btn active" data-ide="all" data-i18n="tab_ide_all">全部環境</button>
+          <button class="ide-tab-btn" data-ide="vscode">VS Code</button>
+          <button class="ide-tab-btn" data-ide="antigravity">Antigravity</button>
+          <button class="ide-tab-btn" data-ide="cursor">Cursor</button>
+        </div>
       </div>
 
       <!-- Plugins Grid Container -->
@@ -179,7 +191,7 @@
       <div class="section-header">
         <span class="section-tag" data-i18n="section_video_tag">影片教學</span>
         <h2 class="section-title" data-i18n="section_video_title">精選影音示範與實戰教學</h2>
-        <p class="section-desc" data-i18n="section_video_desc">透過生動詳細的影片解說，快速掌握 Antigravity IDE 擴充套件的最佳實踐與操作技巧。</p>
+        <p class="section-desc" data-i18n="section_video_desc">示範畫面以 Antigravity 為主；Cursor / VS Code 的側邊欄與指令位置相同。用影片快速掌握操作。</p>
       </div>
 
       <div class="video-showcase-wrapper">
@@ -258,7 +270,7 @@
         <div class="video-meta-bar">
           <div class="video-title-info">
             <h3 id="tutorial-video-title">設計理念 (Design Philosophy)</h3>
-            <p id="tutorial-video-desc">深入解析 Antigravity 原生擴充套件架構思維：極致簡約、原生無縫融合與高效率 AI 協同開發實戰哲學。</p>
+            <p id="tutorial-video-desc">示範環境為 Antigravity；Cursor / VS Code 的側邊欄與指令位置相同。解析極簡、原生融合與 AI 協同開發。</p>
           </div>
         </div>
 
@@ -280,7 +292,7 @@
       <div class="section-header">
         <span class="section-tag" data-i18n="section_install_tag">極速上手</span>
         <h2 class="section-title" data-i18n="section_install_title">兩種安裝方式 • 輕鬆無縫部署</h2>
-        <p class="section-desc" data-i18n="section_install_desc">支援「下載 ZIP 點擊安裝」與「Git Clone + AI Agent 自動化協同」雙路徑，自由選擇一鍵全安裝或個別插件自選啟用。</p>
+        <p class="section-desc" data-i18n="section_install_desc">支援「下載 ZIP 點擊安裝」與「AI 智能引導安裝（複製 Prompt 即裝）」雙路徑，自由選擇一鍵全安裝或個別插件自選啟用。</p>
       </div>
 
       <div class="install-container">
@@ -313,8 +325,8 @@
               </svg>
             </div>
             <div class="install-tab-text">
-              <div class="install-tab-title" data-i18n="install_tab_git">方式二：Git Clone + AI Agent</div>
-              <div class="install-tab-sub" data-i18n="install_tab_git_sub">智慧協同 • 極速同步更新</div>
+              <div class="install-tab-title" data-i18n="install_tab_git">方式二：AI 智能引導安裝</div>
+              <div class="install-tab-sub" data-i18n="install_tab_git_sub">一鍵複製提示詞 • AI 自動對話配置</div>
             </div>
           </button>
         </div>
@@ -356,7 +368,7 @@
                     <span style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="install_submode_full_badge">雙擊執行腳本</span>
                   </div>
                   <p class="step-desc" data-i18n="install_submode_full_desc" style="margin-bottom: 10px;">
-                    雙擊專案根目錄下的「install-all.bat」，腳本將自動以目前解壓目錄為路徑基底，一次性批次為 6 大擴充套件建立免編譯掛載：
+                    雙擊專案根目錄下的「install-all.bat」，腳本會詢問安裝目標（Antigravity / VS Code / Cursor / 全部），並為支援的套件建立免編譯掛載；不相容套件會自動略過：
                   </p>
                   <div class="install-action-bubble">
                     <code>.\install-all.bat</code>
@@ -386,10 +398,10 @@
             <div class="step-card">
               <h3 class="step-title">
                 <span class="step-badge">03</span>
-                <span data-i18n="install_common_step3_title">重新載入 Antigravity IDE 視窗</span>
+                <span data-i18n="install_common_step3_title">重新載入目前使用的 IDE 視窗</span>
               </h3>
               <p class="step-desc" data-i18n="install_common_step3_desc" style="margin-bottom: 0;">
-                重新啟動 IDE，或是在 IDE 中按快捷鍵 Ctrl + Shift + P，輸入並執行 Developer: Reload Window 即可立即在側邊欄與狀態列看到全新擴充功能！
+                Antigravity 與 Cursor：Ctrl + Shift + P → Developer: Reload Window。VS Code：建議完整關閉後再重開，較不易被 extensions.json 快取覆寫。
               </p>
             </div>
           </div>
@@ -411,17 +423,17 @@
                   <div class="ai-prompt-header">
                     <div class="ai-agent-indicator">
                       <span class="ai-status-dot"></span>
-                      <span data-i18n="install_ai_installer_title">Antigravity AI 互動式安裝引導</span>
+                      <span data-i18n="install_ai_installer_title">跨 IDE 互動式安裝引導</span>
                     </div>
                   </div>
                   <div class="ai-chat-bubble preview-only">
                     <span class="ai-prompt-preview-text" data-i18n-html="install_ai_preview_prompt">
-                      “請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity IDE 原生擴充套件。<br><br>
+                      “請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity Plugins。<br><br>
                       請依序執行以下引導流程：<br>
-                      1. 先詢問我要安裝哪些套件（提供選項：一鍵安裝全部 6 大套件，或自選個別套件）。<br>
-                      2. 詢問我希望將專案原始碼 Clone/放置在本機的哪個目錄（提供預設建議路徑，如 D:\antigravity-plugins）。<br>
-                      3. 根據我的回覆，自動在該目錄執行 Git Clone，並自動為選定的套件建立 IDE 擴充功能掛載。<br>
-                      4. 安裝完成後，提醒我重新載入視窗 (Developer: Reload Window)。”
+                      1. 先確認我目前使用的 IDE（Antigravity / Cursor / VS Code）。<br>
+                      2. 詢問我要安裝哪些套件（全部，或自選）。不相容目前 IDE 的套件請略過並說明原因。<br>
+                      3. 詢問本機放置目錄（預設建議 D:\antigravity-plugins），然後 Git Clone 並掛載到該 IDE 的 extensions 目錄。<br>
+                      4. 完成後提醒重載視窗；若是 VS Code，建議完整關閉再開。”
                     </span>
                   </div>
                   <div class="install-action-row" style="margin-top: 14px;">
@@ -439,9 +451,9 @@
             <div class="step-card">
               <h3 class="step-title">
                 <span class="step-badge">02</span>
-                <span data-i18n="install_ai_step2_title">貼入 Antigravity AI Chat 對話框</span>
+                <span data-i18n="install_ai_step2_title">貼到目前 IDE 的 AI Chat</span>
               </h3>
-              <p class="step-desc" data-i18n="install_ai_step2_desc" style="margin-bottom: 0;">在 Antigravity IDE 任意視窗打開 AI Chat 對話框，貼上剛剛複製的提示詞並發送。</p>
+              <p class="step-desc" data-i18n="install_ai_step2_desc" style="margin-bottom: 0;">在 Cursor、Antigravity 或 VS Code（Copilot Chat 等）打開 AI 對話框，貼上提示詞並發送。</p>
             </div>
 
             <!-- Step 3: AI Dialog & Automated Execution -->
@@ -486,7 +498,7 @@
             </div>
             <div class="info-card-body">
               <h4 class="info-card-title" data-i18n="install_feature_junction_title">Windows Junction 免編譯技術</h4>
-              <p class="info-card-desc" data-i18n="install_feature_junction_desc">以原生目錄連接點掛載至 Antigravity 擴充目錄，零磁碟重複空間，修改代碼即時熱生效。</p>
+              <p class="info-card-desc" data-i18n="install_feature_junction_desc">以目錄連接點掛到 Antigravity、Cursor 或 VS Code 各自的 extensions 目錄，零磁碟重複，修改即熱生效。環境嚴格隔離。</p>
             </div>
           </div>
 
@@ -547,7 +559,7 @@
             </div>
 
             <p class="author-bio" data-i18n="author_bio">
-              專注於 3D 動畫綁定工具開發、自動化腳本管線與 Google Antigravity IDE 原生擴充生態系構建，致力於讓 AI 與開發者的協同流程達到極致流暢。
+              專注於 3D 動畫綁定工具、自動化腳本管線，以及為 VS Code 相容 AI Agent IDE 打造協同工具。
             </p>
 
             <div class="author-details-grid">
@@ -601,11 +613,11 @@
       <div class="footer-top">
         <div class="footer-brand">
           <div class="nav-brand" style="margin-bottom: 8px;">
-            <img src="assets/icons/logo.png?v=3" alt="Antigravity Logo" class="nav-logo" style="width: 28px; height: 28px;" />
-            <span class="nav-title" style="font-size: 1.15rem;">Antigravity Plugins</span>
+            <img src="assets/icons/logo.png?v=3" alt="VS Code Plugins Logo" class="nav-logo" style="width: 28px; height: 28px;" />
+            <span class="nav-title" style="font-size: 1.15rem;" data-i18n="footer_brand">VS Code Plugins</span>
           </div>
           <p class="footer-desc" data-i18n="footer_desc">
-            Google Antigravity IDE 專屬原生擴充套件生態系，賦予 AI 輔助編程前所未有的掌控力與流暢度。
+            源於 VS Code 的開源擴充套件，支援掛載到 VS Code、Antigravity、Cursor，讓 AI 協同開發更好掌控。
           </p>
         </div>
 
@@ -637,24 +649,24 @@
           © <span id="current-year">2026</span> <span class="site-author">TonyLongGu</span>. <span data-i18n="footer_rights">版權所有。以 MIT 授權條款開源發布。</span>
         </div>
         <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan);">
-          Tailored for Google Antigravity IDE
+          <span data-i18n="footer_tagline">源於 VS Code · 亦支援 Antigravity 與 Cursor</span>
         </div>
       </div>
 
       <div class="footer-disclaimer">
         <p data-i18n="footer_disclaimer">
-          免責聲明：本專案為獨立開源社群專案，旨在擴展 Antigravity IDE 開發體驗，與 Google 或 Antigravity 官方無關。所有產品名稱與商標均屬其各自所有者所有。
+          免責聲明：本專案為獨立開源社群專案，與 Google、Antigravity、Cursor 或 Microsoft / VS Code 官方無關。所有產品名稱與商標均屬其各自所有者所有。
         </p>
       </div>
     </div>
   </footer>
 
   <!-- Scripts -->
-  <script src="assets/js/config.js?v=2.1"></script>
-  <script src="assets/js/i18n.js?v=2.1"></script>
-  <script src="assets/js/plugins-data.js?v=2.1"></script>
-  <script src="assets/js/nebula-canvas.js?v=2.1"></script>
-  <script src="assets/js/filter.js?v=2.1"></script>
-  <script src="assets/js/app.js?v=2.1"></script>
+  <script src="assets/js/config.js?v=2.5"></script>
+  <script src="assets/js/i18n.js?v=2.5"></script>
+  <script src="assets/js/plugins-data.js?v=2.5"></script>
+  <script src="assets/js/nebula-canvas.js?v=2.2"></script>
+  <script src="assets/js/filter.js?v=2.2"></script>
+  <script src="assets/js/app.js?v=2.2"></script>
 </body>
 </html>

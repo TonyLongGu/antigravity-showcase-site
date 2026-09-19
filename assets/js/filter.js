@@ -3,11 +3,13 @@
  */
 
 let activeCategory = 'all';
+let activeIde = 'all';
 let searchQuery = '';
 
 function initFilters() {
   const searchInput = document.getElementById('search-input');
   const tabBtns = document.querySelectorAll('.tab-btn');
+  const ideTabBtns = document.querySelectorAll('.ide-tab-btn');
 
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -15,7 +17,6 @@ function initFilters() {
       renderPlugins();
     });
 
-    // Keyboard shortcut to focus search
     window.addEventListener('keydown', (e) => {
       if ((e.ctrlKey && e.key === 'k') || (e.key === '/' && document.activeElement !== searchInput)) {
         e.preventDefault();
@@ -33,6 +34,37 @@ function initFilters() {
       renderPlugins();
     });
   });
+
+  ideTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      ideTabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeIde = btn.getAttribute('data-ide');
+      renderPlugins();
+    });
+  });
+}
+
+function pluginSupportsIde(plugin, ideId) {
+  const ides = Array.isArray(plugin.ides) ? plugin.ides : IDE_ALL;
+  return ides.includes(ideId);
+}
+
+function renderIdeBadges(plugin) {
+  const ides = Array.isArray(plugin.ides) ? plugin.ides : IDE_ALL;
+  const badges = ides.map((ideId) => {
+    const meta = IDE_META[ideId];
+    const label = meta ? meta.short : ideId;
+    return `<span class="ide-badge ide-${ideId}">${label}</span>`;
+  }).join('');
+
+  return `<div class="plugin-ide-row" aria-label="Supported IDEs">${badges}</div>`;
+}
+
+function renderIdeNote(plugin) {
+  const note = plugin.ideNote && (plugin.ideNote[currentLang] || plugin.ideNote['zh-TW']);
+  if (!note) return '';
+  return `<p class="plugin-ide-note">${note}</p>`;
 }
 
 function renderPlugins() {
@@ -41,23 +73,28 @@ function renderPlugins() {
 
   const filtered = PLUGINS_DATA.filter(plugin => {
     const matchesCategory = activeCategory === 'all' || plugin.category === activeCategory;
-    
     if (!matchesCategory) return false;
+
+    if (activeIde !== 'all' && !pluginSupportsIde(plugin, activeIde)) return false;
     if (!searchQuery) return true;
 
     const name = (plugin.name[currentLang] || '').toLowerCase();
     const desc = (plugin.shortDesc[currentLang] || '').toLowerCase();
+    const note = (plugin.ideNote && (plugin.ideNote[currentLang] || '')) || '';
     const id = plugin.id.toLowerCase();
     const tags = plugin.tags.map(t => t.toLowerCase()).join(' ');
     const commands = plugin.commands.map(c => (c.name + ' ' + c.id).toLowerCase()).join(' ');
     const featuresStr = (plugin.features[currentLang] || []).join(' ').toLowerCase();
+    const ideNames = (plugin.ides || IDE_ALL).map((ideId) => (IDE_META[ideId] ? IDE_META[ideId].short : ideId).toLowerCase()).join(' ');
 
-    return name.includes(searchQuery) || 
-           desc.includes(searchQuery) || 
-           id.includes(searchQuery) || 
-           tags.includes(searchQuery) ||
-           commands.includes(searchQuery) ||
-           featuresStr.includes(searchQuery);
+    return name.includes(searchQuery) ||
+      desc.includes(searchQuery) ||
+      note.toLowerCase().includes(searchQuery) ||
+      id.includes(searchQuery) ||
+      tags.includes(searchQuery) ||
+      commands.includes(searchQuery) ||
+      featuresStr.includes(searchQuery) ||
+      ideNames.includes(searchQuery);
   });
 
   if (filtered.length === 0) {
@@ -91,7 +128,9 @@ function renderPlugins() {
           
           <h3 class="plugin-name">${name}</h3>
           <div class="plugin-id">${plugin.id}</div>
+          ${renderIdeBadges(plugin)}
           <p class="plugin-desc">${desc}</p>
+          ${renderIdeNote(plugin)}
           
           <ul class="feature-list">
             ${features.slice(0, 3).map(feat => `<li class="feature-item">${feat}</li>`).join('')}

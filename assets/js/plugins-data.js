@@ -4,6 +4,14 @@
  */
 const MAIN_REPO_URL = typeof SITE_CONFIG !== 'undefined' ? SITE_CONFIG.githubUrl : 'https://github.com/TonyLongGu/antigravity-plugins';
 
+const IDE_META = {
+  antigravity: { id: 'antigravity', short: 'Antigravity' },
+  cursor: { id: 'cursor', short: 'Cursor' },
+  vscode: { id: 'vscode', short: 'VS Code' }
+};
+
+const IDE_ALL = ['vscode', 'antigravity', 'cursor'];
+
 // 預設/精選教學影片 (支援隨時為各套件擴充專屬影片)
 const FEATURED_TUTORIAL_VIDEO = {
   title: 'Antigravity IDE 擴充套件設計理念與實戰指南',
@@ -30,16 +38,21 @@ const PLUGINS_DATA = [
       'en': 'Native sidebar for real-time AI context inspection: scan active Rules, Skills, and MCP tools with historic snapshot restore and jump-to-source.'
     },
     tags: ['Webview', 'Rules & Skills', 'Brain Snapshot', 'Sidebar'],
+    ides: IDE_ALL,
+    ideNote: {
+      'zh-TW': 'Cursor / VS Code 僅顯示當前環境配置，不含 Antigravity 對話快照復盤。',
+      'en': 'On Cursor / VS Code, only the live workspace scan is available — no Antigravity transcript replay.'
+    },
     features: {
       'zh-TW': [
-        '雙模式記憶掃描：當前環境配置即時掃描 vs 歷史對話快照還原，精準解析 transcript.jsonl 注入記憶',
-        '歷史任務切換復盤：支援下拉切換歷史對話任務與復盤，完整對比各階段 Rules 與 Skills 規範生效差異',
-        '一鍵直達與摘要複製：點擊直達開啟對應 .md 技能檔案，頂部支援一鍵將生效上下文複製為 Markdown 格式'
+        '雙模式記憶掃描：Antigravity 可對比當前配置與 transcript.jsonl 歷史快照；Cursor / VS Code 鎖定當前環境掃描',
+        '歷史任務切換復盤：在 Antigravity 下拉切換歷史對話，對比各階段 Rules 與 Skills 生效差異',
+        '一鍵直達與摘要複製：點擊開啟對應 .md 技能檔案，並可將生效上下文複製為 Markdown'
       ],
       'en': [
-        'Dual Mode Memory Scanning: Live workspace config scan vs historic snapshot restore from transcript.jsonl logs',
-        'Historical Task Switching: Dropdown selector for historic conversation replay and multi-stage active rule comparison',
-        '1-Click Navigation & Export: Click to open referenced .md rule files directly, with 1-click Markdown context export'
+        'Dual-mode scan: Antigravity compares live config vs transcript.jsonl snapshots; Cursor / VS Code stay on the live workspace scan',
+        'Historic task replay on Antigravity: switch past conversations and compare Rules / Skills at each stage',
+        '1-click jump and export: open referenced .md files and copy the active context as Markdown'
       ]
     },
     commands: [
@@ -63,10 +76,15 @@ const PLUGINS_DATA = [
       'en': 'Antigravity MCP Manager Dashboard'
     },
     shortDesc: {
-      'zh-TW': '原生側邊欄全域 MCP 伺服器儀表板：提供視覺化單項與批次開關、CLI 進程探針測速、狀態列常駐指示與熱監聽備份。',
-      'en': 'Native sidebar dashboard for global MCP server management: visual batch toggles, CLI process probes, status bar live counter, and auto-backups.'
+      'zh-TW': 'Antigravity 專屬 MCP 儀表板：視覺化開關 ~/.gemini/config、CLI 探針測速、狀態列計數與熱監聽備份。',
+      'en': 'Antigravity-only MCP dashboard: visual toggles for ~/.gemini/config, CLI probes, status-bar count, and live backups.'
     },
     tags: ['Webview', 'MCP Control', 'Probe Ping', 'Status Bar'],
+    ides: ['antigravity'],
+    ideNote: {
+      'zh-TW': '僅支援 Antigravity。安裝腳本在 Cursor / VS Code 會自動略過。',
+      'en': 'Antigravity only. The installer skips Cursor / VS Code.'
+    },
     features: {
       'zh-TW': [
         '全域伺服器視覺管理：無縫嵌入左側活動列，專注維護 ~/.gemini/config 配置，支援視覺化單項與批次開關',
@@ -100,20 +118,25 @@ const PLUGINS_DATA = [
       'en': 'Quick Access & Scratchpad'
     },
     shortDesc: {
-      'zh-TW': '檔案總管專屬快速存取視窗：支援檔案與資料夾雙分組暫存、滑鼠拖曳引用至 Chat 對話框、多選批次與原地層級展開。',
-      'en': 'Dedicated Explorer quick access & scratchpad view: dual-group pinning, drag-and-drop Chat mentions, multi-select, and in-place tree expansion.'
+      'zh-TW': '檔案總管快速存取與暫存：雙分組釘選、拖入 AI Chat / 編輯器引用、多選批次與原地展開。支援 Antigravity、Cursor、VS Code。',
+      'en': 'Explorer scratchpad: dual-group pinning, drag into AI Chat or the editor, multi-select, and in-place expansion. Works on Antigravity, Cursor, and VS Code.'
     },
     tags: ['Explorer View', 'Drag & Drop', 'Chat Mention', 'Multi-Select'],
+    ides: IDE_ALL,
+    ideNote: {
+      'zh-TW': '拖曳使用標準 text/uri-list，可投入目前 IDE 的 AI Chat 或編輯器。',
+      'en': 'Drag uses standard text/uri-list, so you can drop into the current IDE AI Chat or editor.'
+    },
     features: {
       'zh-TW': [
         '雙分組獨立暫存視圖：常駐檔案總管側邊欄，提供常規釘選 (Pinned) 與臨時暫存 (Scratchpad) 雙軌管理',
-        '滑鼠拖曳對話框引用：支援單選或多選檔案直接拖入 Antigravity Chat 對話框，自動轉化為 @檔案 引用',
-        '多選批次與原地目錄展開：支援 Ctrl/Shift 複選批次切換釘選、資料夾原地展開子層級並獨立釘選內部檔案'
+        '滑鼠拖曳引用：單選或多選檔案拖入目前 IDE 的 AI Chat 或編輯器，自動轉成 @檔案 / 路徑',
+        '多選批次與原地目錄展開：Ctrl/Shift 複選切換釘選，資料夾可原地展開並獨立釘選子檔案'
       ],
       'en': [
-        'Dual-Group Tree View: Resident Explorer sidebar panel providing Pinned items and temporary Scratchpad workspaces',
-        'Drag & Drop Chat Mentions: Drag single or multi-selected files into Antigravity Chat box for instant @file references',
-        'Multi-Select & In-Place Expansion: Ctrl/Shift batch actions, in-place directory expansion, and independent child item pinning'
+        'Dual-group tree in Explorer: persistent Pinned items plus a temporary Scratchpad',
+        'Drag into AI Chat or the editor: single or multi-select files become @file / path references',
+        'Multi-select and in-place expansion: Ctrl/Shift batch pin, expand folders, and pin child items'
       ]
     },
     commands: [
@@ -141,10 +164,15 @@ const PLUGINS_DATA = [
       'en': 'AI Model Quota Status Monitor'
     },
     shortDesc: {
-      'zh-TW': '狀態列極簡純文字 AI 配額監控：常駐顯示 Gemini 與 Claude 每週與 5 小時額度，獨家勻速消耗偏差值演算與倒數。',
-      'en': 'Ultra-compact plain-text status bar monitor: tracks weekly and 5-hour AI quotas with unique linear consumption deviation and countdowns.'
+      'zh-TW': 'Antigravity 專屬狀態列額度監控：Gemini / Claude 每週與 5 小時餘額、勻速消耗偏差與倒數。',
+      'en': 'Antigravity-only status-bar quota monitor: weekly and 5-hour Gemini / Claude remaining, linear deviation, and countdown.'
     },
     tags: ['Status Bar', 'Quota Algorithm', 'Countdown', 'QuickPick'],
+    ides: ['antigravity'],
+    ideNote: {
+      'zh-TW': '僅支援 Antigravity（依賴其本地額度 API）。Cursor / VS Code 安裝時會略過。',
+      'en': 'Antigravity only — needs its local quota API. Installer skips Cursor / VS Code.'
+    },
     features: {
       'zh-TW': [
         '極致乾淨純文字狀態列：預設極簡雙欄 (59%, 53% | 7%, 100%)，零 Emoji、零干擾，原生無縫融合底部',
@@ -213,6 +241,7 @@ const PLUGINS_DATA = [
       'en': 'Context menu & editor 1-click runner for Python, PowerShell, and Batch (with Admin UAC), plus high-performance folder Image, Audio, and Video viewers.'
     },
     tags: ['Context Menu', 'Media Viewer', 'PowerShell Bypass', 'UAC Admin'],
+    ides: IDE_ALL,
     features: {
       'zh-TW': [
         '多語言腳本執行：檔案總管右鍵與編輯器右上角 ▶ 一鍵執行 Python、PowerShell（自動 Bypass）與批次檔，支援 UAC 提權',
@@ -271,20 +300,25 @@ const PLUGINS_DATA = [
       'en': 'Antigravity Control Center (Toolbox)'
     },
     shortDesc: {
-      'zh-TW': '側邊欄多功能控制中心：提供工作區同名專案修正、專案腳本聯動排序執行器、全域自訂設定直達捷徑與 Brain 快取清理。',
-      'en': 'Sidebar multi-tool control center: workspace duplicate name fixer, linked project script runner, global config shortcuts, and Brain cache cleaner.'
+      'zh-TW': '側邊欄控制中心：工作區同名修正、專案腳本執行器、依 IDE 切換的設定捷徑與對話記憶庫清理。',
+      'en': 'Sidebar control center: workspace name fixer, project script runner, IDE-aware config shortcuts, and transcript / Brain cleanup.'
     },
     tags: ['Sidebar Panel', 'Workspace Fixer', 'Brain Cleaner', 'Global Config'],
+    ides: IDE_ALL,
+    ideNote: {
+      'zh-TW': '路徑隨 IDE 切換：Cursor 用 ~/.cursor，Antigravity 用 ~/.gemini。純 VS Code 會隱藏 Antigravity 專屬卡片。',
+      'en': 'Paths follow the host: ~/.cursor on Cursor, ~/.gemini on Antigravity. Pure VS Code hides Antigravity-only cards.'
+    },
     features: {
       'zh-TW': [
-        '多專案工作區與同名修正：智慧標記 .code-workspace 同名衝突，一鍵自動補齊父層路徑前綴維持命名一致性',
-        '專案腳本聯動排序執行器：檔案總管右鍵快速加入腳本，隨工作區專案排序動態聯動次序，支援一般與管理員提權執行',
-        '全域目錄直達與記憶庫清理：一鍵直達 ~/.gemini 自訂目錄與過濾開關，提供動態時間滑桿安全釋放對話快取'
+        '多專案工作區與同名修正：標記 .code-workspace 同名衝突，一鍵補上父層路徑前綴',
+        '專案腳本聯動排序執行器：右鍵加入腳本，隨工作區專案排序，支援一般與管理員執行',
+        '全域捷徑與記憶庫清理：Cursor 走 ~/.cursor 與 agent-transcripts；Antigravity 走 ~/.gemini 與 Brain'
       ],
       'en': [
-        'Multi-Project Workspace Fixer: Auto-detects .code-workspace name collisions and applies parent folder prefixes in 1-click',
-        'Project Script Dynamic Runner: Right-click add scripts with workspace-linked dynamic sorting, supporting normal and Admin execution',
-        'Global Shortcuts & Brain Cleaner: 1-Click access to ~/.gemini configs, Explorer filter toggles, and dynamic Brain cache cleanup'
+        'Workspace name fixer: detect .code-workspace collisions and prefix parent folders in one click',
+        'Project script runner: right-click add scripts, keep workspace order, run normal or elevated',
+        'IDE-aware shortcuts and cleanup: ~/.cursor + agent-transcripts on Cursor; ~/.gemini + Brain on Antigravity'
       ]
     },
     commands: [
@@ -308,8 +342,8 @@ const TUTORIAL_VIDEOS = [
       'en': 'Design Philosophy'
     },
     shortDesc: {
-      'zh-TW': '深入解析 Antigravity 原生擴充套件架構思維：極致簡約、原生無縫融合與高效率 AI 協同開發實戰哲學。',
-      'en': 'In-depth breakdown of Antigravity native extensions philosophy: minimal footprint, seamless IDE integration, and AI-driven workflows.'
+      'zh-TW': '示範環境為 Antigravity；Cursor / VS Code 的側邊欄與指令位置相同。解析極簡、原生融合與 AI 協同開發。',
+      'en': 'Demo recorded in Antigravity; Cursor / VS Code use the same sidebar and command locations. Minimal footprint and AI-native workflows.'
     },
     icon: 'assets/icons/philosophy.svg?v=2',
     videoSrc: 'assets/videos/design-philosophy.mp4'

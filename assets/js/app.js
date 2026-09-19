@@ -133,20 +133,20 @@ function copyInstallCmd(cmd) {
 function copyAiInstallPrompt() {
   const isEn = (typeof currentLang !== 'undefined' && currentLang === 'en');
   const promptText = isEn 
-    ? `Please help me install the Antigravity IDE native extensions from GitHub (https://github.com/TonyLongGu/antigravity-plugins.git).
+    ? `Please help me install Antigravity Plugins from GitHub (https://github.com/TonyLongGu/antigravity-plugins.git).
 
 Please guide me through the following interactive workflow:
-1. Ask me which plugins to install (Provide options: 1-Click Install All 6 Plugins, or selectively choose individual plugins).
-2. Ask me where I want to clone and store the repository locally (Provide a recommended default path, e.g. D:\\antigravity-plugins).
-3. Based on my response, automatically clone the repository to that location and create the IDE extension mounts (execute installation scripts or create Directory Junctions).
-4. After installation is complete, guide me to reload the IDE window (Developer: Reload Window).`
-    : `請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity IDE 原生擴充套件。
+1. Confirm which IDE I am using (Antigravity / Cursor / VS Code).
+2. Ask which plugins to install (all, or a selection). Skip plugins that do not support this IDE and explain why (MCP Manager and Quota Status are Antigravity-only).
+3. Ask where to clone the repo (recommended: D:\\antigravity-plugins), then mount into that IDE's extensions folder (run the install scripts or create Directory Junctions).
+4. After install, remind me to reload the window (Developer: Reload Window). For VS Code, fully quit and reopen.`
+    : `請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity Plugins。
 
 請依序執行以下引導流程：
-1. 先詢問我要安裝哪些套件（提供選項：一鍵安裝全部 6 大套件，或自選個別套件）。
-2. 詢問我希望將專案原始碼 Clone/放置在本機的哪個目錄（提供預設建議路徑，如 D:\\antigravity-plugins）。
-3. 根據我的回覆，自動在該目錄執行 Git Clone，並自動為選定的套件建立 IDE 擴充功能掛載（執行安裝腳本或建立 Junction 符號連結）。
-4. 安裝完成後，提醒我重新載入視窗 (Developer: Reload Window)。`;
+1. 先確認我目前使用的 IDE（Antigravity / Cursor / VS Code）。
+2. 詢問我要安裝哪些套件（全部，或自選）。不相容目前 IDE 的套件請略過並說明原因（MCP Manager 與 Quota Status 僅支援 Antigravity）。
+3. 詢問本機放置目錄（預設建議 D:\\antigravity-plugins），然後 Git Clone 並掛載到該 IDE 的 extensions 目錄（執行安裝腳本或建立 Junction）。
+4. 完成後提醒重載視窗 (Developer: Reload Window)；若是 VS Code，建議完整關閉再開。`;
 
   copyToClipboard(promptText, t('install_ai_prompt_copied'));
 }
