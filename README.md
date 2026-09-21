@@ -1,6 +1,6 @@
-# Antigravity Plugins 展示網站 (GitHub Pages)
+# Antigravity IDE Plugins 展示網站 (GitHub Pages)
 
-本目錄為 Antigravity Plugins 靜態展示網站（源於 Antigravity，亦說明 Cursor / VS Code 相容範圍），可直接透過 **GitHub Pages** 託管上線。
+本目錄為 Google Antigravity IDE 專屬原生擴充套件生態系展示網站（亦完整支援 Cursor 與 VS Code 安裝），可直接透過 **GitHub Pages** 託管上線。
 
 ---
 

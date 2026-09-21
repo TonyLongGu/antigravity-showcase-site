@@ -10,7 +10,7 @@ const IDE_META = {
   vscode: { id: 'vscode', short: 'VS Code' }
 };
 
-const IDE_ALL = ['vscode', 'antigravity', 'cursor'];
+const IDE_ALL = ['antigravity', 'cursor', 'vscode'];
 
 // 預設/精選教學影片 (支援隨時為各套件擴充專屬影片)
 const FEATURED_TUTORIAL_VIDEO = {
@@ -22,7 +22,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-ai-context-inspector',
     category: 'sidebar',
-    version: '1.1.8',
+    version: '1.2.0',
     icon: 'assets/icons/inspector.svg?v=2',
     themeClass: 'icon-theme-purple',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-ai-context-inspector`,
@@ -40,8 +40,8 @@ const PLUGINS_DATA = [
     tags: ['Webview', 'Rules & Skills', 'Brain Snapshot', 'Sidebar'],
     ides: IDE_ALL,
     ideNote: {
-      'zh-TW': 'Cursor / VS Code 僅顯示當前環境配置，不含 Antigravity 對話快照復盤。',
-      'en': 'On Cursor / VS Code, only the live workspace scan is available — no Antigravity transcript replay.'
+      'zh-TW': 'Antigravity 支援歷史對話快照復盤；Cursor 與 VS Code 檢視當前工作區生效配置。',
+      'en': 'Antigravity supports transcript replay; Cursor and VS Code inspect active workspace configurations.'
     },
     features: {
       'zh-TW': [
@@ -64,7 +64,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-mcp-manager',
     category: 'sidebar',
-    version: '1.4.0',
+    version: '1.9.0',
     icon: 'assets/icons/mcp.svg?v=2',
     themeClass: 'icon-theme-cyan',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-mcp-manager`,
@@ -76,14 +76,14 @@ const PLUGINS_DATA = [
       'en': 'Antigravity MCP Manager Dashboard'
     },
     shortDesc: {
-      'zh-TW': 'Antigravity 專屬 MCP 儀表板：視覺化開關 ~/.gemini/config、CLI 探針測速、狀態列計數與熱監聽備份。',
-      'en': 'Antigravity-only MCP dashboard: visual toggles for ~/.gemini/config, CLI probes, status-bar count, and live backups.'
+      'zh-TW': 'MCP 管理儀表板：視覺化開關 ~/.gemini/config、CLI 探針測速、狀態列計數與熱監聽備份。支援跨 IDE 檢視。',
+      'en': 'MCP dashboard: visual toggles for ~/.gemini/config, CLI probes, status-bar count, and live backups. Cross-IDE view mode supported.'
     },
     tags: ['Webview', 'MCP Control', 'Probe Ping', 'Status Bar'],
-    ides: ['antigravity'],
+    ides: IDE_ALL,
     ideNote: {
-      'zh-TW': '僅支援 Antigravity。安裝腳本在 Cursor / VS Code 會自動略過。',
-      'en': 'Antigravity only. The installer skips Cursor / VS Code.'
+      'zh-TW': 'Antigravity 原生支援開關切換；Cursor 與 VS Code 為檢視模式（開關請用該 IDE 原生 UI）。',
+      'en': 'Antigravity natively toggles MCP servers; Cursor & VS Code run in view mode (toggle via IDE native UI).'
     },
     features: {
       'zh-TW': [
@@ -124,8 +124,8 @@ const PLUGINS_DATA = [
     tags: ['Explorer View', 'Drag & Drop', 'Chat Mention', 'Multi-Select'],
     ides: IDE_ALL,
     ideNote: {
-      'zh-TW': '拖曳使用標準 text/uri-list，可投入目前 IDE 的 AI Chat 或編輯器。',
-      'en': 'Drag uses standard text/uri-list, so you can drop into the current IDE AI Chat or editor.'
+      'zh-TW': '拖曳使用標準 text/uri-list，可直接投入 Antigravity、Cursor、VS Code 的 AI Chat 或編輯器。',
+      'en': 'Drag uses standard text/uri-list into Antigravity, Cursor, or VS Code AI Chat / editor.'
     },
     features: {
       'zh-TW': [
@@ -152,7 +152,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-quota-status',
     category: 'status',
-    version: '1.0.4',
+    version: '1.1.0',
     icon: 'assets/icons/quota-status.svg?v=2',
     themeClass: 'icon-theme-amber',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-quota-status`,
@@ -164,14 +164,14 @@ const PLUGINS_DATA = [
       'en': 'AI Model Quota Status Monitor'
     },
     shortDesc: {
-      'zh-TW': 'Antigravity 專屬狀態列額度監控：Gemini / Claude 每週與 5 小時餘額、勻速消耗偏差與倒數。',
-      'en': 'Antigravity-only status-bar quota monitor: weekly and 5-hour Gemini / Claude remaining, linear deviation, and countdown.'
+      'zh-TW': '狀態列極簡純文字 AI 配額監控：Gemini / Claude 每週與 5 小時餘額、勻速消耗偏差與倒數。支援 Antigravity 與 Cursor。',
+      'en': 'Ultra-compact plain-text status bar monitor: tracks weekly and 5-hour AI quotas with linear consumption deviation. Supports Antigravity and Cursor.'
     },
     tags: ['Status Bar', 'Quota Algorithm', 'Countdown', 'QuickPick'],
-    ides: ['antigravity'],
+    ides: ['antigravity', 'cursor'],
     ideNote: {
-      'zh-TW': '僅支援 Antigravity（依賴其本地額度 API）。Cursor / VS Code 安裝時會略過。',
-      'en': 'Antigravity only — needs its local quota API. Installer skips Cursor / VS Code.'
+      'zh-TW': '支援 Antigravity（本機 Language Server）與 Cursor（雲端 usage API）；VS Code 因無額度 API 不支援。',
+      'en': 'Supports Antigravity (local Language Server) and Cursor (cloud usage API); VS Code is not supported (no quota API).'
     },
     features: {
       'zh-TW': [
@@ -242,6 +242,10 @@ const PLUGINS_DATA = [
     },
     tags: ['Context Menu', 'Media Viewer', 'PowerShell Bypass', 'UAC Admin'],
     ides: IDE_ALL,
+    ideNote: {
+      'zh-TW': '支援 Antigravity、Cursor、VS Code 檔案總管右鍵與編輯器右上角快捷執行。',
+      'en': 'Supports Antigravity, Cursor, and VS Code explorer context menu & editor top-right action.'
+    },
     features: {
       'zh-TW': [
         '多語言腳本執行：檔案總管右鍵與編輯器右上角 ▶ 一鍵執行 Python、PowerShell（自動 Bypass）與批次檔，支援 UAC 提權',
@@ -288,7 +292,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-toolbox',
     category: 'script',
-    version: '1.3.7',
+    version: '1.3.8',
     icon: 'assets/icons/toolbox.svg?v=2',
     themeClass: 'icon-theme-indigo',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-toolbox`,
@@ -306,7 +310,7 @@ const PLUGINS_DATA = [
     tags: ['Sidebar Panel', 'Workspace Fixer', 'Brain Cleaner', 'Global Config'],
     ides: IDE_ALL,
     ideNote: {
-      'zh-TW': '路徑隨 IDE 切換：Cursor 用 ~/.cursor，Antigravity 用 ~/.gemini。純 VS Code 會隱藏 Antigravity 專屬卡片。',
+      'zh-TW': '路徑隨 IDE 切換：Cursor 走 ~/.cursor，Antigravity 走 ~/.gemini。純 VS Code 會隱藏 Antigravity 專屬卡片。',
       'en': 'Paths follow the host: ~/.cursor on Cursor, ~/.gemini on Antigravity. Pure VS Code hides Antigravity-only cards.'
     },
     features: {

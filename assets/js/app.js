@@ -137,15 +137,15 @@ function copyAiInstallPrompt() {
 
 Please guide me through the following interactive workflow:
 1. Confirm which IDE I am using (Antigravity / Cursor / VS Code).
-2. Ask which plugins to install (all, or a selection). Skip plugins that do not support this IDE and explain why (MCP Manager and Quota Status are Antigravity-only).
-3. Ask where to clone the repo (recommended: D:\\antigravity-plugins), then mount into that IDE's extensions folder (run the install scripts or create Directory Junctions).
-4. After install, remind me to reload the window (Developer: Reload Window). For VS Code, fully quit and reopen.`
+2. Ask which plugins to install (all, or a selection). Skip plugins that do not support this IDE and explain why (currently only Quota Status does not support VS Code; MCP Manager is in view mode on Cursor / VS Code).
+3. Ask where to clone the repo (recommended default: D:\\antigravity-plugins), then mount into that IDE's extensions folder.
+4. After install, remind me to reload the window (Developer: Reload Window); for VS Code, fully quit and reopen.`
     : `請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity Plugins。
 
 請依序執行以下引導流程：
 1. 先確認我目前使用的 IDE（Antigravity / Cursor / VS Code）。
-2. 詢問我要安裝哪些套件（全部，或自選）。不相容目前 IDE 的套件請略過並說明原因（MCP Manager 與 Quota Status 僅支援 Antigravity）。
-3. 詢問本機放置目錄（預設建議 D:\\antigravity-plugins），然後 Git Clone 並掛載到該 IDE 的 extensions 目錄（執行安裝腳本或建立 Junction）。
+2. 詢問我要安裝哪些套件（全部，或自選）。不相容目前 IDE 的套件請略過並說明原因（目前僅 Quota Status 不支援 VS Code；MCP Manager 在 Cursor / VS Code 為檢視模式）。
+3. 詢問本機放置目錄（預設建議 D:\\antigravity-plugins），然後 Git Clone 並掛載到該 IDE 的 extensions 目錄。
 4. 完成後提醒重載視窗 (Developer: Reload Window)；若是 VS Code，建議完整關閉再開。`;
 
   copyToClipboard(promptText, t('install_ai_prompt_copied'));
