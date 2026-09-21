@@ -292,7 +292,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-toolbox',
     category: 'script',
-    version: '1.3.8',
+    version: '1.4.0',
     icon: 'assets/icons/toolbox.svg?v=2',
     themeClass: 'icon-theme-indigo',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-toolbox`,
