@@ -22,7 +22,7 @@
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/variables.css?v=2.2">
   <link rel="stylesheet" href="assets/css/base.css?v=2.2">
-  <link rel="stylesheet" href="assets/css/components.css?v=2.2">
+  <link rel="stylesheet" href="assets/css/components.css?v=2.3">
   <link rel="stylesheet" href="assets/css/animations.css?v=2.2">
   <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=3">
 </head>
@@ -50,6 +50,7 @@
       <ul class="nav-links">
         <li><a href="#explore" class="nav-link" data-i18n="nav_explore">探索插件</a></li>
         <li><a href="#tutorials" class="nav-link" data-i18n="nav_video">影音教學</a></li>
+        <li><a href="#notes" class="nav-link" data-i18n="nav_notes">開發者筆記</a></li>
         <li><a href="#install" class="nav-link" data-i18n="nav_install">安裝指南</a></li>
         <li><a href="#author" class="nav-link" data-i18n="nav_author">關於作者</a></li>
       </ul>
@@ -293,6 +294,22 @@
     </div>
   </section>
 
+  <!-- 3.8 Developer Notes Section -->
+  <section id="notes" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n="section_notes_tag">開發者筆記</span>
+        <h2 class="section-title" data-i18n="section_notes_title">跨 Agent 代理架構最佳實踐</h2>
+        <p class="section-desc" data-i18n="section_notes_desc">解構多 IDE 規範碎片化痛點，以「教導替代限制」守護 Context Window，打造極致專注的 AI 協同開發環境。</p>
+      </div>
+
+      <div class="notes-article-wrapper">
+        <article class="notes-article-card" id="notes-article-card">
+          <!-- Rendered dynamically by app.js from developer-notes.js -->
+        </article>
+      </div>
+    </div>
+  </section>
 
   <!-- 4. Installation Guide Section -->
   <section id="install" class="section">
@@ -636,6 +653,7 @@
               <li><a href="#hero" data-i18n="nav_home">首頁</a></li>
               <li><a href="#explore" data-i18n="nav_explore">探索插件</a></li>
               <li><a href="#tutorials" data-i18n="nav_video">影音教學</a></li>
+              <li><a href="#notes" data-i18n="nav_notes">開發者筆記</a></li>
               <li><a href="#install" data-i18n="nav_install">安裝指南</a></li>
               <li><a href="#author" data-i18n="nav_author">關於作者</a></li>
             </ul>
@@ -671,10 +689,11 @@
 
   <!-- Scripts -->
   <script src="assets/js/config.js?v=2.6"></script>
-  <script src="assets/js/i18n.js?v=2.6"></script>
+  <script src="assets/js/i18n.js?v=2.7"></script>
   <script src="assets/js/plugins-data.js?v=2.6"></script>
+  <script src="assets/js/developer-notes.js?v=1.1"></script>
   <script src="assets/js/nebula-canvas.js?v=2.3"></script>
   <script src="assets/js/filter.js?v=2.3"></script>
-  <script src="assets/js/app.js?v=2.3"></script>
+  <script src="assets/js/app.js?v=2.4"></script>
 </body>
 </html>

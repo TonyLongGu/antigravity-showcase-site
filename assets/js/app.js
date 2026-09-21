@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initVideoShowcase();
   initCustomVideoPlayer();
 
+  // 5.8 Initialize Developer Notes Article
+  renderDeveloperNotes();
+
   // 6. Set Dynamic Year
   const yearEl = document.getElementById('current-year');
   if (yearEl) {
@@ -47,34 +50,35 @@ function initNavigation() {
     });
   }
 
-  // Smooth scroll with customized offset to display more rich content directly
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      const targetId = this.getAttribute('href');
-      if (targetId === '#' || targetId === '#hero') {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        return;
-      }
-      const targetEl = document.querySelector(targetId);
-      if (targetEl) {
-        e.preventDefault();
-        const navbar = document.querySelector('.navbar');
-        const navHeight = navbar ? navbar.offsetHeight : 70;
-        
-        // 取得目標元素相對於全頁面的頂部位置
-        const elementPosition = targetEl.getBoundingClientRect().top + window.pageYOffset;
-        
-        // 額外向下偏移約 48px（微調回彈，保留適當頂部留白並充分呈現內容）
-        const extraOffset = 48;
-        const offsetPosition = Math.max(0, elementPosition - navHeight + extraOffset);
+  // Smooth scroll with customized offset using event delegation (works for static & dynamic links)
+  document.addEventListener('click', function(e) {
+    const anchor = e.target.closest('a[href^="#"]');
+    if (!anchor) return;
 
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth'
-        });
-      }
-    });
+    const targetId = anchor.getAttribute('href');
+    if (targetId === '#' || targetId === '#hero') {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    const targetEl = document.querySelector(targetId);
+    if (targetEl) {
+      e.preventDefault();
+      const navbar = document.querySelector('.navbar');
+      const navHeight = navbar ? navbar.offsetHeight : 70;
+      
+      // 取得目標元素相對於全頁面的頂部位置
+      const elementPosition = targetEl.getBoundingClientRect().top + window.pageYOffset;
+      
+      // 額外向下偏移約 48px（微調回彈，保留適當頂部留白並充分呈現內容）
+      const extraOffset = 48;
+      const offsetPosition = Math.max(0, elementPosition - navHeight + extraOffset);
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   });
 }
 
@@ -1286,4 +1290,181 @@ function switchInstallMethod(method) {
     if (panelZip) panelZip.classList.remove('active');
   }
 }
+
+/**
+ * --------------------------------------------------------------------------
+ * Developer Notes Article Renderer & Markdown Parser
+ * --------------------------------------------------------------------------
+ */
+function parseNotesMarkdown(markdownText) {
+  if (!markdownText) return '';
+  
+  const lines = markdownText.trim().split('\n');
+  let html = '';
+  let inUl = false;
+  let inOl = false;
+
+  function closeLists() {
+    if (inUl) {
+      html += '</ul>\n';
+      inUl = false;
+    }
+    if (inOl) {
+      html += '</ol>\n';
+      inOl = false;
+    }
+  }
+
+  function inlineFormat(text) {
+    let res = text;
+    // Bold: **text**
+    res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Inline code: `text`
+    res = res.replace(/`([^`]+)`/g, '<code class="notes-inline-code">$1</code>');
+    return res;
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    const line = rawLine.trim();
+
+    if (!line) {
+      closeLists();
+      continue;
+    }
+
+    if (line === '---') {
+      closeLists();
+      html += '<hr class="notes-divider" />\n';
+      continue;
+    }
+
+    if (line.startsWith('### ')) {
+      closeLists();
+      html += `<h4 class="notes-subheading">${inlineFormat(line.slice(4))}</h4>\n`;
+      continue;
+    }
+
+    if (line.startsWith('## ')) {
+      closeLists();
+      html += `<h3 class="notes-heading">${inlineFormat(line.slice(3))}</h3>\n`;
+      continue;
+    }
+
+    if (line.startsWith('# ')) {
+      closeLists();
+      html += `<h2 class="notes-title-main">${inlineFormat(line.slice(2))}</h2>\n`;
+      continue;
+    }
+
+    // Unordered list item
+    if (line.startsWith('- ') || line.startsWith('* ')) {
+      if (inOl) closeLists();
+      if (!inUl) {
+        html += '<ul class="notes-list">\n';
+        inUl = true;
+      }
+      html += `  <li class="notes-list-item">${inlineFormat(line.slice(2))}</li>\n`;
+      continue;
+    }
+
+    // Ordered list item
+    const olMatch = line.match(/^(\d+)\.\s+(.*)$/);
+    if (olMatch) {
+      if (inUl) closeLists();
+      if (!inOl) {
+        html += '<ol class="notes-ordered-list">\n';
+        inOl = true;
+      }
+      html += `  <li class="notes-ordered-item">${inlineFormat(olMatch[2])}</li>\n`;
+      continue;
+    }
+
+    // Regular paragraph
+    closeLists();
+    html += `<p class="notes-paragraph">${inlineFormat(line)}</p>\n`;
+  }
+
+  closeLists();
+  return html;
+}
+
+function renderDeveloperNotes() {
+  const container = document.getElementById('notes-article-card');
+  if (!container || typeof DEVELOPER_NOTES_ARTICLE === 'undefined') return;
+
+  const lang = (typeof currentLang !== 'undefined' && DEVELOPER_NOTES_ARTICLE[currentLang]) ? currentLang : 'zh-TW';
+  const article = DEVELOPER_NOTES_ARTICLE[lang] || DEVELOPER_NOTES_ARTICLE['zh-TW'];
+  if (!article) return;
+
+  const bodyHtml = parseNotesMarkdown(article.content);
+  const copyBtnLabel = t('btn_copy_notes') || '複製文章 Markdown';
+
+  container.innerHTML = `
+    <div class="notes-header">
+      <div class="notes-meta-bar">
+        <div class="notes-badge-group">
+          <span class="notes-badge-tag">${article.tag || '開發者筆記'}</span>
+          <span class="notes-badge-sub">${article.badge || '架構心法'}</span>
+        </div>
+        <div class="notes-meta-info">
+          <span class="notes-meta-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            ${article.readingTime || '3 min'}
+          </span>
+          <span class="notes-meta-item">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            ${article.lastUpdated || '2026-09-21'}
+          </span>
+        </div>
+      </div>
+      <h3 class="notes-article-title">${article.title}</h3>
+      <p class="notes-article-subtitle">${article.subtitle}</p>
+      
+      <div class="notes-action-toolbar">
+        <button class="btn-notes-copy" onclick="copyNotesArticleMarkdown()" title="${copyBtnLabel}">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="btn-copy-notes-text">${copyBtnLabel}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="notes-article-body">
+      ${bodyHtml}
+    </div>
+
+    <div class="notes-footer-callout">
+      <div class="callout-icon">💡</div>
+      <div class="callout-content">
+        <div class="callout-title">${lang === 'zh-TW' ? '在 IDE 中無縫實踐此架構' : 'Implement This in Your IDE'}</div>
+        <div class="callout-desc">${lang === 'zh-TW' 
+          ? '搭配「Antigravity 控制中心」的多專案工作區管理，一鍵自動同步與映射全域 Skills，享受零摩擦的跨 Agent 協同體驗。' 
+          : 'Use Antigravity Toolbox to manage multi-root workspaces and auto-sync global skills via Windows Junctions for a zero-friction experience.'}</div>
+      </div>
+      <a href="#explore" class="callout-btn">${lang === 'zh-TW' ? '探索控制中心 ↗' : 'View Toolbox ↗'}</a>
+    </div>
+  `;
+}
+
+function copyNotesArticleMarkdown() {
+  if (typeof DEVELOPER_NOTES_ARTICLE === 'undefined') return;
+  const lang = (typeof currentLang !== 'undefined' && DEVELOPER_NOTES_ARTICLE[currentLang]) ? currentLang : 'zh-TW';
+  const article = DEVELOPER_NOTES_ARTICLE[lang] || DEVELOPER_NOTES_ARTICLE['zh-TW'];
+  if (!article || !article.content) return;
+
+  const fullText = `# ${article.title}\n\n> ${article.subtitle}\n\n${article.content.trim()}\n`;
+  copyToClipboard(fullText, t('notes_copied') || '已複製開發者筆記全文！');
+}
+
 

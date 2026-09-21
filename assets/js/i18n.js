@@ -11,6 +11,7 @@ const I18N = {
     nav_explore: '探索插件',
     nav_features: '核心特色',
     nav_video: '影音教學',
+    nav_notes: '開發者筆記',
     nav_install: '安裝指南',
     nav_github: 'GitHub',
     lang_btn: 'EN',
@@ -55,6 +56,12 @@ const I18N = {
     copied_cmd_prefix: '已複製指令',
     copy_failed: '複製失敗，請手動選取',
     btn_card_github_title: '前往 GitHub 插件源碼目錄',
+    
+    section_notes_tag: '開發者筆記',
+    section_notes_title: '跨 Agent 代理架構最佳實踐',
+    section_notes_desc: '解構多 IDE 規範碎片化痛點，以「教導替代限制」守護 Context Window，打造極致專注的 AI 協同開發環境。',
+    btn_copy_notes: '複製文章 Markdown',
+    notes_copied: '已複製開發者筆記全文！',
     
     nav_author: '關於作者',
     section_author_tag: '開發者簡介',
@@ -143,6 +150,7 @@ const I18N = {
     nav_explore: 'Explore Plugins',
     nav_features: 'Features',
     nav_video: 'Video Tutorials',
+    nav_notes: 'Developer Notes',
     nav_author: 'About Creator',
     nav_install: 'Installation',
     nav_github: 'GitHub',
@@ -188,6 +196,12 @@ const I18N = {
     copied_cmd_prefix: 'Copied command',
     copy_failed: 'Copy failed, please copy manually',
     btn_card_github_title: 'View plugin source on GitHub',
+    
+    section_notes_tag: 'Developer Notes',
+    section_notes_title: 'Cross-Agent Architecture Best Practices',
+    section_notes_desc: 'Deconstructing cross-IDE rule fragmentation: Guide rather than restrict, defend the context window, and build an ultra-focused AI workspace.',
+    btn_copy_notes: 'Copy Markdown',
+    notes_copied: 'Developer note copied to clipboard!',
     
     section_author_tag: 'Developer Profile',
     section_author_title: 'About the Creator',
@@ -287,6 +301,9 @@ function setLanguage(lang) {
   }
   if (typeof initVideoShowcase === 'function') {
     initVideoShowcase(true);
+  }
+  if (typeof renderDeveloperNotes === 'function') {
+    renderDeveloperNotes();
   }
   if (typeof SubtitleManager !== 'undefined' && typeof currentActiveVideoId !== 'undefined') {
     SubtitleManager.load(currentActiveVideoId, lang);
