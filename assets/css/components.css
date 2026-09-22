@@ -92,6 +92,11 @@
   margin-top: 2px;
 }
 
+.hero-ide-pills .ide-badge {
+  display: inline-flex;
+  align-items: center;
+}
+
 .hero-ide-pill {
   display: inline-flex;
   align-items: center;
@@ -796,15 +801,15 @@
 }
 
 .ide-badge.ide-cursor {
-  color: #c084fc;
-  border-color: rgba(192, 132, 252, 0.3);
-  background: rgba(192, 132, 252, 0.06);
+  color: #ffb830;
+  border-color: rgba(255, 184, 48, 0.38);
+  background: rgba(255, 184, 48, 0.09);
 }
 
 .ide-badge.ide-vscode {
-  color: #38bdf8;
-  border-color: rgba(56, 189, 248, 0.3);
-  background: rgba(56, 189, 248, 0.06);
+  color: #60cdff;
+  border-color: rgba(96, 205, 255, 0.38);
+  background: rgba(96, 205, 255, 0.09);
 }
 
 .plugin-ide-note {

@@ -16,7 +16,7 @@ const I18N = {
     nav_github: 'GitHub',
     lang_btn: 'EN',
     
-    hero_badge: '專為 Google Antigravity IDE 打造的原生擴充套件生態系',
+    hero_badge: '專為 AI Agent IDE 打造的原生擴充套件生態系',
     hero_ide_antigravity: 'Antigravity (原生)',
     hero_compat_notice: '源於 <strong>Google Antigravity IDE</strong>，同一套也可掛到 <strong>Cursor</strong> 與 <strong>VS Code</strong>。目前僅 <strong>AI 額度即時監控</strong> 不支援 VS Code（該 IDE 沒有對應額度 API）；其餘套件三端皆可安裝。',
     hero_last_updated_label: '網站更新時間：',
@@ -156,7 +156,7 @@ const I18N = {
     nav_github: 'GitHub',
     lang_btn: '繁中',
     
-    hero_badge: 'Native Extension Ecosystem for Google Antigravity IDE',
+    hero_badge: 'Native Extension Ecosystem for AI Agent IDEs',
     hero_ide_antigravity: 'Antigravity (Native)',
     hero_compat_notice: 'Born for <strong>Google Antigravity IDE</strong>, with full support for <strong>Cursor</strong> & <strong>VS Code</strong>. Currently only <strong>AI Quota Status</strong> does not support VS Code (due to lacking quota API); all other plugins can be installed across all three IDEs.',
     hero_last_updated_label: 'Site Updated:',

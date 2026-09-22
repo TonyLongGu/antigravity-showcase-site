@@ -10,7 +10,7 @@ const IDE_META = {
   vscode: { id: 'vscode', short: 'VS Code' }
 };
 
-const IDE_ALL = ['antigravity', 'cursor', 'vscode'];
+const IDE_ALL = ['antigravity', 'vscode', 'cursor'];
 
 // 預設/精選教學影片 (支援隨時為各套件擴充專屬影片)
 const FEATURED_TUTORIAL_VIDEO = {
@@ -20,44 +20,48 @@ const FEATURED_TUTORIAL_VIDEO = {
 
 const PLUGINS_DATA = [
   {
-    id: 'antigravity-ai-context-inspector',
-    category: 'sidebar',
-    version: '1.2.0',
-    icon: 'assets/icons/inspector.svg?v=2',
-    themeClass: 'icon-theme-purple',
-    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-ai-context-inspector`,
+    id: 'antigravity-toolbox',
+    category: 'script',
+    version: '1.4.0',
+    icon: 'assets/icons/toolbox.svg?v=2',
+    themeClass: 'icon-theme-indigo',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-toolbox`,
     cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
-    installCmd: 'cd antigravity-ai-context-inspector && .\\install-extension.bat',
-    videoSrc: 'assets/videos/ai-context-inspector.mp4',
+    installCmd: 'cd antigravity-toolbox && .\\install-extension.bat',
+    videoSrc: 'assets/videos/toolbox.mp4',
     name: {
-      'zh-TW': 'AI 上下文檢視器 (AI Context Inspector)',
-      'en': 'AI Context Inspector'
+      'zh-TW': 'Antigravity 控制中心 (Toolbox)',
+      'en': 'Antigravity Control Center (Toolbox)'
     },
     shortDesc: {
-      'zh-TW': '原生側邊欄即時檢視 AI 生效上下文：精準掌握 Rules、Skills 與 MCP 工具綁定，支援即時配置掃描與歷史記憶還原。',
-      'en': 'Native sidebar for real-time AI context inspection: scan active Rules, Skills, and MCP tools with historic snapshot restore and jump-to-source.'
+      'zh-TW': '側邊欄控制中心：工作區同名修正、專案腳本執行器、依 IDE 切換的設定捷徑與對話記憶庫清理。',
+      'en': 'Sidebar control center: workspace name fixer, project script runner, IDE-aware config shortcuts, and transcript / Brain cleanup.'
     },
-    tags: ['Webview', 'Rules & Skills', 'Brain Snapshot', 'Sidebar'],
+    tags: ['Sidebar Panel', 'Workspace Fixer', 'Brain Cleaner', 'Global Config'],
     ides: IDE_ALL,
     ideNote: {
-      'zh-TW': 'Antigravity 支援歷史對話快照復盤；Cursor 與 VS Code 檢視當前工作區生效配置。',
-      'en': 'Antigravity supports transcript replay; Cursor and VS Code inspect active workspace configurations.'
+      'zh-TW': '路徑隨 IDE 切換：Cursor 走 ~/.cursor，Antigravity 走 ~/.gemini。純 VS Code 會隱藏 Antigravity 專屬卡片。',
+      'en': 'Paths follow the host: ~/.cursor on Cursor, ~/.gemini on Antigravity. Pure VS Code hides Antigravity-only cards.'
     },
     features: {
       'zh-TW': [
-        '雙模式記憶掃描：Antigravity 可對比當前配置與 transcript.jsonl 歷史快照；Cursor / VS Code 鎖定當前環境掃描',
-        '歷史任務切換復盤：在 Antigravity 下拉切換歷史對話，對比各階段 Rules 與 Skills 生效差異',
-        '一鍵直達與摘要複製：點擊開啟對應 .md 技能檔案，並可將生效上下文複製為 Markdown'
+        '多專案工作區與同名修正：標記 .code-workspace 同名衝突，一鍵補上父層路徑前綴',
+        '專案腳本聯動排序執行器：右鍵加入腳本，隨工作區專案排序，支援一般與管理員執行',
+        '全域捷徑與記憶庫清理：Cursor 走 ~/.cursor 與 agent-transcripts；Antigravity 走 ~/.gemini 與 Brain'
       ],
       'en': [
-        'Dual-mode scan: Antigravity compares live config vs transcript.jsonl snapshots; Cursor / VS Code stay on the live workspace scan',
-        'Historic task replay on Antigravity: switch past conversations and compare Rules / Skills at each stage',
-        '1-click jump and export: open referenced .md files and copy the active context as Markdown'
+        'Workspace name fixer: detect .code-workspace collisions and prefix parent folders in one click',
+        'Project script runner: right-click add scripts, keep workspace order, run normal or elevated',
+        'IDE-aware shortcuts and cleanup: ~/.cursor + agent-transcripts on Cursor; ~/.gemini + Brain on Antigravity'
       ]
     },
     commands: [
-      { id: 'antigravity.aiContext.refresh', name: '重新整理 AI 上下文 (Refresh Context)' },
-      { id: 'antigravity.aiContext.focusView', name: '聚焦 AI 上下文檢視器 (Focus View)' }
+      { id: 'antigravity.toolbox.refresh', name: '重新整理工作區狀態 (Refresh Workspace)' },
+      { id: 'antigravity.toolbox.fixWorkspace', name: '自動修正工作區同名專案名稱 (Fix Workspace Names)' },
+      { id: 'antigravity.toolbox.resetWorkspace', name: '重設工作區為預設名稱 (Reset Workspace Names)' },
+      { id: 'antigravity.toolbox.openSettings', name: '開啟 settings.json (Open Settings)' },
+      { id: 'antigravity.toolbox.addScriptToRunner', name: '加入至專案腳本執行器 (Add to Runner)' },
+      { id: 'antigravity.toolbox.focusView', name: '聚焦控制中心側邊欄 (Focus View)' }
     ],
     configurations: []
   },
@@ -102,6 +106,115 @@ const PLUGINS_DATA = [
       { id: 'antigravity.mcp.focusView', name: '聚焦 MCP 側邊欄面板 (Focus View)' }
     ],
     configurations: []
+  },
+  {
+    id: 'antigravity-ai-context-inspector',
+    category: 'sidebar',
+    version: '1.2.0',
+    icon: 'assets/icons/inspector.svg?v=2',
+    themeClass: 'icon-theme-purple',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-ai-context-inspector`,
+    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
+    installCmd: 'cd antigravity-ai-context-inspector && .\\install-extension.bat',
+    videoSrc: 'assets/videos/ai-context-inspector.mp4',
+    name: {
+      'zh-TW': 'AI 上下文檢視器 (AI Context Inspector)',
+      'en': 'AI Context Inspector'
+    },
+    shortDesc: {
+      'zh-TW': '原生側邊欄即時檢視 AI 生效上下文：精準掌握 Rules、Skills 與 MCP 工具綁定，支援即時配置掃描與歷史記憶還原。',
+      'en': 'Native sidebar for real-time AI context inspection: scan active Rules, Skills, and MCP tools with historic snapshot restore and jump-to-source.'
+    },
+    tags: ['Webview', 'Rules & Skills', 'Brain Snapshot', 'Sidebar'],
+    ides: IDE_ALL,
+    ideNote: {
+      'zh-TW': 'Antigravity 支援歷史對話快照復盤；Cursor 與 VS Code 檢視當前工作區生效配置。',
+      'en': 'Antigravity supports transcript replay; Cursor and VS Code inspect active workspace configurations.'
+    },
+    features: {
+      'zh-TW': [
+        '雙模式記憶掃描：Antigravity 可對比當前配置與 transcript.jsonl 歷史快照；Cursor / VS Code 鎖定當前環境掃描',
+        '歷史任務切換復盤：在 Antigravity 下拉切換歷史對話，對比各階段 Rules 與 Skills 生效差異',
+        '一鍵直達與摘要複製：點擊開啟對應 .md 技能檔案，並可將生效上下文複製為 Markdown'
+      ],
+      'en': [
+        'Dual-mode scan: Antigravity compares live config vs transcript.jsonl snapshots; Cursor / VS Code stay on the live workspace scan',
+        'Historic task replay on Antigravity: switch past conversations and compare Rules / Skills at each stage',
+        '1-click jump and export: open referenced .md files and copy the active context as Markdown'
+      ]
+    },
+    commands: [
+      { id: 'antigravity.aiContext.refresh', name: '重新整理 AI 上下文 (Refresh Context)' },
+      { id: 'antigravity.aiContext.focusView', name: '聚焦 AI 上下文檢視器 (Focus View)' }
+    ],
+    configurations: []
+  },
+  {
+    id: 'antigravity-script-runner',
+    category: 'script',
+    version: '1.6.2',
+    icon: 'assets/icons/script-runner.svg?v=2',
+    themeClass: 'icon-theme-lime',
+    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
+    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
+    installCmd: 'cd antigravity-script-runner && .\\install-extension.bat',
+    videoSrc: 'assets/videos/script-runner.mp4',
+    name: {
+      'zh-TW': '腳本右鍵執行工具 (Script Runner)',
+      'en': 'Context Script Runner'
+    },
+    shortDesc: {
+      'zh-TW': '檔案總管與編輯器右鍵直達：一鍵執行 Python、PowerShell 與批次檔（支援管理員提權），並內建圖片、聲音與影片資料夾高效能檢視工具。',
+      'en': 'Context menu & editor 1-click runner for Python, PowerShell, and Batch (with Admin UAC), plus high-performance folder Image, Audio, and Video viewers.'
+    },
+    tags: ['Context Menu', 'Media Viewer', 'PowerShell Bypass', 'UAC Admin'],
+    ides: IDE_ALL,
+    ideNote: {
+      'zh-TW': '支援 Antigravity、Cursor、VS Code 檔案總管右鍵與編輯器右上角快捷執行。',
+      'en': 'Supports Antigravity, Cursor, and VS Code explorer context menu & editor top-right action.'
+    },
+    features: {
+      'zh-TW': [
+        '多語言腳本執行：檔案總管右鍵與編輯器右上角 ▶ 一鍵執行 Python、PowerShell（自動 Bypass）與批次檔，支援 UAC 提權',
+        '資料夾圖片檢視工具：4.5x 右鍵抓手滾動、游標錨點無損縮放 (Cursor-Anchored Zoom)、全域指針鎖定與右鍵/Esc 極速退出',
+        '資料夾聲音與影片檢視工具：懸停預覽試聽、Web Audio API 動態霓虹頻譜、高性能解耦 Seek 尋道播放器（杜絕解碼死鎖）'
+      ],
+      'en': [
+        'Multi-Language Script Runner: Explorer context menu & Editor ▶ button for Python, PowerShell (auto Bypass), and Batch with UAC Admin elevation',
+        'Folder Image Viewer: 4.5x right-click hand scrolling, cursor-anchored zoom lightbox, global pointer capture, and instant right-click/Esc exit',
+        'Folder Audio & Video Viewers: Hover preview, Web Audio API dynamic neon spectrum visualizer, and high-performance decoupled seek player'
+      ]
+    },
+    commands: [
+      { id: 'scriptRunner.viewFolderImages', name: '檢視圖片 (View Images)' },
+      { id: 'scriptRunner.viewFolderAudios', name: '檢視聲音 (View Audio)' },
+      { id: 'scriptRunner.viewFolderVideos', name: '檢視影片 (View Videos)' },
+      { id: 'scriptRunner.runPy', name: '執行 Python 腳本 (Run Python)' },
+      { id: 'scriptRunner.runPs1', name: '執行 PowerShell 腳本 (Run PowerShell)' },
+      { id: 'scriptRunner.runPs1Admin', name: '執行 PowerShell 腳本 (系統管理員) (Run PowerShell Admin)' },
+      { id: 'scriptRunner.runBat', name: '執行批次檔 (Run Batch Script)' },
+      { id: 'scriptRunner.runBatAdmin', name: '執行批次檔 (系統管理員) (Run Batch File Admin)' }
+    ],
+    configurations: [
+      {
+        key: 'scriptRunner.runAsAdmin',
+        type: 'boolean',
+        default: 'true',
+        desc: {
+          'zh-TW': '是否預設以系統管理員身分 (Administrator) 提權獨立視窗執行',
+          'en': 'Whether to run scripts as Administrator in elevated window'
+        }
+      },
+      {
+        key: 'scriptRunner.keepWindowOpen',
+        type: 'boolean',
+        default: 'true',
+        desc: {
+          'zh-TW': '以管理員身分執行時，是否在腳本執行完畢後保持視窗以供檢視輸出',
+          'en': 'Keep window open after execution finishes to review logs'
+        }
+      }
+    ]
   },
   {
     id: 'antigravity-quick-access',
@@ -221,119 +334,6 @@ const PLUGINS_DATA = [
         }
       }
     ]
-  },
-  {
-    id: 'antigravity-script-runner',
-    category: 'script',
-    version: '1.6.2',
-    icon: 'assets/icons/script-runner.svg?v=2',
-    themeClass: 'icon-theme-lime',
-    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
-    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
-    installCmd: 'cd antigravity-script-runner && .\\install-extension.bat',
-    videoSrc: 'assets/videos/script-runner.mp4',
-    name: {
-      'zh-TW': '腳本右鍵執行工具 (Script Runner)',
-      'en': 'Context Script Runner'
-    },
-    shortDesc: {
-      'zh-TW': '檔案總管與編輯器右鍵直達：一鍵執行 Python、PowerShell 與批次檔（支援管理員提權），並內建圖片、聲音與影片資料夾高效能檢視工具。',
-      'en': 'Context menu & editor 1-click runner for Python, PowerShell, and Batch (with Admin UAC), plus high-performance folder Image, Audio, and Video viewers.'
-    },
-    tags: ['Context Menu', 'Media Viewer', 'PowerShell Bypass', 'UAC Admin'],
-    ides: IDE_ALL,
-    ideNote: {
-      'zh-TW': '支援 Antigravity、Cursor、VS Code 檔案總管右鍵與編輯器右上角快捷執行。',
-      'en': 'Supports Antigravity, Cursor, and VS Code explorer context menu & editor top-right action.'
-    },
-    features: {
-      'zh-TW': [
-        '多語言腳本執行：檔案總管右鍵與編輯器右上角 ▶ 一鍵執行 Python、PowerShell（自動 Bypass）與批次檔，支援 UAC 提權',
-        '資料夾圖片檢視工具：4.5x 右鍵抓手滾動、游標錨點無損縮放 (Cursor-Anchored Zoom)、全域指針鎖定與右鍵/Esc 極速退出',
-        '資料夾聲音與影片檢視工具：懸停預覽試聽、Web Audio API 動態霓虹頻譜、高性能解耦 Seek 尋道播放器（杜絕解碼死鎖）'
-      ],
-      'en': [
-        'Multi-Language Script Runner: Explorer context menu & Editor ▶ button for Python, PowerShell (auto Bypass), and Batch with UAC Admin elevation',
-        'Folder Image Viewer: 4.5x right-click hand scrolling, cursor-anchored zoom lightbox, global pointer capture, and instant right-click/Esc exit',
-        'Folder Audio & Video Viewers: Hover preview, Web Audio API dynamic neon spectrum visualizer, and high-performance decoupled seek player'
-      ]
-    },
-    commands: [
-      { id: 'scriptRunner.viewFolderImages', name: '檢視圖片 (View Images)' },
-      { id: 'scriptRunner.viewFolderAudios', name: '檢視聲音 (View Audio)' },
-      { id: 'scriptRunner.viewFolderVideos', name: '檢視影片 (View Videos)' },
-      { id: 'scriptRunner.runPy', name: '執行 Python 腳本 (Run Python)' },
-      { id: 'scriptRunner.runPs1', name: '執行 PowerShell 腳本 (Run PowerShell)' },
-      { id: 'scriptRunner.runPs1Admin', name: '執行 PowerShell 腳本 (系統管理員) (Run PowerShell Admin)' },
-      { id: 'scriptRunner.runBat', name: '執行批次檔 (Run Batch Script)' },
-      { id: 'scriptRunner.runBatAdmin', name: '執行批次檔 (系統管理員) (Run Batch File Admin)' }
-    ],
-    configurations: [
-      {
-        key: 'scriptRunner.runAsAdmin',
-        type: 'boolean',
-        default: 'true',
-        desc: {
-          'zh-TW': '是否預設以系統管理員身分 (Administrator) 提權獨立視窗執行',
-          'en': 'Whether to run scripts as Administrator in elevated window'
-        }
-      },
-      {
-        key: 'scriptRunner.keepWindowOpen',
-        type: 'boolean',
-        default: 'true',
-        desc: {
-          'zh-TW': '以管理員身分執行時，是否在腳本執行完畢後保持視窗以供檢視輸出',
-          'en': 'Keep window open after execution finishes to review logs'
-        }
-      }
-    ]
-  },
-  {
-    id: 'antigravity-toolbox',
-    category: 'script',
-    version: '1.4.0',
-    icon: 'assets/icons/toolbox.svg?v=2',
-    themeClass: 'icon-theme-indigo',
-    repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-toolbox`,
-    cloneCmd: `git clone ${MAIN_REPO_URL}.git`,
-    installCmd: 'cd antigravity-toolbox && .\\install-extension.bat',
-    videoSrc: 'assets/videos/toolbox.mp4',
-    name: {
-      'zh-TW': 'Antigravity 控制中心 (Toolbox)',
-      'en': 'Antigravity Control Center (Toolbox)'
-    },
-    shortDesc: {
-      'zh-TW': '側邊欄控制中心：工作區同名修正、專案腳本執行器、依 IDE 切換的設定捷徑與對話記憶庫清理。',
-      'en': 'Sidebar control center: workspace name fixer, project script runner, IDE-aware config shortcuts, and transcript / Brain cleanup.'
-    },
-    tags: ['Sidebar Panel', 'Workspace Fixer', 'Brain Cleaner', 'Global Config'],
-    ides: IDE_ALL,
-    ideNote: {
-      'zh-TW': '路徑隨 IDE 切換：Cursor 走 ~/.cursor，Antigravity 走 ~/.gemini。純 VS Code 會隱藏 Antigravity 專屬卡片。',
-      'en': 'Paths follow the host: ~/.cursor on Cursor, ~/.gemini on Antigravity. Pure VS Code hides Antigravity-only cards.'
-    },
-    features: {
-      'zh-TW': [
-        '多專案工作區與同名修正：標記 .code-workspace 同名衝突，一鍵補上父層路徑前綴',
-        '專案腳本聯動排序執行器：右鍵加入腳本，隨工作區專案排序，支援一般與管理員執行',
-        '全域捷徑與記憶庫清理：Cursor 走 ~/.cursor 與 agent-transcripts；Antigravity 走 ~/.gemini 與 Brain'
-      ],
-      'en': [
-        'Workspace name fixer: detect .code-workspace collisions and prefix parent folders in one click',
-        'Project script runner: right-click add scripts, keep workspace order, run normal or elevated',
-        'IDE-aware shortcuts and cleanup: ~/.cursor + agent-transcripts on Cursor; ~/.gemini + Brain on Antigravity'
-      ]
-    },
-    commands: [
-      { id: 'antigravity.toolbox.refresh', name: '重新整理工作區狀態 (Refresh Workspace)' },
-      { id: 'antigravity.toolbox.fixWorkspace', name: '自動修正工作區同名專案名稱 (Fix Workspace Names)' },
-      { id: 'antigravity.toolbox.resetWorkspace', name: '重設工作區為預設名稱 (Reset Workspace Names)' },
-      { id: 'antigravity.toolbox.openSettings', name: '開啟 settings.json (Open Settings)' },
-      { id: 'antigravity.toolbox.addScriptToRunner', name: '加入至專案腳本執行器 (Add to Runner)' },
-      { id: 'antigravity.toolbox.focusView', name: '聚焦控制中心側邊欄 (Focus View)' }
-    ],
-    configurations: []
   }
 ];
  
