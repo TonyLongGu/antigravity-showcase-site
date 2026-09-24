@@ -2820,6 +2820,22 @@ body.has-web-fullscreen .video-showcase-wrapper {
   color: rgba(226, 232, 240, 0.88);
 }
 
+.notes-blockquote {
+  margin: 22px 0;
+  padding: 16px 22px;
+  background: rgba(0, 242, 254, 0.05);
+  border-left: 3px solid var(--accent-cyan);
+  border-radius: 0 10px 10px 0;
+  color: rgba(240, 246, 252, 0.95);
+  font-size: 0.96rem;
+  line-height: 1.76;
+}
+
+.notes-article-body em {
+  font-style: italic;
+  color: rgba(148, 163, 184, 0.92);
+}
+
 /* Clean list typography aligned flush with text boundary */
 .notes-list,
 .notes-ordered-list {
@@ -2847,6 +2863,18 @@ body.has-web-fullscreen .video-showcase-wrapper {
   color: var(--accent-cyan);
   font-size: 1.25rem;
   line-height: 1.76;
+}
+
+.notes-list-item-nested {
+  margin-left: 1.4rem;
+  color: rgba(203, 213, 225, 0.88);
+  font-size: 0.94rem;
+}
+
+.notes-list-item-nested::before {
+  content: "◦";
+  color: rgba(0, 242, 254, 0.7);
+  font-size: 1.1rem;
 }
 
 /* Numbered list (1, 2, 3) - Flush with left boundary */

@@ -1319,6 +1319,8 @@ function parseNotesMarkdown(markdownText) {
     let res = text;
     // Bold: **text**
     res = res.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // Italic: *text* (after bold)
+    res = res.replace(/\*([^*]+)\*/g, '<em>$1</em>');
     // Inline code: `text`
     res = res.replace(/`([^`]+)`/g, '<code class="notes-inline-code">$1</code>');
     return res;
@@ -1336,6 +1338,12 @@ function parseNotesMarkdown(markdownText) {
     if (line === '---') {
       closeLists();
       html += '<hr class="notes-divider" />\n';
+      continue;
+    }
+
+    if (line.startsWith('> ')) {
+      closeLists();
+      html += `<blockquote class="notes-blockquote">${inlineFormat(line.slice(2))}</blockquote>\n`;
       continue;
     }
 
@@ -1359,12 +1367,13 @@ function parseNotesMarkdown(markdownText) {
 
     // Unordered list item
     if (line.startsWith('- ') || line.startsWith('* ')) {
+      const isNested = rawLine.startsWith('  ') || rawLine.startsWith('\t');
       if (inOl) closeLists();
       if (!inUl) {
         html += '<ul class="notes-list">\n';
         inUl = true;
       }
-      html += `  <li class="notes-list-item">${inlineFormat(line.slice(2))}</li>\n`;
+      html += `  <li class="notes-list-item${isNested ? ' notes-list-item-nested' : ''}">${inlineFormat(line.slice(2))}</li>\n`;
       continue;
     }
 
