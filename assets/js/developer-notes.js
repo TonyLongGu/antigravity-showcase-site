@@ -46,8 +46,6 @@ const DEVELOPER_NOTES_ARTICLE = {
 
 令人玩味的比喻：AI Agent 御三家 —— Antigravity、VS Code、Cursor
 
-![AI Agent 御三家 —— Antigravity、VS Code、Cursor](assets/images/pokemon_ide_classroom_homework_dusk_closeup.png)
-
 本工具開發起初由 Antigravity 入門（高性價比），而後因工作需要引入 Cursor（更強的推理模型），再尋求更彈性的應用策略 VS Code（Cline、Codex），逐一收服不同屬性的 AI Agent，以此攻略各種類型的任務：
 
 - **Cursor + Claude**：單純代碼開發
@@ -93,8 +91,6 @@ Scattered user preferences, temporary decisions, and project backstories accumul
 ### IDE & AI Agent Selection Strategy
 
 An intriguing analogy: The "Big Three" AI Agents —— Antigravity, VS Code, and Cursor
-
-![AI Agent "Big Three" —— Antigravity, VS Code, Cursor](assets/images/pokemon_ide_classroom_homework_dusk_closeup.png)
 
 Our toolchain development began with Antigravity (high cost-performance ratio). Later, driven by project demands, we introduced Cursor (stronger reasoning models), and further explored flexible strategies with VS Code (Cline, Codex) — mastering distinct AI Agents one by one to conquer varied workloads:
 
