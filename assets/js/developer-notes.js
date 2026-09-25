@@ -13,8 +13,8 @@ const DEVELOPER_NOTES_ARTICLE = {
   'zh-TW': {
     tag: '開發者筆記',
     badge: '架構心法與最佳實踐',
-    readingTime: '3 分鐘閱讀',
-    lastUpdated: '2026-09-24',
+    readingTime: '4 分鐘閱讀',
+    lastUpdated: '2026-09-25',
     title: '跨 Agent 代理架構最佳實踐：Rules、Skills 與 AI 專注力管理',
     subtitle: '解構多 IDE 規範碎片化痛點，以「教導替代限制」守護 Context Window，打造極致專注的 AI 協同開發環境。',
     content: `
@@ -42,21 +42,27 @@ const DEVELOPER_NOTES_ARTICLE = {
 
 ---
 
-### 核心組件定位與協同：Skills、MCP 與 Plugins
+### IDE、AI Agent 選擇策略
 
-在建構現代 Agent 擴充生態時，釐清三者的職責邊界能避免架構混亂：
+令人玩味的比喻：AI Agent 御三家 —— Antigravity、VS Code、Cursor
 
-- **Skills（教學 / SOP）**：教 AI **「怎麼做」**（How-to）。以 \`SKILL.md\` 規範作業流程與經驗眉角，用明確指引取代硬性限制。
-- **MCP（工具能力 / 外部手腳）**：給 AI **「能做什麼」**（Capabilities）。以標準協定調度外部 API、本機軟體與腳本（Python / PowerShell），化為執行的手腳。
-- **Plugins（整合安裝包 / 模組套件）**：**「一鍵打包分發」**（Packaging）。將特定任務的 Skills、MCP 配置（\`mcp_config.json\`）與 Agents 整合為開箱即用的套裝模組*（註：此處特指 Agent 生態規範的 Bundle 整合包，與本站提供的「IDE 延伸工具模組」為不同概念）*。
+![AI Agent 御三家 —— Antigravity、VS Code、Cursor](assets/images/pokemon_ide_classroom_homework_dusk_closeup.png)
+
+本工具開發起初由 Antigravity 入門（高性價比），而後因工作需要引入 Cursor（更強的推理模型），再尋求更彈性的應用策略 VS Code（Cline、Codex），逐一收服不同屬性的 AI Agent，以此攻略各種類型的任務：
+
+- **Cursor + Claude**：單純代碼開發
+- **Cursor + Codex**：代碼開發 + 圖文
+- **Antigravity**：單純文書工作
+- **Antigravity + Codex**：圖文創作
+- **VS Code（Cline + Codex）**：影音 + 3D 創作
 `
   },
 
   'en': {
     tag: 'Developer Notes',
     badge: 'Architecture & Best Practices',
-    readingTime: '3 min read',
-    lastUpdated: '2026-09-24',
+    readingTime: '4 min read',
+    lastUpdated: '2026-09-25',
     title: 'Cross-Agent Architecture Best Practices: Rules, Skills & AI Focus',
     subtitle: 'Deconstructing cross-IDE rule fragmentation: Guide rather than restrict, defend the context window, and build an ultra-focused AI workspace.',
     content: `
@@ -84,13 +90,19 @@ Scattered user preferences, temporary decisions, and project backstories accumul
 
 ---
 
-### Core Component Roles & Synergy: Skills, MCP, and Plugins
+### IDE & AI Agent Selection Strategy
 
-When designing a modern Agent extension ecosystem, establishing clear conceptual boundaries prevents architectural sprawl:
+An intriguing analogy: The "Big Three" AI Agents —— Antigravity, VS Code, and Cursor
 
-- **Skills (Guidance / SOP)**: Instruct AI on **"How to do it"** (How-to). Codify standard workflows and edge cases inside \`SKILL.md\`, substituting rigid constraints with clear instructions.
-- **MCP (Capabilities / External Hands & Feet)**: Grant AI **"What it can do"** (Capabilities). Dispatch local Python/PowerShell scripts, databases, external APIs, and desktop software (e.g. ComfyUI, Blender, GitHub) via standardized protocols.
-- **Plugins (Packaged Distribution / Extension Bundles)**: **"One-click packaging and distribution"** (Packaging). Bundle task-specific Skills, MCP configurations (\`mcp_config.json\`), and Agents into an out-of-the-box module *(Note: Refers to Agent ecosystem bundles, distinct from our website's IDE extension tools)*.
+![AI Agent "Big Three" —— Antigravity, VS Code, Cursor](assets/images/pokemon_ide_classroom_homework_dusk_closeup.png)
+
+Our toolchain development began with Antigravity (high cost-performance ratio). Later, driven by project demands, we introduced Cursor (stronger reasoning models), and further explored flexible strategies with VS Code (Cline, Codex) — mastering distinct AI Agents one by one to conquer varied workloads:
+
+- **Cursor + Claude**: Pure code development
+- **Cursor + Codex**: Code development + text/graphics
+- **Antigravity**: Pure documentation & writing
+- **Antigravity + Codex**: Graphic & text creation
+- **VS Code (Cline + Codex)**: Video & 3D creation
 `
   }
 };

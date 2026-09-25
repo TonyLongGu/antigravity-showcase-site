@@ -1341,6 +1341,16 @@ function parseNotesMarkdown(markdownText) {
       continue;
     }
 
+    // Markdown Image: ![alt](src)
+    const imgMatch = line.match(/^!\[(.*?)\]\((.*?)\)$/);
+    if (imgMatch) {
+      closeLists();
+      const alt = imgMatch[1];
+      const src = imgMatch[2];
+      html += `<div class="notes-image-container"><img src="${src}" alt="${alt}" class="notes-image" loading="lazy" />${alt ? `<div class="notes-image-caption">${alt}</div>` : ''}</div>\n`;
+      continue;
+    }
+
     if (line.startsWith('> ')) {
       closeLists();
       html += `<blockquote class="notes-blockquote">${inlineFormat(line.slice(2))}</blockquote>\n`;
