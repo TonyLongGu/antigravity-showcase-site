@@ -152,7 +152,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-script-runner',
     category: 'script',
-    version: '1.6.2',
+    version: '1.7.1',
     icon: 'assets/icons/script-runner.svg?v=2',
     themeClass: 'icon-theme-lime',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-script-runner`,
