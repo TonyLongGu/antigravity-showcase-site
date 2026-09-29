@@ -213,21 +213,63 @@ function getCurrentPlaybackTime() {
   return v ? (v.currentTime || 0) : 0;
 }
 
+/** 取得目前語系（集中處理跨檔載入順序，避免各處重複 typeof 判斷） */
+function getCurrentLang() {
+  return typeof currentLang !== 'undefined' && currentLang ? currentLang : 'zh-TW';
+}
+
+/** 取得目前選取的教學影片 ID */
+function getActiveVideoId() {
+  return typeof currentActiveVideoId !== 'undefined' && currentActiveVideoId
+    ? currentActiveVideoId
+    : 'antigravity-design-philosophy';
+}
+
 /**
- * Antigravity High-Precision Subtitle Engine (WebVTT Parser & Multi-Language Sync)
+ * Antigravity Subtitle Engine（資料驅動 · 零網路請求）
+ *
+ * 字幕來源為 tools/build-subtitles.js 由 assets/subtitles/*.vtt 預先編譯的
+ * SUBTITLE_TRACKS，因此：
+ *   - 本機 file:// 直接開啟 index.html 也能正常顯示字幕（原本 fetch 會被 CORS 阻擋）
+ *   - 零額外網路請求、無 404 靜默失敗、「CC 燈亮著卻沒字幕」的假狀態不復存在
+ *   - 缺漏的字幕會在產生階段就被列出，而非上線後才發現
  */
+
+/** 語系鍵值正規化：字幕資料只區分 en 與 zh-TW */
+function getSubtitleLang(lang) {
+  return lang === 'en' ? 'en' : 'zh-TW';
+}
+
+/**
+ * 影片 ID → 字幕主題鍵值
+ * 資料層若明確宣告 subtitleKey 則優先採用，否則回退至既有命名慣例（antigravity- 前綴）。
+ * 該慣例僅集中於此函式，不再散落各處；缺少資料時會於 load() 警示並隱藏 CC 按鈕。
+ */
+function getSubtitleKey(videoId) {
+  const list = getTutorialVideosList();
+  const item = list.find((v) => v.id === videoId);
+  if (item && item.subtitleKey) return item.subtitleKey;
+  return String(videoId).replace(/^antigravity-/, '');
+}
+
+/** 取得指定影片的字幕主題（含所有語系）；無資料時回傳 null */
+function getSubtitleTrack(videoId) {
+  if (typeof SUBTITLE_TRACKS === 'undefined') return null;
+  return SUBTITLE_TRACKS[getSubtitleKey(videoId)] || null;
+}
+
 const SubtitleManager = {
-  isEnabled: localStorage.getItem('antigravity_subtitle_enabled') !== 'false',
+  isEnabled: true,
   currentCues: [],
   currentVideoId: '',
   currentLang: '',
   activeCueIndex: -1,
 
   init() {
+    // 於初始化階段才讀取設定，避免腳本載入期就觸碰儲存層（隱私模式下 localStorage 會 throw）
+    this.isEnabled = SafeStorage.get('antigravity_subtitle_enabled') !== 'false';
     this.updateButtonUI();
-    const targetId = typeof currentActiveVideoId !== 'undefined' ? currentActiveVideoId : 'antigravity-design-philosophy';
-    const lang = typeof currentLang !== 'undefined' ? currentLang : 'zh-TW';
-    this.load(targetId, lang);
+    this.load(getActiveVideoId(), getCurrentLang());
   },
 
   updateButtonUI() {
@@ -243,118 +285,83 @@ const SubtitleManager = {
 
   toggle() {
     this.isEnabled = !this.isEnabled;
-    localStorage.setItem('antigravity_subtitle_enabled', this.isEnabled ? 'true' : 'false');
+    SafeStorage.set('antigravity_subtitle_enabled', this.isEnabled ? 'true' : 'false');
     this.updateButtonUI();
     if (this.isEnabled) {
       this.activeCueIndex = -1; // 重設快取索引，確保能立刻觸發當前語句渲染
-      this.sync(getCurrentPlaybackTime(), true); // 強制即時重新繪製
+      this.sync(getCurrentPlaybackTime());
     } else {
       this.hideText();
     }
   },
 
-  async load(videoId, lang) {
+  load(videoId, lang) {
     if (!videoId) return;
     this.currentVideoId = videoId;
-    const targetLang = lang || (typeof currentLang !== 'undefined' ? currentLang : 'zh-TW');
-    this.currentLang = targetLang;
+    this.currentLang = getSubtitleLang(lang || getCurrentLang());
     this.currentCues = [];
     this.activeCueIndex = -1;
     this.hideText();
 
-    // 支援將插件 ID (如 antigravity-design-philosophy) 映射為檔案名稱 (design-philosophy)
-    const baseName = videoId.replace(/^antigravity-/, '');
-    const vttLang = (targetLang === 'en') ? 'en' : 'zh-TW';
-    const vttUrl = `assets/subtitles/${baseName}.${vttLang}.vtt`;
+    const track = getSubtitleTrack(videoId);
+    // 無字幕資料的主題直接隱藏 CC 按鈕，避免「燈亮著卻沒有字幕」的假狀態
+    this.updateAvailability(!!track);
 
-    try {
-      const res = await fetch(vttUrl);
-      if (!res.ok) {
-        return;
-      }
-      const vttText = await res.text();
-      if (this.currentVideoId === videoId && this.currentLang === targetLang) {
-        this.currentCues = this.parseVTT(vttText);
-        this.sync(getCurrentPlaybackTime(), true);
-      }
-    } catch (err) {
-      console.warn('Subtitle load error:', err);
+    if (!track) {
+      console.warn(`[Subtitle] 找不到字幕主題資料：videoId=${videoId}（key=${getSubtitleKey(videoId)}）`);
+      return;
     }
+
+    const cues = track[this.currentLang];
+    if (!cues || cues.length === 0) {
+      console.warn(`[Subtitle] 主題 ${getSubtitleKey(videoId)} 缺少語系 ${this.currentLang} 字幕`);
+      return;
+    }
+
+    this.currentCues = cues;
+    this.sync(getCurrentPlaybackTime());
   },
 
-  parseVTT(text) {
-    const cues = [];
-    if (!text) return cues;
-    const lines = text.replace(/\r\n/g, '\n').split('\n');
-    let i = 0;
-    
-    // 跳過開頭非時間戳行
-    while (i < lines.length && !lines[i].includes('-->')) {
-      i++;
-    }
+  /** 依字幕資料是否存在切換 CC 按鈕顯示（樣式對應 .custom-ctrl-btn[hidden]） */
+  updateAvailability(available) {
+    const dom = getPlayerDOM();
+    if (dom.ccBtn) dom.ccBtn.hidden = !available;
+  },
 
-    while (i < lines.length) {
-      const line = lines[i].trim();
-      if (line.includes('-->')) {
-        const parts = line.split('-->');
-        const startStr = parts[0].trim().split(' ')[0];
-        const endStr = parts[1].trim().split(' ')[0];
-        const start = this.timeToSeconds(startStr);
-        const end = this.timeToSeconds(endStr);
-        
-        i++;
-        let cueText = [];
-        while (i < lines.length && lines[i].trim() !== '') {
-          cueText.push(lines[i].trim());
-          i++;
-        }
-
-        if (!isNaN(start) && !isNaN(end) && cueText.length > 0) {
-          cues.push({
-            start,
-            end,
-            text: cueText.join(' ')
-          });
-        }
+  /** 以二分搜尋定位當前 cue（資料已依 start 排序），取代每次同步都線性掃描全部字幕的成本 */
+  findCueIndex(currentTime) {
+    const cues = this.currentCues;
+    let lo = 0;
+    let hi = cues.length - 1;
+    let candidate = -1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (cues[mid].start <= currentTime) {
+        candidate = mid;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
       }
-      i++;
     }
-    return cues;
+    if (candidate === -1) return -1;
+    return currentTime <= cues[candidate].end ? candidate : -1;
   },
 
-  timeToSeconds(timeStr) {
-    if (!timeStr) return 0;
-    const parts = timeStr.split(':');
-    if (parts.length < 2) return 0;
-    let hours = 0, mins = 0, secs = 0;
-    if (parts.length === 3) {
-      hours = parseFloat(parts[0]) || 0;
-      mins = parseFloat(parts[1]) || 0;
-      secs = parseFloat(parts[2].replace(',', '.')) || 0;
-    } else {
-      mins = parseFloat(parts[0]) || 0;
-      secs = parseFloat(parts[1].replace(',', '.')) || 0;
-    }
-    return hours * 3600 + mins * 60 + secs;
-  },
-
-  sync(currentTime, forceUpdate = false) {
+  sync(currentTime) {
     if (!this.isEnabled || !this.currentCues || this.currentCues.length === 0) {
       this.hideText();
       return;
     }
 
-    const matchedIndex = this.currentCues.findIndex(c => currentTime >= c.start && currentTime <= c.end);
-    if (matchedIndex !== -1) {
-      if (forceUpdate || this.activeCueIndex !== matchedIndex) {
-        this.activeCueIndex = matchedIndex;
-        this.showText(this.currentCues[matchedIndex].text);
-      }
-    } else {
-      if (this.activeCueIndex !== -1) {
-        this.activeCueIndex = -1;
-        this.hideText();
-      }
+    const matchedIndex = this.findCueIndex(currentTime);
+    if (matchedIndex === -1) {
+      if (this.activeCueIndex !== -1) this.hideText();
+      return;
+    }
+
+    if (this.activeCueIndex !== matchedIndex) {
+      this.activeCueIndex = matchedIndex;
+      this.showText(this.currentCues[matchedIndex].text);
     }
   },
 
@@ -380,19 +387,28 @@ const SubtitleManager = {
 
 let isMouseHoveringControls = false;
 
-function blurActiveControl() {
-  // 延遲微任務，讓原生事件派發完畢後立即解除焦點，消除手機觸控殘留的外框 (Focus Ring)
-  requestAnimationFrame(() => {
-    const el = document.activeElement;
-    if (el && (el.classList?.contains('custom-ctrl-btn') || el.id?.startsWith('ctrl-') || el.closest?.('.custom-player-controls'))) {
-      if (typeof el.blur === 'function') el.blur();
-    }
-  });
+/**
+ * 播放器 UI 自動收合時，若焦點仍停在控制列按鈕上（該按鈕已透明不可見），
+ * 將焦點交還播放器本體（tabindex="0"），維持鍵盤操作的連續性。
+ *
+ * 註：不再採用「強制 blur()」的舊作法——那會把鍵盤焦點整個抽回 body，
+ * 使連續操作斷鏈；行動端點擊殘留的外框已由 CSS
+ * `.custom-ctrl-btn:focus:not(:focus-visible)` 從根本解決，無需 JS 補丁。
+ */
+function moveFocusToPlayerSurface() {
+  const dom = getPlayerDOM();
+  const container = dom.container;
+  if (!container) return;
+
+  const el = document.activeElement;
+  if (el && el !== container && el.tagName === 'BUTTON' && container.contains(el)) {
+    // preventScroll：焦點轉移不得觸發任何捲動位移
+    container.focus({ preventScroll: true });
+  }
 }
 
 function toggleSubtitles() {
   SubtitleManager.toggle();
-  blurActiveControl();
 }
 
 function wakePlayerUI() {
@@ -427,8 +443,8 @@ function hidePlayerUI() {
     dom.container.classList.add('hide-ui');
     dom.controls.classList.remove('visible');
 
-    // 隱藏時主動釋放控制列內殘留的焦點，消除手機外框
-    blurActiveControl();
+    // 隱藏時把焦點交還播放器本體，避免焦點滯留在已不可見的按鈕上
+    moveFocusToPlayerSurface();
   }
 }
 
@@ -493,8 +509,6 @@ function toggleCustomPlayer() {
       dom.badge.classList.remove('flash');
     }, 300);
   }
-
-  blurActiveControl();
 }
 
 function toggleMute() {
@@ -517,7 +531,6 @@ function toggleMute() {
     updateVolumeSliderUI(0);
   }
   wakePlayerUI();
-  blurActiveControl();
 }
 
 function updateVolumeSliderUI(val) {
@@ -576,6 +589,32 @@ function tryUnlockOrientation() {
   }
 }
 
+/**
+ * 全螢幕外框歸位窗口（對應 CSS .is-fs-settling / .is-fs-releasing）
+ *
+ * 瀏覽器進出全螢幕時會自行播放縮放動畫（Chrome 約 300ms），動畫期間元素
+ * 仍接近滿版尺寸；此時若套用視窗外框，1px 白色邊框與 ring shadow 就會在
+ * 畫面邊緣閃出白線。故於歸位窗口內暫時隱藏外框，待尺寸歸位後再無動畫地恢復。
+ */
+const FS_FRAME_SETTLE_MS = 400; // 涵蓋 UA 縮放動畫（約 300ms）並保留餘裕
+let fsFrameSettleTimer = null;
+
+function markFullscreenFrameSettling() {
+  const container = getPlayerDOM().container;
+  if (!container) return;
+
+  container.classList.remove('is-fs-releasing');
+  container.classList.add('is-fs-settling');
+
+  clearTimeout(fsFrameSettleTimer);
+  fsFrameSettleTimer = setTimeout(() => {
+    // 先恢復外框（此時仍鎖住過渡），下一幀才解除過渡鎖，確保不會產生淡入動畫
+    container.classList.remove('is-fs-settling');
+    container.classList.add('is-fs-releasing');
+    requestAnimationFrame(() => container.classList.remove('is-fs-releasing'));
+  }, FS_FRAME_SETTLE_MS);
+}
+
 function enterWebFullscreen() {
   const container = document.getElementById('main-video-player');
   const fsEnter = document.getElementById('ctrl-icon-fullscreen-enter');
@@ -585,6 +624,7 @@ function enterWebFullscreen() {
   isWebFullscreen = true;
   container.classList.add('is-web-fullscreen');
   document.body.classList.add('has-web-fullscreen');
+  markFullscreenFrameSettling();
 
   if (fsEnter && fsExit) {
     fsEnter.style.display = 'none';
@@ -594,7 +634,6 @@ function enterWebFullscreen() {
   tryLockLandscape();
   isDraggingProgress = false;
   wakePlayerUI();
-  blurActiveControl();
 }
 
 function exitWebFullscreen() {
@@ -606,6 +645,7 @@ function exitWebFullscreen() {
   isWebFullscreen = false;
   container.classList.remove('is-web-fullscreen');
   document.body.classList.remove('has-web-fullscreen');
+  markFullscreenFrameSettling();
 
   if (fsEnter && fsExit) {
     fsEnter.style.display = 'block';
@@ -613,9 +653,6 @@ function exitWebFullscreen() {
   }
 
   tryUnlockOrientation();
-
-  // 釋放全螢幕按鈕焦點，消除手機外框
-  blurActiveControl();
 
   // 退出時瞬間校準置中
   requestAnimationFrame(() => {
@@ -644,6 +681,8 @@ function updateFullscreenState() {
     } else {
       container.classList.remove('is-fullscreen');
     }
+    // 進入/退出原生全螢幕皆會經過此處，統一開啟外框歸位窗口
+    markFullscreenFrameSettling();
   }
 
   // 若退出原生全螢幕，同步清除 web 全螢幕殘留狀態
@@ -677,11 +716,9 @@ function updateFullscreenState() {
     }
   }
 
-  // 退出全螢幕時的焦點釋放與無縫就位保障
+  // 退出全螢幕時的無縫就位保障
   if (!isFs) {
-    blurActiveControl();
-
-    // 2. 備用校準：以 instant (無動畫) 確保精準居中，徹底杜絕縮回後的二次滑動感
+    // 備用校準：以 instant (無動畫) 確保精準居中，徹底杜絕縮回後的二次滑動感
     requestAnimationFrame(() => {
       if (container) {
         container.scrollIntoView({
@@ -695,7 +732,6 @@ function updateFullscreenState() {
 
   isDraggingProgress = false;
   wakePlayerUI();
-  blurActiveControl();
 }
 
 function toggleFullscreen() {
@@ -768,7 +804,6 @@ function toggleFullscreen() {
     console.warn('Native fullscreen exception, fallback to web fullscreen:', err);
     enterWebFullscreen();
   }
-  blurActiveControl();
 }
 
 let justDraggedProgress = false;
@@ -960,16 +995,20 @@ function initCustomVideoPlayer() {
   // 點擊容器時自動聚焦，確保滑鼠移出後鍵盤快捷鍵（如 Space）依然能精準控制且不發生全頁跳躍式滾動
   container.addEventListener('pointerdown', () => {
     if (document.activeElement !== container && !container.contains(document.activeElement)) {
-      container.focus();
+      container.focus({ preventScroll: true });
     }
   });
 
-  // 全域/播放器鍵盤快捷鍵 (全螢幕、滑鼠懸停、或播放中均可極速操控)
+  // 播放器鍵盤快捷鍵
+  // 作用範圍嚴格限定「全螢幕中」或「播放器持有焦點且仍在視窗內」，
+  // 避免影片於背景播放時綁架整頁的空白鍵與方向鍵捲動。
   document.addEventListener('keydown', (e) => {
+    const active = document.activeElement;
+    const isInput = !!active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
+    if (isInput) return;
+
     const isNativeFs = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
     const isFs = isNativeFs || isWebFullscreen;
-    const isInput = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
-    if (isInput) return;
 
     if (e.key === 'Escape' && isWebFullscreen) {
       e.preventDefault();
@@ -977,14 +1016,14 @@ function initCustomVideoPlayer() {
       return;
     }
 
-    const isHovered = container.matches(':hover');
-    const isFocused = container === document.activeElement || container.contains(document.activeElement);
+    const isFocusInside = !!active && (active === container || container.contains(active));
     const rect = container.getBoundingClientRect();
     const isVisibleOnScreen = rect.top < window.innerHeight && rect.bottom > 0;
-    
-    // 當處於全螢幕、或滑鼠懸停、或播放器持有焦點、或正在可視範圍內播放時，接管影音快捷鍵
-    const isPlayerActive = isFs || isHovered || isFocused || (isPlaying && isVisibleOnScreen);
-    if (!isPlayerActive) return;
+
+    if (!isFs && !(isFocusInside && isVisibleOnScreen)) return;
+
+    // 焦點位於控制列按鈕時，空白鍵交還原生按鈕啟用（避免與按鈕語意互相衝突）
+    if (e.code === 'Space' && active && active.tagName === 'BUTTON') return;
 
     if (e.code === 'Space' || e.key === 'k' || e.key === 'K') {
       e.preventDefault();
@@ -1265,7 +1304,7 @@ function switchTutorialVideo(videoId) {
 
   // 切換載入對應影片之字幕
   if (typeof SubtitleManager !== 'undefined') {
-    SubtitleManager.load(videoId, typeof currentLang !== 'undefined' ? currentLang : 'zh-TW');
+    SubtitleManager.load(videoId, getCurrentLang());
   }
 }
 

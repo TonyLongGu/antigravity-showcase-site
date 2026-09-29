@@ -1037,6 +1037,17 @@
 /* ==========================================================================
    Antigravity Custom High-Performance Video Player
    ========================================================================== */
+
+/* 行動端：消除 Chrome / Android 點擊時覆蓋整片播放器的半透明「選取高亮」方塊
+   （該高亮會命中整個點擊層並鋪滿畫面，視覺上與文字被選取極易混淆）
+   注意：-webkit-tap-highlight-color 在 Blink 為繼承屬性，但仍明確列出主要命中節點，
+   以確保不同引擎（含 iOS Safari）行為一致。 */
+.video-player-container,
+.video-player-container .player-click-surface,
+.video-player-container .custom-player-controls {
+  -webkit-tap-highlight-color: transparent;
+}
+
 .video-player-container {
   position: relative;
   width: 100%;
@@ -1060,9 +1071,12 @@
   outline-offset: 2px;
 }
 
-.video-player-container:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.7), 0 0 24px rgba(99, 102, 241, 0.15);
+/* 僅在支援真正滑鼠懸停的裝置套用光暈：避免行動端點擊後 :hover 黏著，形成持續發光的假「選中」狀態 */
+@media (hover: hover) and (pointer: fine) {
+  .video-player-container:hover {
+    border-color: rgba(99, 102, 241, 0.35);
+    box-shadow: 0 20px 48px -8px rgba(0, 0, 0, 0.7), 0 0 24px rgba(99, 102, 241, 0.15);
+  }
 }
 
 /* 全螢幕模式完美適配 (原生 Fullscreen 依託 Top Layer，Web Fullscreen 採用 Fixed 浮層) */
@@ -1110,6 +1124,24 @@
   box-shadow: none !important;
   transition: none !important;
   z-index: 2147483647 !important;
+}
+
+/* --------------------------------------------------------------------------
+   全螢幕「外框歸位窗口」
+   瀏覽器進出全螢幕時會自行播放縮放動畫，動畫期間元素仍接近滿版尺寸；
+   若此刻已套用視窗外框（1px 白色邊框 + 1px ring shadow），就會在畫面
+   邊緣閃出一條白線。故以兩段式類別處理：
+     .is-fs-settling  → 歸位期間完全不繪製外框，並停用過渡
+     .is-fs-releasing → 外框已恢復但停用過渡；下一幀移除本類別時不會觸發淡入動畫
+   -------------------------------------------------------------------------- */
+.video-player-container.is-fs-settling {
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+.video-player-container.is-fs-releasing {
+  transition: none !important;
 }
 
 /* 行動端 Web 全螢幕時解除祖先元素 Stacking Context 限制、徹底隱藏干擾部件並鎖定背景滾動 */
@@ -1428,6 +1460,11 @@ body.has-web-fullscreen .video-showcase-wrapper {
 }
 .custom-ctrl-btn {
   -webkit-tap-highlight-color: transparent; /* 消除行動端點擊灰色高亮方塊 */
+}
+
+/* 該影片沒有對應字幕資料時整顆隱藏（顯示改由 JS 設定 hidden 屬性，語意與樣式一致） */
+.custom-ctrl-btn[hidden] {
+  display: none;
 }
 
 /* 進度條容器與擴大命中熱區 */

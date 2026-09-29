@@ -282,7 +282,8 @@ const I18N = {
   }
 };
 
-let currentLang = localStorage.getItem('antigravity_lang') || 'zh-TW';
+// 透過 SafeStorage 讀取：隱私模式或儲存被封鎖時不會 throw（裸呼叫會中斷整個腳本）
+let currentLang = SafeStorage.get('antigravity_lang', 'zh-TW');
 
 function t(key) {
   return I18N[currentLang]?.[key] || I18N['zh-TW']?.[key] || key;
@@ -291,7 +292,7 @@ function t(key) {
 function setLanguage(lang) {
   if (!I18N[lang]) return;
   currentLang = lang;
-  localStorage.setItem('antigravity_lang', lang);
+  SafeStorage.set('antigravity_lang', lang);
   if (typeof document !== 'undefined' && document.documentElement) {
     document.documentElement.lang = lang === 'zh-TW' ? 'zh-TW' : 'en';
   }
