@@ -53,6 +53,8 @@ const I18N = {
     ctrl_play_title: '播放 / 暫停 (Space)',
     ctrl_mute_title: '靜音 / 取消靜音 (M)',
     ctrl_fullscreen_title: '全螢幕 (F)',
+    ctrl_progress_label: '影片進度',
+    ctrl_progress_title: '點擊或拖曳跳轉（方向鍵 ±5 秒、PageUp／PageDown ±10 秒、Home／End 跳至頭尾）',
     copied_cmd_prefix: '已複製指令',
     copy_failed: '複製失敗，請手動選取',
     btn_card_github_title: '前往 GitHub 插件源碼目錄',
@@ -193,6 +195,8 @@ const I18N = {
     ctrl_play_title: 'Play / Pause (Space)',
     ctrl_mute_title: 'Mute / Unmute (M)',
     ctrl_fullscreen_title: 'Fullscreen (F)',
+    ctrl_progress_label: 'Video progress',
+    ctrl_progress_title: 'Click or drag to seek (Arrows ±5s, PageUp / PageDown ±10s, Home / End to jump)',
     copied_cmd_prefix: 'Copied command',
     copy_failed: 'Copy failed, please copy manually',
     btn_card_github_title: 'View plugin source on GitHub',
@@ -330,6 +334,11 @@ function updateDOMTranslations() {
     el.setAttribute('placeholder', t(key));
   });
 
+  document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+    const key = el.getAttribute('data-i18n-aria-label');
+    el.setAttribute('aria-label', t(key));
+  });
+
   document.querySelectorAll('[data-i18n-html]').forEach(el => {
     const key = el.getAttribute('data-i18n-html');
     el.innerHTML = t(key);
@@ -344,6 +353,9 @@ function updateDOMTranslations() {
 
   const playBtn = document.getElementById('ctrl-play-btn');
   if (playBtn) playBtn.setAttribute('title', t('ctrl_play_title'));
+
+  const progBar = document.getElementById('player-progress-container');
+  if (progBar) progBar.setAttribute('title', t('ctrl_progress_title'));
 
   const muteBtn = document.getElementById('ctrl-mute-btn');
   if (muteBtn) muteBtn.setAttribute('title', t('ctrl_mute_title'));

@@ -1534,6 +1534,18 @@ body.has-web-fullscreen .video-showcase-wrapper {
   transform: translate(-50%, -50%) scale(1);
 }
 
+/* 鍵盤聚焦提示（僅 :focus-visible）：加厚進度條、顯示拖曳點並補上外框，
+   讓以 Tab 進入的鍵盤使用者能明確看見焦點位置；滑鼠點擊不會殘留外框 */
+.player-progress-container:focus-visible {
+  height: 8px;
+  outline: 2px solid rgba(56, 189, 248, 0.55);
+  outline-offset: 6px;
+}
+
+.player-progress-container:focus-visible .player-progress-thumb {
+  transform: translate(-50%, -50%) scale(1);
+}
+
 /* 底部操作按鈕列 */
 .custom-controls-row {
   display: flex;

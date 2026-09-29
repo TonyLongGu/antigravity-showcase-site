@@ -470,6 +470,28 @@ function updatePlayPauseUI(playing) {
   }
 }
 
+/**
+ * 播放/暫停微提示（0.3 秒極速淡出）
+ *
+ * 僅作為「使用者手勢的即時回饋」而存在；播放狀態本身一律由原生 play / pause / ended
+ * 事件驅動，因此本函式不碰 isPlaying 與控制列圖示，避免出現「樂觀猜測」的假狀態。
+ */
+let badgeFlashTimer = null;
+function flashPlayerBadge(playing) {
+  const dom = getPlayerDOM();
+  if (dom.badgePlay) dom.badgePlay.style.display = playing ? 'block' : 'none';
+  if (dom.badgePause) dom.badgePause.style.display = playing ? 'none' : 'block';
+
+  if (dom.badge) {
+    dom.badge.classList.add('flash');
+    // 連續快速點擊時重算淡出時間，避免前一次計時器提早收掉後一次的提示
+    clearTimeout(badgeFlashTimer);
+    badgeFlashTimer = setTimeout(() => {
+      dom.badge.classList.remove('flash');
+    }, 300);
+  }
+}
+
 function toggleCustomPlayer() {
   // 防止進度條拖曳後的 ghost click 與拖曳中的穿透
   if (justDraggedProgress || isDraggingProgress) return;
@@ -478,36 +500,21 @@ function toggleCustomPlayer() {
   if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
   if (!html5VideoEl) return;
 
+  // 只負責「下達指令」：真正的狀態與 UI 更新交由原生事件（play / pause / ended / playing）處理，
+  // 確保畫面永遠反映媒體元素的真實狀態；若 play() 被瀏覽器拒絕，事件不會觸發，UI 自然維持原狀。
   if (html5VideoEl.paused) {
     const p = html5VideoEl.play();
     if (p && p.catch) {
       p.catch(e => {
         console.warn('HTML5 Video Play:', e);
-        isPlaying = false;
-        updatePlayPauseUI(false);
         showBufferingIndicator(false);
       });
     }
-    isPlaying = true;
-    if (dom.badgePlay) dom.badgePlay.style.display = 'block';
-    if (dom.badgePause) dom.badgePause.style.display = 'none';
-    updatePlayPauseUI(true);
-    wakePlayerUI();
+    flashPlayerBadge(true);
   } else {
     html5VideoEl.pause();
-    isPlaying = false;
     showBufferingIndicator(false);
-    if (dom.badgePlay) dom.badgePlay.style.display = 'none';
-    if (dom.badgePause) dom.badgePause.style.display = 'block';
-    updatePlayPauseUI(false);
-  }
-
-  // 0.3 秒極速淡出微提示
-  if (dom.badge) {
-    dom.badge.classList.add('flash');
-    setTimeout(() => {
-      dom.badge.classList.remove('flash');
-    }, 300);
+    flashPlayerBadge(false);
   }
 }
 
@@ -845,6 +852,32 @@ function formatTime(seconds) {
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
 
+/**
+ * 同步進度條的無障礙語意（role="slider"）
+ *   - 已知時長：提供 aria-valuemin / aria-valuemax / aria-valuenow，並以人類可讀的
+ *     aria-valuetext（例：1:23 / 4:56）描述位置，避免螢幕報讀器只讀出冰冷的秒數
+ *   - 尚未取得時長（載入中、切換影片）：移除數值屬性使 slider 呈現 indeterminate
+ *
+ * 時間軸更新（timeupdate）與拖曳預覽（updateSeekUI）共用本函式，確保視覺與語意永不脫節。
+ */
+function updateProgressAria(curr, dur) {
+  const dom = getPlayerDOM();
+  if (!dom.progContainer) return;
+
+  if (!(dur > 0)) {
+    dom.progContainer.removeAttribute('aria-valuemax');
+    dom.progContainer.removeAttribute('aria-valuenow');
+    dom.progContainer.setAttribute('aria-valuetext', '0:00 / 0:00');
+    return;
+  }
+
+  const safeCurr = Math.max(0, Math.min(dur, curr || 0));
+  dom.progContainer.setAttribute('aria-valuemin', '0');
+  dom.progContainer.setAttribute('aria-valuemax', String(Math.round(dur)));
+  dom.progContainer.setAttribute('aria-valuenow', String(Math.round(safeCurr)));
+  dom.progContainer.setAttribute('aria-valuetext', `${formatTime(safeCurr)} / ${formatTime(dur)}`);
+}
+
 function updateTimeAndDuration() {
   if (isDraggingProgress) return;
   const dom = getPlayerDOM();
@@ -873,6 +906,9 @@ function updateTimeAndDuration() {
     if (dom.thumbEl) dom.thumbEl.style.left = `${pct}%`;
     if (dom.bufBar) dom.bufBar.style.width = `${loadedPct}%`;
   }
+
+  // 同步進度條的無障礙數值（role="slider"）
+  updateProgressAria(curr, dur);
 
   // 同步字幕顯示
   if (typeof SubtitleManager !== 'undefined') {
@@ -1059,15 +1095,20 @@ function initCustomVideoPlayer() {
     }
   });
 
-  // click-surface 使用 pointerdown+pointerup 精確判定「有意按下並釋放」才觸發播放/暫停
-  // 雙擊防競態：利用 260ms 計時器解耦單擊與雙擊，徹底杜絕快速點擊產生的 Play Promise 中斷報錯
+  // click-surface 點擊判定：pointerdown + pointerup 需構成「有意按下並釋放」才觸發
+  // 單擊「立即」切換播放/暫停（0 延遲）；280ms 內出現第二次點擊則視為雙擊，追加切換全螢幕。
+  // 雙擊＝兩次 toggle，播放狀態淨變化為零（自然還原），故不會有 Play Promise 競態。
+  // 舊版以 260ms 計時器延後單擊執行，會讓「按暫停」延遲約 0.26 秒才真正生效，已移除。
+  const DOUBLE_TAP_MS = 280;   // 雙擊判定窗口（與瀏覽器 dblclick 慣例一致）
+  const TAP_MAX_MOVE_PX = 10;  // 按下與放開之間的位移超過此值即視為拖曳/選取意圖
+  const TAP_MAX_HOLD_MS = 700; // 觸控長按上限（交還系統手勢）；滑鼠不設限，長按後放開仍應生效
+
   const clickSurface = dom.clickSurface || document.getElementById('player-click-surface');
   if (clickSurface) {
     let surfacePointerDownTime = 0;
     let surfacePointerDownX = 0;
     let surfacePointerDownY = 0;
     let lastTapTime = 0;
-    let singleTapTimer = null;
 
     clickSurface.addEventListener('pointerdown', (e) => {
       surfacePointerDownTime = Date.now();
@@ -1076,29 +1117,22 @@ function initCustomVideoPlayer() {
     });
 
     clickSurface.addEventListener('pointerup', (e) => {
-      const dt = Date.now() - surfacePointerDownTime;
+      // 僅接受主要指標與主要按鍵（左鍵 / 觸控 / 觸控筆）：右鍵、中鍵不得切換播放狀態
+      if (!e.isPrimary || e.button !== 0) return;
+
       const dx = Math.abs(e.clientX - surfacePointerDownX);
       const dy = Math.abs(e.clientY - surfacePointerDownY);
-      // 僅在快速按下並釋放（<400ms）且未移動（<10px）時才視為有效手勢
-      if (dt < 400 && dx < 10 && dy < 10) {
-        const now = Date.now();
-        if (now - lastTapTime < 280) {
-          // 雙擊全螢幕：立即取消待執行的單擊播放/暫停，平滑切換全螢幕，零播放衝突
-          lastTapTime = 0;
-          if (singleTapTimer) {
-            clearTimeout(singleTapTimer);
-            singleTapTimer = null;
-          }
-          toggleFullscreen();
-        } else {
-          lastTapTime = now;
-          if (singleTapTimer) clearTimeout(singleTapTimer);
-          singleTapTimer = setTimeout(() => {
-            toggleCustomPlayer();
-            singleTapTimer = null;
-          }, 260);
-        }
-      }
+      if (dx > TAP_MAX_MOVE_PX || dy > TAP_MAX_MOVE_PX) return; // 有位移即視為拖曳，不觸發
+
+      // 觸控/觸控筆長按通常代表系統手勢（選取、長按選單），故設上限；滑鼠長按後放開仍算有效點擊
+      if (e.pointerType !== 'mouse' && Date.now() - surfacePointerDownTime > TAP_MAX_HOLD_MS) return;
+
+      const now = Date.now();
+      const isDoubleTap = (now - lastTapTime) < DOUBLE_TAP_MS;
+      lastTapTime = isDoubleTap ? 0 : now; // 連點後歸零，第三次點擊重新起算，避免全螢幕反覆切換
+
+      toggleCustomPlayer();                // 立即切換播放/暫停（零延遲）
+      if (isDoubleTap) toggleFullscreen(); // 雙擊追加全螢幕（播放狀態已被第二次點擊還原）
     });
 
     // 阻止 click-surface 上的 click 事件（防止殘留的 onclick 或瀏覽器自動派發的 click）
@@ -1132,6 +1166,7 @@ function initCustomVideoPlayer() {
     if (dom.filledBar) dom.filledBar.style.width = `${pos * 100}%`;
     if (dom.thumbEl) dom.thumbEl.style.left = `${pos * 100}%`;
     if (dom.timeCurrent && dur > 0) dom.timeCurrent.textContent = formatTime(pos * dur);
+    updateProgressAria(pos * dur, dur); // 拖曳預覽期間同步無障礙數值，避免視覺與語意不一致
   };
 
   // 真正執行跳轉（僅在點擊釋放或拖曳結束時執行一次）
@@ -1206,6 +1241,29 @@ function initCustomVideoPlayer() {
 
   progContainer.addEventListener('pointerup', endDragSeek);
   progContainer.addEventListener('pointercancel', cancelDragSeek);
+
+  // 進度條鍵盤操作（role="slider" 慣例）
+  // 左右方向鍵 ±5 秒已由播放器全域快捷鍵處理，此處補上滑桿慣用的：
+  //   Home / End         → 跳至影片開頭 / 結尾
+  //   PageUp / PageDown  → ±10 秒（依 WAI-ARIA 慣例：PageUp 為增值、PageDown 為減值）
+  progContainer.addEventListener('keydown', (e) => {
+    if (!html5VideoEl) return;
+    const dur = html5VideoEl.duration || 0;
+    if (!(dur > 0)) return;
+
+    if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      safeSeekHtml5Video(e.key === 'Home' ? 0 : dur);
+    } else if (e.key === 'PageUp' || e.key === 'PageDown') {
+      e.preventDefault();
+      safeSeekHtml5Video(getCurrentPlaybackTime() + (e.key === 'PageUp' ? 10 : -10));
+    } else {
+      return; // 其餘按鍵（含 Space）交還播放器全域快捷鍵處理
+    }
+
+    updateTimeAndDuration();
+    wakePlayerUI();
+  });
 
   // 初始化字幕引擎 (載入預設字幕並還原設定)
   if (typeof SubtitleManager !== 'undefined') {
@@ -1290,6 +1348,7 @@ function switchTutorialVideo(videoId) {
   if (dom.bufBar) dom.bufBar.style.width = '0%';
   if (dom.timeCurrent) dom.timeCurrent.textContent = '0:00';
   if (dom.timeDuration) dom.timeDuration.textContent = '0:00';
+  updateProgressAria(0, 0); // 來源已更換、時長尚未取得：進度條語意回到 indeterminate
 
   if (!html5VideoEl) html5VideoEl = dom.html5Video || document.getElementById('tutorial-html5-video');
 
