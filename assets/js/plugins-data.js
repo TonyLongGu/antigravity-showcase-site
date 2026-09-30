@@ -68,7 +68,7 @@ const PLUGINS_DATA = [
   {
     id: 'antigravity-mcp-manager',
     category: 'sidebar',
-    version: '1.9.0',
+    version: '1.9.1',
     icon: 'assets/icons/mcp.svg?v=2',
     themeClass: 'icon-theme-cyan',
     repoUrl: `${MAIN_REPO_URL}/tree/main/antigravity-mcp-manager`,
