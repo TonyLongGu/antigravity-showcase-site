@@ -14,7 +14,7 @@ const DEVELOPER_NOTES_ARTICLE = {
     tag: '開發者筆記',
     badge: '架構心法與最佳實踐',
     readingTime: '4 分鐘閱讀',
-    lastUpdated: '2026-09-25',
+    lastUpdated: '2026-10-03',
     title: '跨 Agent 代理架構最佳實踐：Rules、Skills 與 AI 專注力管理',
     subtitle: '解構多 IDE 規範碎片化痛點，以「教導替代限制」守護 Context Window，打造極致專注的 AI 協同開發環境。',
     content: `
@@ -27,18 +27,6 @@ const DEVELOPER_NOTES_ARTICLE = {
 - **在首專案內建立 \`AGENTS.md\` 作為全域規範**：不做繁瑣的條件式規範（避免不同 Harness 專屬規則各自為政），內容保持通則與精要。不論是 Antigravity、Cursor、VS Code、Codex、Cline 都能讀取。
 - **具體需求改採 Skills 格式書寫（與其限制，不如教導怎麼做）**：將操作流程與專業技能放置於專案資料夾中的 \`.agents/skills\` 目錄內，使 Agent 可以檢索讀取，必要時可將引用通則書寫至 \`AGENTS.md\`。特殊低頻或私有流程，改放置在該專案的自訂目錄中，守護寶貴的 Context 空間。
 - **在 IDE 中建立多專案工作區，隨需啟閉**：不同類型、任務的 Skills 建立為獨立專案置入 IDE 工作區，不使用時將其關閉，例如應用本工具「控制中心 / 多專案工作區」，可以全自動建立/移除 Windows Junction 連接。
-
----
-
-### 記憶解耦與持久化：使用 Supermemory MCP 管理碎片記憶
-
-長期協同開發中累積的零散偏好、暫時性決策或專案背景，若全部硬編碼塞進 Rules 或常態 Prompt，會嚴重侵占寶貴的 Context Window：
-
-- **痛點**：常駐 Context 過於肥大會引發注意力漂移、推論延遲拉長與大量 Token 浪費；而完全不記錄又會導致跨會話失憶。
-- **解法：引入 Supermemory MCP 管理碎片記憶**：
-  - **平時零佔用，按需檢索（On-Demand Retrieval）**：將跨對話、跨專案的零碎記憶與經驗沉澱託管至 Supermemory，不污染常駐上下文。
-  - **語意搜尋與動態喚醒**：當 AI 遇到相關任務需要背景知識或特定習慣時，再透過 MCP 接口動態檢索相關碎片記憶。
-  - **落實守護專注力**：實現「平時零負擔、查閱有依據」的 AI 專注力保護閉環。
 
 ---
 
@@ -60,7 +48,7 @@ const DEVELOPER_NOTES_ARTICLE = {
     tag: 'Developer Notes',
     badge: 'Architecture & Best Practices',
     readingTime: '4 min read',
-    lastUpdated: '2026-09-25',
+    lastUpdated: '2026-10-03',
     title: 'Cross-Agent Architecture Best Practices: Rules, Skills & AI Focus',
     subtitle: 'Deconstructing cross-IDE rule fragmentation: Guide rather than restrict, defend the context window, and build an ultra-focused AI workspace.',
     content: `
@@ -73,18 +61,6 @@ In real-world AI-assisted development, an excess of Rules, Skills, and MCP tools
 - **Root-level \`AGENTS.md\` as Universal Baseline**: Avoid convoluted conditional harness rules (preventing fragmented rules across disparate tools). Keep instructions high-level, concise, and universal. Antigravity, Cursor, VS Code, Codex, and Cline all read it seamlessly.
 - **Author Specific Needs as Skills (Guide Rather Than Restrict)**: Place procedural workflows and specialized capabilities inside \`.agents/skills\` within the project folder for on-demand retrieval by the agent, referencing universal conventions in \`AGENTS.md\` when necessary. Keep niche, low-frequency, or private workflows in custom project subdirectories to shield valuable Context space.
 - **On-Demand Multi-Project Workspaces in IDE**: Organize distinct types and domain-specific skills into dedicated projects within your IDE workspace, activating or closing them as needed. With our "Control Center / Multi-Project Workspaces", Windows Junctions are created and detached fully automatically.
-
----
-
-### Memory Decoupling & Persistence: Managing Fragmented Memory with Supermemory MCP
-
-Scattered user preferences, temporary decisions, and project backstories accumulated across long-term collaborations will heavily congest the context window if hardcoded into Rules or static prompts:
-
-- **Pain Point**: Bloated persistent context induces attention drift, stretches inference latency, and wastes token budgets, while abandoning records leads to cross-session amnesia.
-- **Solution: Manage Fragmented Memories via Supermemory MCP**:
-  - **Zero Idle Footprint with On-Demand Retrieval**: Offload fragmented memories and historical insights across conversations and projects to Supermemory, keeping persistent context pristine.
-  - **Semantic Search & Dynamic Activation**: Dynamically query relevant memory snippets through MCP interfaces only when specific background context is needed.
-  - **Guarding AI Focus**: Achieve a self-sustaining loop of "zero idle overhead, factual recall when needed."
 
 ---
 

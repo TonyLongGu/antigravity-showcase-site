@@ -9,7 +9,6 @@ const I18N = {
     brand_badge: 'IDE',
     nav_home: '首頁',
     nav_explore: '探索插件',
-    nav_features: '核心特色',
     nav_video: '影音教學',
     nav_notes: '開發者筆記',
     nav_install: '安裝指南',
@@ -18,7 +17,6 @@ const I18N = {
     
     hero_badge: '專為 AI Agent IDE 打造的原生擴充套件生態系',
     hero_ide_antigravity: 'Antigravity (原生)',
-    hero_compat_notice: '源於 <strong>Google Antigravity IDE</strong>，同一套也可掛到 <strong>Cursor</strong> 與 <strong>VS Code</strong>。目前僅 <strong>AI 額度即時監控</strong> 不支援 VS Code（該 IDE 沒有對應額度 API）；其餘套件三端皆可安裝。',
     hero_last_updated_label: '網站更新時間：',
     hero_title_1: '極致擴展你的',
     hero_title_gradient: 'AI 協同開發體驗',
@@ -26,7 +24,6 @@ const I18N = {
     btn_explore: '瀏覽 6 大插件',
     btn_download_all_zip: '下載全套插件包 (.zip)',
     btn_watch_video: '觀看教學影片',
-    btn_install_guide: '一鍵安裝教學',
     btn_copy_cmd: '複製',
     btn_copied: '已複製！',
     
@@ -40,8 +37,6 @@ const I18N = {
     tab_ide_all: '全部環境',
     
     btn_github_repo: '前往 GitHub 倉庫 ↗',
-    btn_watch_tutorial: '教學影片',
-    btn_quick_install: '安裝',
     empty_search_title: '查無符合的擴充套件',
     empty_search_desc: '請嘗試搜尋其他關鍵字，或切換分類 / IDE 篩選。',
     
@@ -137,7 +132,8 @@ const I18N = {
     footer_desc: 'Google Antigravity IDE 專屬原生擴充套件生態系，亦可掛載至 Cursor 與 VS Code，賦予 AI 輔助編程前所未有的掌控力與流暢度。',
     footer_quick_links: '快速導航',
     footer_resources: '生態資源',
-    footer_community: '開源社群',
+    footer_github_repo: 'GitHub 倉庫',
+    footer_license: 'MIT 授權條款',
     footer_rights: '版權所有。以 MIT 授權條款開源發布。',
     footer_tagline: '源於 Google Antigravity IDE · 同步支援 Cursor 與 VS Code',
     footer_disclaimer: '免責聲明：本專案為獨立開源社群專案，旨在擴展 Antigravity IDE 開發體驗，亦相容 Cursor 與 VS Code。與 Google、Cursor 或 Microsoft / VS Code 官方無關。所有產品名稱與商標均屬其各自所有者所有。'
@@ -150,7 +146,6 @@ const I18N = {
     brand_badge: 'IDE',
     nav_home: 'Home',
     nav_explore: 'Plugins',
-    nav_features: 'Features',
     nav_video: 'Tutorials',
     nav_notes: 'Notes',
     nav_install: 'Install',
@@ -160,7 +155,6 @@ const I18N = {
     
     hero_badge: 'Native Extension Ecosystem for AI Agent IDEs',
     hero_ide_antigravity: 'Antigravity (Native)',
-    hero_compat_notice: 'Born for <strong>Google Antigravity IDE</strong>, with full support for <strong>Cursor</strong> & <strong>VS Code</strong>. Currently only <strong>AI Quota Status</strong> does not support VS Code (due to lacking quota API); all other plugins can be installed across all three IDEs.',
     hero_last_updated_label: 'Site Updated:',
     hero_title_1: 'Supercharge Your',
     hero_title_gradient: 'AI Pair Programming Flow',
@@ -168,7 +162,6 @@ const I18N = {
     btn_explore: 'Explore 6 Plugins',
     btn_download_all_zip: 'Download All (.zip)',
     btn_watch_video: 'Watch Video Tutorial',
-    btn_install_guide: 'Installation Guide',
     btn_copy_cmd: 'Copy',
     btn_copied: 'Copied!',
     
@@ -182,8 +175,6 @@ const I18N = {
     tab_ide_all: 'All IDEs',
     
     btn_github_repo: 'View on GitHub ↗',
-    btn_watch_tutorial: 'Video Guide',
-    btn_quick_install: 'Install',
     empty_search_title: 'No Matching Plugins Found',
     empty_search_desc: 'Try different keywords, or switch category / IDE filters.',
     
@@ -279,7 +270,8 @@ const I18N = {
     footer_desc: 'Native extension suite for Google Antigravity IDE, also mountable on Cursor and VS Code, bringing unmatched clarity and control to your AI-assisted workflow.',
     footer_quick_links: 'Quick Navigation',
     footer_resources: 'Ecosystem',
-    footer_community: 'Community',
+    footer_github_repo: 'GitHub Repository',
+    footer_license: 'MIT License',
     footer_rights: 'All rights reserved. Released under MIT License.',
     footer_tagline: 'Tailored for Google Antigravity IDE · Also supports Cursor & VS Code',
     footer_disclaimer: 'Disclaimer: This is an independent open-source project created to enhance the Antigravity IDE experience, also compatible with Cursor & VS Code. It is not affiliated with Google, Cursor, or Microsoft / VS Code. All trademarks belong to their respective owners.'
@@ -339,17 +331,17 @@ function updateDOMTranslations() {
     el.setAttribute('aria-label', t(key));
   });
 
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    el.setAttribute('title', t(key));
+  });
+
   document.querySelectorAll('[data-i18n-html]').forEach(el => {
     const key = el.getAttribute('data-i18n-html');
     el.innerHTML = t(key);
   });
 
   document.title = t('page_title');
-
-  const langBtn = document.getElementById('btn-lang-toggle');
-  if (langBtn) {
-    langBtn.textContent = currentLang === 'zh-TW' ? 'EN' : '繁中';
-  }
 
   const playBtn = document.getElementById('ctrl-play-btn');
   if (playBtn) playBtn.setAttribute('title', t('ctrl_play_title'));
