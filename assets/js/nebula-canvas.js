@@ -12,8 +12,8 @@
   let mouse = { x: -1000, y: -1000, vx: 0, vy: 0, radius: mode === 'ember' ? 170 : 160 };
 
   const PARTICLE_COUNT = 75;
-  /* Embers have no connecting lines, so a slightly higher count keeps a similar visual density. */
-  const EMBER_COUNT = 150;
+  /* Ash has no connecting lines. A higher count keeps the field present. */
+  const EMBER_COUNT = 210;
   const CONNECT_DISTANCE = 130;
   const MOUSE_CONNECT_DISTANCE = 160;
 
@@ -89,23 +89,27 @@
     }
   }
 
-  const EMBER_COLORS = ['#ff5a00', '#ff7a1a', '#ff9328', '#ffb347', '#ffd7a8', '#e04e00'];
+  const EMBER_COLORS = ['#b85a2a', '#d4783a', '#8d4e32', '#e8b07a', '#ff8f3c', '#6e4634'];
+  const EMBER_REACH = 96;
 
   class EmberParticle {
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      const hot = Math.random();
-      this.hot = hot > 0.72;
-      this.radius = this.hot ? Math.random() * 0.75 + 0.55 : Math.random() * 1.25 + 0.7;
-      this.baseAlpha = this.hot ? Math.random() * 0.22 + 0.62 : Math.random() * 0.22 + 0.32;
+      this.baseRadius = Math.random() * 2.6 + 2.1;
+      this.baseAlpha = Math.random() * 0.22 + 0.42;
       this.alpha = this.baseAlpha;
       this.phase = Math.random() * Math.PI * 2;
-      this.flickerSpeed = 0.02 + Math.random() * 0.045;
+      this.flickerSpeed = 0.012 + Math.random() * 0.028;
       this.color = EMBER_COLORS[(Math.random() * EMBER_COLORS.length) | 0];
-      this.rise = -(Math.random() * 0.42 + 0.2);
-      this.vx = (Math.random() - 0.5) * 0.22;
+      this.rise = -(Math.random() * 0.32 + 0.16);
+      this.vx = (Math.random() - 0.5) * 0.1;
       this.vy = this.rise;
+    }
+
+    radiusAt(y) {
+      const depth = Math.max(0, Math.min(1, y / Math.max(height, 1)));
+      return this.baseRadius * (0.24 + 0.76 * depth);
     }
 
     update() {
@@ -117,41 +121,35 @@
       const dy = this.y - mouse.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < mouse.radius && dist > 0.5) {
-        const force = (mouse.radius - dist) / mouse.radius;
-        const nx = dx / dist;
-        const ny = dy / dist;
-        this.vx += nx * force * 0.95 + mouse.vx * force * 0.05;
-        this.vy += ny * force * 0.6 + mouse.vy * force * 0.05;
-        this.vx += -ny * force * 0.38;
-        this.vy -= force * 0.32;
-        this.alpha = Math.min(0.95, this.baseAlpha + force * 0.5);
+      if (dist < EMBER_REACH && dist > 0.5) {
+        const force = (EMBER_REACH - dist) / EMBER_REACH;
+        this.vx += (dx / dist) * force * 0.16;
+        this.alpha = Math.min(0.82, this.baseAlpha + force * 0.08);
       } else {
-        const flicker = 0.78 + 0.22 * Math.sin(this.phase);
-        this.alpha = this.baseAlpha * flicker;
-        this.vy += (this.rise - this.vy) * 0.02;
-        this.vx += (Math.sin(this.phase) * 0.08 - this.vx) * 0.012;
+        this.alpha = this.baseAlpha * (0.86 + 0.14 * Math.sin(this.phase));
+        this.vy += (this.rise - this.vy) * 0.035;
+        this.vx *= 0.985;
       }
 
-      this.vx *= 0.988;
-
-      if (this.y < -18) {
+      if (this.y < -24) {
         this.x = Math.random() * width;
-        this.y = height + Math.random() * 28;
-        this.vx = (Math.random() - 0.5) * 0.22;
+        this.y = height + Math.random() * 30;
+        this.vx = (Math.random() - 0.5) * 0.1;
         this.vy = this.rise;
         this.alpha = this.baseAlpha;
       }
-      if (this.x < -24) this.x = width + 12;
-      if (this.x > width + 24) this.x = -12;
+      if (this.x < -30) this.x = width + 8;
+      if (this.x > width + 30) this.x = -8;
     }
 
     draw() {
+      const radius = this.radiusAt(this.y);
+      const depth = Math.max(0, Math.min(1, this.y / Math.max(height, 1)));
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
       ctx.fillStyle = this.color;
-      ctx.globalAlpha = this.alpha;
-      ctx.shadowBlur = this.hot ? 6 : 4;
+      ctx.globalAlpha = this.alpha * (0.5 + 0.5 * depth);
+      ctx.shadowBlur = Math.min(4, radius);
       ctx.shadowColor = this.color;
       ctx.fill();
       ctx.shadowBlur = 0;

@@ -9,7 +9,7 @@ html[data-theme="ember"] {
   --accent-purple-rgb: 255, 154, 60;
   --link-hover: #ffc48a;
 
-  --bg-space: #1a1714;
+  --bg-space: #161310;
   --bg-primary: #211c19;
   --bg-secondary: #2a2420;
   --bg-tertiary: #352d28;
@@ -38,9 +38,21 @@ html[data-theme="ember"] {
   --shadow-purple: 0 8px 18px rgba(255, 122, 26, 0.1);
 }
 
-/* Headline stays cream. Orange is not used for large type. */
+/* Warm depth, same idea as the starfield washes: lighter charcoal above, deeper below. */
+html[data-theme="ember"] body {
+  background-color: #161310;
+  background-image:
+    radial-gradient(ellipse 85% 55% at 10% -8%, rgba(156, 96, 58, 0.55), transparent 58%),
+    radial-gradient(ellipse 68% 62% at 108% 34%, rgba(96, 58, 42, 0.62), transparent 60%),
+    radial-gradient(ellipse 100% 36% at 50% 112%, rgba(36, 22, 16, 0.75), transparent 55%),
+    linear-gradient(168deg, #534236 0%, #312620 32%, #1b1613 64%, #100d0b 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* Headline gradient in warm orange, matching the starfield title treatment. */
 html[data-theme="ember"] .text-gradient {
-  background: linear-gradient(180deg, #fff8f2 0%, #f0d8c4 100%);
+  background: linear-gradient(120deg, #ffc989 0%, #ff9a3c 46%, #e85a12 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -51,15 +63,20 @@ html[data-theme="ember"] ::selection {
   color: #fff8f2;
 }
 
-/* Edge warmth only — no large glow over the reading column. */
+/* Same glow placement as the starfield, recolored to muted warm brown so the page has depth without an orange veil. */
 html[data-theme="ember"] .ambient-glow {
-  opacity: 0.045;
-  width: 420px;
-  height: 420px;
+  opacity: 0.28;
+  width: 680px;
+  height: 680px;
+}
+
+html[data-theme="ember"] .ambient-glow-1 {
+  background: radial-gradient(circle, #b47a52 0%, transparent 70%);
 }
 
 html[data-theme="ember"] .ambient-glow-2 {
-  opacity: 0.03;
+  opacity: 0.22;
+  background: radial-gradient(circle, #6e4536 0%, transparent 70%);
 }
 
 /* Buttons */
