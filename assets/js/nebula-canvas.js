@@ -179,7 +179,7 @@
       ctx.closePath();
       ctx.fillStyle = this.color;
       ctx.globalAlpha = this.drawAlpha * (0.55 + 0.45 * depth);
-      ctx.shadowBlur = Math.min(3, radius * 0.45);
+      ctx.shadowBlur = Math.min(1.5, radius * 0.2);
       ctx.shadowColor = this.color;
       ctx.fill();
       ctx.restore();
