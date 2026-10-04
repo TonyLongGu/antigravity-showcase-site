@@ -124,17 +124,13 @@ html[data-theme="ember"] .callout-btn:hover {
   box-shadow: none;
 }
 
-/* Current section in the top nav */
+/* 目前所在區塊：導覽列唯一會亮起的項目（滑過其他項目不再另開第二條底線） */
 html[data-theme="ember"] .nav-link.nav-current {
   color: #ff7a1a;
 }
 
 html[data-theme="ember"] .nav-link.nav-current::after {
   width: 100%;
-  background: #ff7a1a;
-}
-
-html[data-theme="ember"] .nav-link:hover::after {
   background: #ff7a1a;
 }
 

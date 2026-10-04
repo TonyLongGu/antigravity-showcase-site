@@ -17,6 +17,7 @@ const I18N = {
     
     hero_badge: '專為 AI Agent IDE 打造的原生擴充套件生態系',
     hero_ide_antigravity: 'Antigravity (原生)',
+    hero_ide_vscode: 'VS Code (相容)',
     hero_last_updated_label: '網站更新時間：',
     hero_title_1: '極致擴展你的',
     hero_title_gradient: 'AI 協同開發體驗',
@@ -33,12 +34,10 @@ const I18N = {
     tab_status: '狀態列監控',
     tab_explorer: '檔案總管視圖',
     tab_script: '腳本與工具箱',
-    ide_filter_label: '依 IDE',
-    tab_ide_all: '全部環境',
     
     btn_github_repo: '前往 GitHub 倉庫 ↗',
     empty_search_title: '查無符合的擴充套件',
-    empty_search_desc: '請嘗試搜尋其他關鍵字，或切換分類 / IDE 篩選。',
+    empty_search_desc: '請嘗試搜尋其他關鍵字，或切換分類篩選。',
     
     section_video_tag: '影片教學',
     section_video_title: '精選影音示範與實戰教學',
@@ -126,7 +125,7 @@ const I18N = {
     
     section_plugins_tag: '探索插件',
     section_plugins_title: '全方位 Antigravity IDE 擴充套件',
-    section_plugins_desc: '即時搜尋、分類過濾，亦可依 IDE 篩選相容性，探索各項專屬功能並一鍵前往 GitHub 倉庫。',
+    section_plugins_desc: '即時搜尋、分類過濾，探索各項專屬功能並一鍵前往 GitHub 倉庫。',
     
     footer_brand: 'Antigravity Plugins',
     footer_desc: 'Google Antigravity IDE 專屬原生擴充套件生態系，亦可掛載至 Cursor 與 VS Code，賦予 AI 輔助編程前所未有的掌控力與流暢度。',
@@ -155,6 +154,7 @@ const I18N = {
     
     hero_badge: 'Native Extension Ecosystem for AI Agent IDEs',
     hero_ide_antigravity: 'Antigravity (Native)',
+    hero_ide_vscode: 'VS Code (Compatible)',
     hero_last_updated_label: 'Site Updated:',
     hero_title_1: 'Supercharge Your',
     hero_title_gradient: 'AI Pair Programming Flow',
@@ -171,12 +171,10 @@ const I18N = {
     tab_status: 'Status Bar Metrics',
     tab_explorer: 'Explorer Views',
     tab_script: 'Scripts & Toolbox',
-    ide_filter_label: 'By IDE',
-    tab_ide_all: 'All IDEs',
     
     btn_github_repo: 'View on GitHub ↗',
     empty_search_title: 'No Matching Plugins Found',
-    empty_search_desc: 'Try different keywords, or switch category / IDE filters.',
+    empty_search_desc: 'Try different keywords, or switch the category filter.',
     
     section_video_tag: 'Video Guides',
     section_video_title: 'Featured Video Walkthroughs',
@@ -264,7 +262,7 @@ const I18N = {
     
     section_plugins_tag: 'Ecosystem Suite',
     section_plugins_title: 'Antigravity IDE Extension Suite',
-    section_plugins_desc: 'Instant search, category & IDE filtering. Explore tailored features and head straight to GitHub repositories.',
+    section_plugins_desc: 'Instant search and category filtering. Explore tailored features and head straight to GitHub repositories.',
     
     footer_brand: 'Antigravity Plugins',
     footer_desc: 'Native extension suite for Google Antigravity IDE, also mountable on Cursor and VS Code, bringing unmatched clarity and control to your AI-assisted workflow.',

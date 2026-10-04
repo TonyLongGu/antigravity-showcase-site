@@ -8,12 +8,15 @@
   const ctx = canvas.getContext('2d');
   let width, height;
   let particles = [];
-  let mode = document.documentElement.getAttribute('data-theme') === 'ember' ? 'ember' : 'starfield';
+  // 粒子模式＝主題鍵。實際值於下方 MODE_SPECS 定義後，依 data-theme 校正。
+  let mode = 'starfield';
   let mouse = { x: -1000, y: -1000, vx: 0, vy: 0, radius: 160 };
 
   const PARTICLE_COUNT = 75;
   /* Ash has no connecting lines. A higher count keeps the field present. */
   const EMBER_COUNT = 210;
+  /* Code glyphs have no connecting lines either; the count carries the texture. */
+  const CODE_COUNT = 92;
   const CONNECT_DISTANCE = 130;
   const MOUSE_CONNECT_DISTANCE = 160;
 
@@ -213,12 +216,104 @@
     }
   }
 
+  /* ---------------------------------------------------------------------
+     VS Code — 程式碼字符模式
+     以極低透明度的等寬字元漂浮，取代星空的連線與餘燼的上升感；
+     游標掠過時把附近的字微微照亮，像編輯器照亮游標所在的程式碼。
+     --------------------------------------------------------------------- */
+  const CODE_GLYPHS = [
+    'const', 'let', 'fn', 'async', 'await', 'import', 'export', 'type', 'class',
+    '=>', '===', '!==', '&&', '||', '?.', '??', '::', '++', '--', '**',
+    '{ }', '( )', '[ ]', '</>', '#', '@', '~', ';', '...', '0x1f', '//'
+  ];
+
+  /* Dark+ 語法色，但刻意不放灰色：灰字符會讓整個畫面顯得灰平。
+     藍為主體，綠與橘只當點綴。 */
+  function codeColor() {
+    const roll = Math.random();
+    if (roll < 0.4) return '#6aaee6';  // 關鍵字藍
+    if (roll < 0.7) return '#84c3ff';  // 亮藍
+    if (roll < 0.84) return '#a5e0ff'; // 淺藍
+    if (roll < 0.94) return '#7fae6a'; // 字串綠
+    return '#dda088';                  // 字串橘
+  }
+
+  class CodeParticle {
+    constructor() {
+      const size = 11 + Math.random() * 7;
+      this.size = size;
+      // 先把字型字串組好，避免每幀重新拼接。
+      this.font = '600 ' + size.toFixed(1) + 'px "JetBrains Mono", Consolas, Monaco, monospace';
+      this.glyph = CODE_GLYPHS[Math.floor(Math.random() * CODE_GLYPHS.length)];
+      this.color = codeColor();
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      // 緩慢朝左上飄移，像程式碼往上捲動。
+      this.vx = -(0.06 + Math.random() * 0.22);
+      this.vy = -(0.1 + Math.random() * 0.34);
+      this.baseAlpha = 0.12 + Math.random() * 0.22;
+      this.alpha = this.baseAlpha;
+      this.bobPhase = Math.random() * Math.PI * 2;
+      this.bobSpeed = 0.004 + Math.random() * 0.01;
+    }
+
+    // 從底部重新進場並換一個字元，讓畫面不重複。
+    recycle() {
+      this.glyph = CODE_GLYPHS[Math.floor(Math.random() * CODE_GLYPHS.length)];
+      this.color = codeColor();
+      this.x = Math.random() * width;
+      this.y = height + this.size * 2;
+    }
+
+    update() {
+      this.bobPhase += this.bobSpeed;
+      this.x += this.vx;
+      this.y += this.vy + Math.sin(this.bobPhase) * 0.12;
+
+      if (this.y < -this.size * 2) this.recycle();
+      if (this.x < -this.size * 3) this.x = width + this.size;
+
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      let target = this.baseAlpha;
+      if (dist < mouse.radius && dist > 0.5) {
+        const force = (mouse.radius - dist) / mouse.radius;
+        target = Math.min(0.74, this.baseAlpha + force * 0.5);
+        this.x -= (dx / dist) * force * 0.5;
+        this.y -= (dy / dist) * force * 0.5;
+      }
+      this.alpha += (target - this.alpha) * 0.09;
+    }
+
+    draw() {
+      ctx.font = this.font;
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = this.color;
+      ctx.globalAlpha = this.alpha;
+      ctx.fillText(this.glyph, this.x, this.y);
+    }
+  }
+
+  /* 主題 → 粒子模式註冊表。
+     新增主題只要在這裡補一筆（粒子類別 / 數量 / 是否畫連線 / 是否阻尼滑鼠慣性）。
+     注意：必須放在類別定義之後，否則會踩到 class 的 TDZ。 */
+  const MODE_SPECS = {
+    starfield: { Ctor: Particle, count: PARTICLE_COUNT, lines: true, dampMouse: false },
+    ember: { Ctor: EmberParticle, count: EMBER_COUNT, lines: false, dampMouse: true },
+    vscode: { Ctor: CodeParticle, count: CODE_COUNT, lines: false, dampMouse: false }
+  };
+
+  function specFor(name) {
+    return MODE_SPECS[name] || MODE_SPECS.starfield;
+  }
+
   function spawn() {
     particles = [];
-    const Ctor = mode === 'ember' ? EmberParticle : Particle;
-    const count = mode === 'ember' ? EMBER_COUNT : PARTICLE_COUNT;
-    for (let i = 0; i < count; i++) {
-      particles.push(new Ctor());
+    const spec = specFor(mode);
+    for (let i = 0; i < spec.count; i++) {
+      particles.push(new spec.Ctor());
     }
   }
 
@@ -267,7 +362,8 @@
 
     ctx.clearRect(0, 0, width, height);
 
-    if (mode === 'ember') {
+    const spec = specFor(mode);
+    if (spec.dampMouse) {
       mouse.vx *= 0.82;
       mouse.vy *= 0.82;
     }
@@ -277,7 +373,7 @@
       p.draw();
     }
 
-    if (mode !== 'ember') drawLines();
+    if (spec.lines) drawLines();
     ctx.globalAlpha = 1;
 
     animationFrameId = requestAnimationFrame(animate);
@@ -312,7 +408,7 @@
     pause,
     resume,
     setMode(next) {
-      const resolved = next === 'ember' ? 'ember' : 'starfield';
+      const resolved = MODE_SPECS[next] ? next : 'starfield';
       if (resolved === mode) return;
       mode = resolved;
       mouse.radius = 160;
@@ -320,6 +416,11 @@
       ctx.clearRect(0, 0, width, height);
     }
   };
+
+  /* 依載入時的 data-theme 決定起始模式。
+     head 的 bootstrap 已先把屬性套上，這裡只要對照註冊表，避免一開始就畫錯模式。 */
+  const initialTheme = document.documentElement.getAttribute('data-theme');
+  if (MODE_SPECS[initialTheme]) mode = initialTheme;
 
   spawn();
   animate();

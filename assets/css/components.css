@@ -133,6 +133,14 @@
   box-shadow: 0 0 14px rgba(255, 184, 48, 0.4);
 }
 
+.hero-ide-pills .ide-vscode[aria-pressed="true"] {
+  opacity: 1;
+  color: #9dd6ff;
+  border-color: rgba(77, 163, 255, 1);
+  background: rgba(77, 163, 255, 0.26);
+  box-shadow: 0 0 16px rgba(77, 163, 255, 0.5);
+}
+
 .hero-ide-pill {
   display: inline-flex;
   align-items: center;
@@ -203,8 +211,13 @@
   color: var(--text-primary);
 }
 
-.nav-link:hover::after,
-.nav-link.active::after {
+/* 目前所在區塊：導覽列唯一會顯示底線的項目。
+   滑過其他項目只變色、不再拉出第二條底線，避免同時出現兩條底線。 */
+.nav-link.nav-current {
+  color: var(--text-primary);
+}
+
+.nav-link.nav-current::after {
   width: 100%;
 }
 
@@ -619,48 +632,6 @@
   box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.2);
 }
 
-.ide-filter-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-}
-
-.ide-filter-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-}
-
-.ide-tab-btn {
-  padding: 6px 14px;
-  background: transparent;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.ide-tab-btn:hover {
-  border-color: var(--border-medium);
-  color: var(--text-primary);
-}
-
-.ide-tab-btn.active {
-  background: rgba(var(--accent-rgb), 0.1);
-  border-color: rgba(var(--accent-rgb), 0.4);
-  color: var(--accent-cyan);
-  box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.15);
-}
-
 /* --------------------------------------------------------------------------
    4. Plugin Cards Grid
    -------------------------------------------------------------------------- */
@@ -843,9 +814,9 @@
 }
 
 .ide-badge.ide-vscode {
-  color: #60cdff;
-  border-color: rgba(96, 205, 255, 0.38);
-  background: rgba(96, 205, 255, 0.09);
+  color: #7dd3ff;
+  border-color: rgba(125, 211, 255, 0.46);
+  background: rgba(125, 211, 255, 0.12);
 }
 
 .plugin-ide-note {
