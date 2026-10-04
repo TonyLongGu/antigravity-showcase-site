@@ -95,7 +95,7 @@
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      this.baseRadius = Math.random() * 2.6 + 2.1;
+      this.baseRadius = 1.35 + Math.random() * 5.4;
       this.baseAlpha = Math.random() * 0.22 + 0.42;
       this.alpha = this.baseAlpha;
       this.phase = Math.random() * Math.PI * 2;
@@ -106,7 +106,7 @@
       this.color = EMBER_COLORS[(Math.random() * EMBER_COLORS.length) | 0];
       // Persistent lean to one side, so the path is not a symmetric wave.
       this.drift = (Math.random() < 0.5 ? -1 : 1) * (0.12 + Math.random() * 0.4);
-      const sizeT = Math.max(0, Math.min(1, (this.baseRadius - 2.1) / 2.6));
+      const sizeT = Math.max(0, Math.min(1, (this.baseRadius - 1.35) / 5.4));
       // Large embers crawl; small sparks rise several times faster. Jitter stays inside that gap.
       this.rise = (2.05 - sizeT * 1.82) * (0.78 + Math.random() * 0.44);
     }
@@ -119,18 +119,18 @@
     update() {
       const depth = Math.max(0, Math.min(1, this.y / Math.max(height, 1)));
       const climb = 1 - depth;
-      // Faster near the bottom, easing to about 35% of that speed at the top. Size is already in this.rise.
-      this.y -= this.rise * (0.42 + 0.78 * depth);
-      // Sideways motion stays small and slow near the bottom, then widens and quickens.
-      // Two uneven frequencies plus a one-sided drift, instead of a single sine.
-      const pace = 0.55 + 1.7 * climb;
+      // A little faster at the bottom than before. Still eases to about 31% of that speed at the top.
+      this.y -= this.rise * (0.42 + 0.94 * depth);
+      // Wider sideways travel higher up, but the wobble slows and the sharp harmonic fades so it is not twitchy.
+      const pace = 0.62 - 0.34 * climb;
       const swayScale = 0.32 + 1.9 * climb;
-      this.phase += this.swaySpeed * pace * (0.5 + Math.sin(this.phase2) * 0.5 + 0.35);
+      const flutter = 0.16 * (1 - climb);
+      this.phase += this.swaySpeed * pace * (0.85 + Math.sin(this.phase2) * flutter);
       this.phase2 += this.swaySpeed2 * pace;
       const wave =
-        Math.sin(this.phase) * (0.4 + 0.6 * Math.abs(Math.sin(this.phase2))) +
-        Math.sin(this.phase * 2.37 + this.phase2) * 0.45;
-      this.x += wave * this.swayAmp * swayScale * 0.5 + this.drift * swayScale;
+        Math.sin(this.phase) * (0.7 + 0.3 * Math.abs(Math.sin(this.phase2))) +
+        Math.sin(this.phase * 2.37 + this.phase2) * (0.36 * (1 - climb));
+      this.x += wave * this.swayAmp * swayScale * 0.42 + this.drift * swayScale;
 
       const dx = mouse.x - this.x;
       const dy = mouse.y - this.y;
