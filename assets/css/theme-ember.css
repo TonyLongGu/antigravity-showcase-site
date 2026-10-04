@@ -1,0 +1,287 @@
+/* ==========================================================================
+   熱情橘 — warm charcoal skin. Starfield (no data-theme) is unchanged.
+   Orange is reserved for buttons, the current nav item, and small highlights.
+   Long-form text stays warm off-white.
+   ========================================================================== */
+
+html[data-theme="ember"] {
+  --accent-rgb: 255, 122, 26;
+  --accent-purple-rgb: 255, 154, 60;
+  --link-hover: #ffc48a;
+
+  --bg-space: #1a1714;
+  --bg-primary: #211c19;
+  --bg-secondary: #2a2420;
+  --bg-tertiary: #352d28;
+  --bg-card: rgba(42, 36, 32, 0.74);
+  --bg-card-hover: rgba(54, 46, 40, 0.9);
+  --bg-glass: rgba(33, 28, 25, 0.8);
+  --bg-glass-heavy: rgba(26, 23, 20, 0.94);
+
+  --border-subtle: rgba(255, 220, 190, 0.08);
+  --border-medium: rgba(255, 206, 168, 0.16);
+  --border-focus: rgba(255, 122, 26, 0.55);
+  --border-glow: rgba(255, 154, 70, 0.28);
+
+  --accent-cyan: #ff7a1a;
+  --accent-blue: #ff9a3c;
+  --accent-purple: #ffb066;
+  --grad-primary: linear-gradient(135deg, #ff9a3c 0%, #ff5c00 100%);
+  --grad-glow: radial-gradient(circle at 50% 0%, rgba(255, 122, 26, 0.08), transparent 70%);
+
+  --text-primary: #f6f1ea;
+  --text-secondary: #e6dcd0;
+  --text-muted: #c4b6a6;
+  --text-inverse: #1c120c;
+
+  --shadow-neon: 0 8px 20px rgba(255, 92, 0, 0.18);
+  --shadow-purple: 0 8px 18px rgba(255, 122, 26, 0.1);
+}
+
+/* Headline stays cream. Orange is not used for large type. */
+html[data-theme="ember"] .text-gradient {
+  background: linear-gradient(180deg, #fff8f2 0%, #f0d8c4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html[data-theme="ember"] ::selection {
+  background: rgba(255, 122, 26, 0.28);
+  color: #fff8f2;
+}
+
+/* Edge warmth only — no large glow over the reading column. */
+html[data-theme="ember"] .ambient-glow {
+  opacity: 0.045;
+  width: 420px;
+  height: 420px;
+}
+
+html[data-theme="ember"] .ambient-glow-2 {
+  opacity: 0.03;
+}
+
+/* Buttons */
+html[data-theme="ember"] .btn-primary,
+html[data-theme="ember"] a.btn-primary {
+  background: linear-gradient(135deg, #ff9a3c 0%, #ff5c00 100%) !important;
+  color: #1c120c !important;
+  box-shadow: 0 8px 22px rgba(255, 92, 0, 0.28) !important;
+}
+
+html[data-theme="ember"] .btn-primary:hover,
+html[data-theme="ember"] a.btn-primary:hover {
+  color: #1c120c !important;
+  box-shadow: 0 12px 26px rgba(255, 92, 0, 0.4) !important;
+}
+
+html[data-theme="ember"] .btn-secondary {
+  color: #f6f1ea;
+  border-color: rgba(255, 138, 42, 0.55) !important;
+  background: rgba(255, 244, 232, 0.04);
+}
+
+html[data-theme="ember"] .btn-secondary:hover {
+  color: #ffd2a8;
+  border-color: #ff7a1a !important;
+  background: rgba(255, 122, 26, 0.1);
+}
+
+html[data-theme="ember"] .install-dl-btn {
+  background: linear-gradient(135deg, #ff9a3c 0%, #ff5c00 100%);
+  color: #1c120c;
+  box-shadow: 0 8px 18px rgba(255, 92, 0, 0.28);
+}
+
+html[data-theme="ember"] .install-dl-btn:hover {
+  color: #1c120c;
+  box-shadow: 0 10px 22px rgba(255, 92, 0, 0.4);
+}
+
+html[data-theme="ember"] .btn-copy:hover,
+html[data-theme="ember"] .callout-btn:hover {
+  background: #ff7a1a;
+  color: #1c120c;
+  border-color: #ff7a1a;
+  box-shadow: none;
+}
+
+/* Current section in the top nav */
+html[data-theme="ember"] .nav-link.nav-current {
+  color: #ff7a1a;
+}
+
+html[data-theme="ember"] .nav-link.nav-current::after {
+  width: 100%;
+  background: #ff7a1a;
+}
+
+html[data-theme="ember"] .nav-link:hover::after {
+  background: #ff7a1a;
+}
+
+/* Blue-black panels become the same warm charcoal */
+html[data-theme="ember"] .hero-badge,
+html[data-theme="ember"] .hero-badge-update,
+html[data-theme="ember"] .hero-badge-update:hover {
+  background: rgba(36, 31, 27, 0.82);
+}
+
+html[data-theme="ember"] .install-tab-btn,
+html[data-theme="ember"] .info-card,
+html[data-theme="ember"] .ai-flow-item {
+  background: rgba(36, 31, 27, 0.72);
+}
+
+html[data-theme="ember"] .ai-chat-bubble.preview-only,
+html[data-theme="ember"] .ai-chat-bubble.preview-only:hover {
+  background: rgba(36, 31, 27, 0.78);
+}
+
+html[data-theme="ember"] .video-player-container {
+  background: #1a1714;
+}
+
+html[data-theme="ember"] .video-showcase-wrapper,
+html[data-theme="ember"] .plugin-card:hover,
+html[data-theme="ember"] .notes-image-container,
+html[data-theme="ember"] .notes-image-container:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
+}
+
+html[data-theme="ember"] .player-feedback-badge {
+  background: rgba(36, 30, 26, 0.82);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="ember"] .player-progress-filled {
+  background: linear-gradient(90deg, #ff9a3c, #ff5c00);
+  box-shadow: none;
+}
+
+html[data-theme="ember"] .custom-ctrl-btn:hover,
+html[data-theme="ember"] .custom-ctrl-btn#ctrl-cc-btn.active {
+  color: #ffb066;
+  filter: none;
+}
+
+html[data-theme="ember"] .custom-volume-slider {
+  --vol-color: #ff8a2a;
+}
+
+html[data-theme="ember"] .subtitle-bubble {
+  background: rgba(32, 26, 22, 0.9);
+  border-color: rgba(255, 176, 110, 0.28);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.72);
+}
+
+html[data-theme="ember"] .subtitle-text {
+  color: #f7f3ee;
+}
+
+html[data-theme="ember"] .video-player-container:focus-visible,
+html[data-theme="ember"] .player-progress-container:focus-visible {
+  outline-color: rgba(255, 154, 60, 0.7);
+}
+
+html[data-theme="ember"] .step-badge {
+  color: #ff8a2a;
+  background: linear-gradient(135deg, rgba(255, 122, 26, 0.16), rgba(255, 176, 92, 0.1));
+  border-color: rgba(255, 122, 26, 0.4);
+  box-shadow: none;
+}
+
+html[data-theme="ember"] .icon-theme-cyan,
+html[data-theme="ember"] .feature-icon-cyan {
+  background: linear-gradient(135deg, rgba(255, 122, 26, 0.2), rgba(255, 186, 110, 0.16));
+  border-color: rgba(255, 138, 42, 0.4);
+  box-shadow: none;
+}
+
+html[data-theme="ember"] .terminal-code {
+  color: #f3ebe3;
+}
+
+html[data-theme="ember"] .terminal-prompt {
+  color: #ff7a1a;
+}
+
+html[data-theme="ember"] .info-card-svg path[stroke="#38bdf8"] {
+  stroke: #ff9a3c;
+}
+
+html[data-theme="ember"] #shieldGradRight stop:first-child,
+html[data-theme="ember"] #shieldGradLeft stop:first-child {
+  stop-color: #ff9a3c;
+}
+
+/* Developer notes — warm off-white body, orange only as small markers */
+html[data-theme="ember"] .notes-article-card {
+  background: rgba(36, 31, 27, 0.88);
+  border-color: rgba(255, 206, 168, 0.16);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="ember"] .notes-article-card:hover {
+  border-color: rgba(255, 154, 70, 0.32);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.48);
+}
+
+html[data-theme="ember"] .notes-article-body,
+html[data-theme="ember"] .notes-paragraph,
+html[data-theme="ember"] .notes-list-item,
+html[data-theme="ember"] .notes-ordered-item,
+html[data-theme="ember"] .notes-blockquote {
+  color: #f0e6da;
+}
+
+html[data-theme="ember"] .notes-list-item-nested {
+  color: #e2d5c6;
+}
+
+html[data-theme="ember"] .notes-heading,
+html[data-theme="ember"] .notes-subheading,
+html[data-theme="ember"] .notes-title-main,
+html[data-theme="ember"] .callout-title,
+html[data-theme="ember"] .notes-article-body strong {
+  color: #f7f2eb;
+}
+
+html[data-theme="ember"] .notes-article-body em,
+html[data-theme="ember"] .notes-image-caption {
+  color: #cbbbaa;
+}
+
+html[data-theme="ember"] .notes-inline-code {
+  color: #f6efe6;
+  background: rgba(255, 220, 190, 0.08);
+  border-color: rgba(255, 200, 160, 0.2);
+}
+
+html[data-theme="ember"] .notes-blockquote {
+  background: rgba(255, 122, 26, 0.05);
+}
+
+html[data-theme="ember"] .notes-image-container {
+  background: rgba(28, 24, 21, 0.72);
+  border-color: rgba(255, 206, 168, 0.16);
+}
+
+html[data-theme="ember"] .notes-image-caption {
+  background: rgba(26, 22, 19, 0.94);
+}
+
+html[data-theme="ember"] .notes-footer-callout {
+  background: rgba(255, 244, 232, 0.03);
+  border-color: rgba(255, 176, 110, 0.22);
+  box-shadow: none;
+}
+
+html[data-theme="ember"] .callout-desc {
+  color: #e6dcd0;
+}
+
+html[data-theme="ember"] .footer-disclaimer {
+  color: rgba(232, 220, 206, 0.55);
+}

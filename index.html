@@ -8,6 +8,15 @@
   <meta name="description" content="Google Antigravity IDE 專屬原生擴充套件生態系，同步支援 Cursor 與 VS Code 安裝：AI 上下文檢視器、MCP 管理儀表板、檔案總管常用暫存視窗、AI 配額監控、腳本右鍵執行工具與控制中心。">
   <meta name="keywords" content="Antigravity, Google Antigravity, Antigravity IDE, Cursor, VS Code, VS Code Extension, MCP Manager, AI Context, Gemini Quota">
   <meta name="author" content="TonyLongGu">
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem('antigravity_visual_theme') === 'ember') {
+          document.documentElement.setAttribute('data-theme', 'ember');
+        }
+      } catch (e) {}
+    })();
+  </script>
   
   <!-- OpenGraph / Social Cards -->
   <meta property="og:type" content="website">
@@ -20,10 +29,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="assets/css/variables.css?v=2.2">
-  <link rel="stylesheet" href="assets/css/base.css?v=2.2">
-  <link rel="stylesheet" href="assets/css/components.css?v=3.1">
-  <link rel="stylesheet" href="assets/css/animations.css?v=2.2">
+  <link rel="stylesheet" href="assets/css/variables.css?v=2.3">
+  <link rel="stylesheet" href="assets/css/base.css?v=2.3">
+  <link rel="stylesheet" href="assets/css/components.css?v=3.2">
+  <link rel="stylesheet" href="assets/css/animations.css?v=2.3">
+  <link rel="stylesheet" href="assets/css/theme-ember.css?v=1.0">
   <link rel="icon" type="image/png" href="assets/icons/favicon.png?v=3">
 </head>
 <body>
@@ -56,6 +66,13 @@
       </ul>
 
       <div class="nav-actions">
+        <div class="theme-switcher">
+          <label class="visually-hidden" for="theme-select">視覺風格</label>
+          <select id="theme-select" class="theme-select" aria-label="視覺風格">
+            <option value="starfield">星空</option>
+            <option value="ember">熱情橘</option>
+          </select>
+        </div>
         <button id="btn-lang-toggle" class="btn-lang" data-i18n="lang_btn">EN</button>
         <a href="https://github.com/TonyLongGu/antigravity-plugins" target="_blank" rel="noopener noreferrer" class="btn-github github-link" title="GitHub" aria-label="GitHub" data-i18n-title="nav_github" data-i18n-aria-label="nav_github">
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -690,7 +707,8 @@
   <script src="assets/js/plugins-data.js?v=2.6"></script>
   <script src="assets/js/subtitles-data.js?v=1.0"></script>
   <script src="assets/js/developer-notes.js?v=1.3"></script>
-  <script src="assets/js/nebula-canvas.js?v=2.3"></script>
+  <script src="assets/js/nebula-canvas.js?v=2.4"></script>
+  <script src="assets/js/theme.js?v=1.0"></script>
   <script src="assets/js/filter.js?v=2.3"></script>
   <script src="assets/js/app.js?v=2.9"></script>
 </body>
