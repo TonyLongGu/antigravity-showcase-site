@@ -102,7 +102,8 @@
       this.swayAmp = 0.22 + Math.random() * 1.15;
       this.swaySpeed = 0.012 + Math.random() * 0.042;
       this.color = EMBER_COLORS[(Math.random() * EMBER_COLORS.length) | 0];
-      this.rise = -(0.42 + Math.random() * 1.85);
+      // Upward speed at the bottom. A little slower than the previous fixed range (0.42–2.27).
+      this.rise = 0.36 + Math.random() * 1.5;
     }
 
     radiusAt(y) {
@@ -112,7 +113,9 @@
 
     update() {
       this.phase += this.swaySpeed;
-      this.y += this.rise;
+      const depth = Math.max(0, Math.min(1, this.y / Math.max(height, 1)));
+      // Full rise at the bottom, easing to about 42% near the top.
+      this.y -= this.rise * (0.42 + 0.58 * depth);
       this.x += Math.cos(this.phase) * this.swayAmp;
 
       const dx = mouse.x - this.x;
