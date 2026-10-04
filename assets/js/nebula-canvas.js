@@ -102,7 +102,7 @@
       this.swayAmp = 0.22 + Math.random() * 1.15;
       this.swaySpeed = 0.012 + Math.random() * 0.042;
       this.color = EMBER_COLORS[(Math.random() * EMBER_COLORS.length) | 0];
-      // Upward speed at the bottom. A little slower than the previous fixed range (0.42–2.27).
+      // Upward speed at the bottom. The height curve slows this as the particle climbs.
       this.rise = 0.36 + Math.random() * 1.5;
     }
 
@@ -112,11 +112,13 @@
     }
 
     update() {
-      this.phase += this.swaySpeed;
       const depth = Math.max(0, Math.min(1, this.y / Math.max(height, 1)));
-      // Full rise at the bottom, easing to about 42% near the top.
-      this.y -= this.rise * (0.42 + 0.58 * depth);
-      this.x += Math.cos(this.phase) * this.swayAmp;
+      const climb = 1 - depth;
+      // A bit faster at the bottom than before; the same ease-off still leaves the top near 35% of that speed.
+      this.y -= this.rise * (0.42 + 0.78 * depth);
+      // Sway stays small and slow near the bottom, then widens and quickens as the particle rises.
+      this.phase += this.swaySpeed * (0.55 + 1.7 * climb);
+      this.x += Math.cos(this.phase) * this.swayAmp * (0.32 + 1.9 * climb);
 
       const dx = mouse.x - this.x;
       const dy = mouse.y - this.y;
