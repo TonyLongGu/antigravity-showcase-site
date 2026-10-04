@@ -40,8 +40,11 @@
       }
     }
 
-    const select = document.getElementById('theme-select');
-    if (select && select.value !== next) select.value = next;
+    const label = document.getElementById('theme-select-label');
+    if (label) label.textContent = next === 'ember' ? '熱情橘' : '星空';
+    document.querySelectorAll('#theme-menu [role="option"]').forEach((opt) => {
+      opt.setAttribute('aria-selected', opt.getAttribute('data-value') === next ? 'true' : 'false');
+    });
 
     if (window.NebulaEngine && typeof window.NebulaEngine.setMode === 'function') {
       window.NebulaEngine.setMode(next);
@@ -75,13 +78,49 @@
   }
 
   function initThemeSwitcher() {
+    const root = document.querySelector('.theme-switcher');
+    const button = document.getElementById('theme-select');
+    const menu = document.getElementById('theme-menu');
+    const options = menu ? Array.from(menu.querySelectorAll('[role="option"]')) : [];
+
+    function closeMenu() {
+      if (!menu || !button) return;
+      menu.hidden = true;
+      button.setAttribute('aria-expanded', 'false');
+    }
+
+    function openMenu() {
+      if (!menu || !button) return;
+      menu.hidden = false;
+      button.setAttribute('aria-expanded', 'true');
+    }
+
     applyTheme(readTheme(), false);
-    const select = document.getElementById('theme-select');
-    if (select) {
-      select.addEventListener('change', () => {
-        applyTheme(select.value, true);
+
+    if (button && menu) {
+      button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (menu.hidden) openMenu();
+        else closeMenu();
+      });
+
+      options.forEach((opt) => {
+        opt.addEventListener('click', (event) => {
+          event.stopPropagation();
+          applyTheme(opt.getAttribute('data-value'), true);
+          closeMenu();
+        });
+      });
+
+      document.addEventListener('click', (event) => {
+        if (root && !root.contains(event.target)) closeMenu();
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMenu();
       });
     }
+
     initNavCurrent();
   }
 

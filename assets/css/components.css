@@ -201,6 +201,8 @@
 .theme-select {
   appearance: none;
   -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
   height: 32px;
   min-width: 96px;
   margin: 0;
@@ -232,9 +234,49 @@
   box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.35);
 }
 
-.theme-select option {
-  background: var(--bg-primary);
+.theme-select[aria-expanded="true"] {
+  border-color: var(--accent-cyan);
   color: var(--text-primary);
+}
+
+.theme-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  min-width: 100%;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--bg-glass-heavy);
+  border: 1px solid var(--border-medium);
+  border-radius: 14px;
+  box-shadow: var(--shadow-md);
+}
+
+.theme-menu[hidden] {
+  display: none;
+}
+
+.theme-menu [role="option"] {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 9px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.theme-menu [role="option"]:hover,
+.theme-menu [role="option"]:focus,
+.theme-menu [role="option"][aria-selected="true"] {
+  background: rgba(var(--accent-rgb), 0.18);
+  color: var(--accent-cyan);
+  outline: none;
 }
 
 /* Language Switcher */
@@ -743,7 +785,7 @@
   width: 58px;
   height: 58px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.15), rgba(var(--accent-purple-rgb), 0.15));
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(127, 0, 255, 0.15));
   border: 1px solid var(--border-medium);
   display: flex;
   align-items: center;
@@ -766,9 +808,9 @@
 }
 
 .icon-theme-cyan {
-  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.22), rgba(56, 189, 248, 0.22));
-  border-color: rgba(var(--accent-rgb), 0.45);
-  box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.25);
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.22), rgba(56, 189, 248, 0.22));
+  border-color: rgba(0, 242, 254, 0.45);
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
 }
 
 .icon-theme-emerald {
@@ -854,9 +896,9 @@
 }
 
 .ide-badge.ide-antigravity {
-  color: var(--accent-cyan);
-  border-color: rgba(var(--accent-rgb), 0.35);
-  background: rgba(var(--accent-rgb), 0.08);
+  color: #00f2fe;
+  border-color: rgba(0, 242, 254, 0.35);
+  background: rgba(0, 242, 254, 0.08);
 }
 
 .ide-badge.ide-cursor {
@@ -1037,13 +1079,13 @@
 
 /* Feature Icon Radiant Themes (對齊 IDE 品牌漸層與霓虹光暈) */
 .feature-icon-cyan {
-  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.2), rgba(56, 189, 248, 0.2));
-  border: 1px solid rgba(var(--accent-rgb), 0.45);
-  box-shadow: 0 0 22px rgba(var(--accent-rgb), 0.22);
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(56, 189, 248, 0.2));
+  border: 1px solid rgba(0, 242, 254, 0.45);
+  box-shadow: 0 0 22px rgba(0, 242, 254, 0.22);
 }
 
 .feature-box:hover .feature-icon-cyan {
-  box-shadow: 0 0 32px rgba(var(--accent-rgb), 0.4);
+  box-shadow: 0 0 32px rgba(0, 242, 254, 0.4);
 }
 
 .feature-icon-purple {

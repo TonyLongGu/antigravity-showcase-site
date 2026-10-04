@@ -9,7 +9,7 @@
   let width, height;
   let particles = [];
   let mode = document.documentElement.getAttribute('data-theme') === 'ember' ? 'ember' : 'starfield';
-  let mouse = { x: -1000, y: -1000, vx: 0, vy: 0, radius: mode === 'ember' ? 170 : 160 };
+  let mouse = { x: -1000, y: -1000, vx: 0, vy: 0, radius: 160 };
 
   const PARTICLE_COUNT = 75;
   /* Ash has no connecting lines. A higher count keeps the field present. */
@@ -90,7 +90,6 @@
   }
 
   const EMBER_COLORS = ['#b85a2a', '#d4783a', '#8d4e32', '#e8b07a', '#ff8f3c', '#6e4634'];
-  const EMBER_REACH = 96;
 
   class EmberParticle {
     constructor() {
@@ -100,11 +99,10 @@
       this.baseAlpha = Math.random() * 0.22 + 0.42;
       this.alpha = this.baseAlpha;
       this.phase = Math.random() * Math.PI * 2;
-      this.flickerSpeed = 0.012 + Math.random() * 0.028;
+      this.swayAmp = 0.22 + Math.random() * 1.15;
+      this.swaySpeed = 0.012 + Math.random() * 0.042;
       this.color = EMBER_COLORS[(Math.random() * EMBER_COLORS.length) | 0];
-      this.rise = -(Math.random() * 0.32 + 0.16);
-      this.vx = (Math.random() - 0.5) * 0.1;
-      this.vy = this.rise;
+      this.rise = -(0.42 + Math.random() * 1.85);
     }
 
     radiusAt(y) {
@@ -113,29 +111,26 @@
     }
 
     update() {
-      this.phase += this.flickerSpeed;
-      this.x += this.vx;
-      this.y += this.vy;
+      this.phase += this.swaySpeed;
+      this.y += this.rise;
+      this.x += Math.cos(this.phase) * this.swayAmp;
 
-      const dx = this.x - mouse.x;
-      const dy = this.y - mouse.y;
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < EMBER_REACH && dist > 0.5) {
-        const force = (EMBER_REACH - dist) / EMBER_REACH;
-        this.vx += (dx / dist) * force * 0.16;
-        this.alpha = Math.min(0.82, this.baseAlpha + force * 0.08);
+      if (dist < mouse.radius && dist > 0.5) {
+        const force = (mouse.radius - dist) / mouse.radius;
+        this.x -= (dx / dist) * force * 1.5;
+        this.y -= (dy / dist) * force * 1.5;
+        this.alpha = Math.min(1, this.baseAlpha + force * 0.5);
       } else {
         this.alpha = this.baseAlpha * (0.86 + 0.14 * Math.sin(this.phase));
-        this.vy += (this.rise - this.vy) * 0.035;
-        this.vx *= 0.985;
       }
 
       if (this.y < -24) {
         this.x = Math.random() * width;
         this.y = height + Math.random() * 30;
-        this.vx = (Math.random() - 0.5) * 0.1;
-        this.vy = this.rise;
         this.alpha = this.baseAlpha;
       }
       if (this.x < -30) this.x = width + 8;
@@ -258,7 +253,7 @@
       const resolved = next === 'ember' ? 'ember' : 'starfield';
       if (resolved === mode) return;
       mode = resolved;
-      mouse.radius = mode === 'ember' ? 170 : 160;
+      mouse.radius = 160;
       spawn();
       ctx.clearRect(0, 0, width, height);
     }

@@ -209,13 +209,6 @@ html[data-theme="ember"] .step-badge {
   box-shadow: none;
 }
 
-html[data-theme="ember"] .icon-theme-cyan,
-html[data-theme="ember"] .feature-icon-cyan {
-  background: linear-gradient(135deg, rgba(255, 122, 26, 0.2), rgba(255, 186, 110, 0.16));
-  border-color: rgba(255, 138, 42, 0.4);
-  box-shadow: none;
-}
-
 html[data-theme="ember"] .terminal-code {
   color: #f3ebe3;
 }
