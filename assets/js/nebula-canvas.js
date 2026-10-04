@@ -96,19 +96,25 @@
       this.x = Math.random() * width;
       this.y = Math.random() * height;
       this.baseRadius = 1.35 + Math.random() * 5.4;
-      this.baseAlpha = Math.random() * 0.22 + 0.42;
-      this.alpha = this.baseAlpha;
       this.phase = Math.random() * Math.PI * 2;
       this.phase2 = Math.random() * Math.PI * 2;
+      this.angle = Math.random() * Math.PI * 2;
       this.swayAmp = 0.35 + Math.random() * 1.45;
       this.swaySpeed = 0.007 + Math.random() * 0.055;
       this.swaySpeed2 = 0.004 + Math.random() * 0.033;
       this.color = EMBER_COLORS[(Math.random() * EMBER_COLORS.length) | 0];
       // Persistent lean to one side, so the path is not a symmetric wave.
       this.drift = (Math.random() < 0.5 ? -1 : 1) * (0.12 + Math.random() * 0.4);
-      const sizeT = Math.max(0, Math.min(1, (this.baseRadius - 1.35) / 5.4));
-      // Large embers crawl; small sparks rise several times faster. Jitter stays inside that gap.
-      this.rise = (2.05 - sizeT * 1.82) * (0.78 + Math.random() * 0.44);
+      // Own brightness and size clocks, so neither stays fixed.
+      this.glow = 0.22 + Math.random() * 0.58;
+      this.glowAmp = 0.24 + Math.random() * 0.28;
+      this.glowPhase = Math.random() * Math.PI * 2;
+      this.glowSpeed = 0.006 + Math.random() * 0.016;
+      this.sizePhase = Math.random() * Math.PI * 2;
+      this.sizeSpeed = 0.005 + Math.random() * 0.014;
+      this.riseJitter = 0.88 + Math.random() * 0.24;
+      this.brightness = this.glow;
+      this.drawAlpha = this.brightness;
     }
 
     radiusAt(y) {
@@ -117,10 +123,15 @@
     }
 
     update() {
+      this.glowPhase += this.glowSpeed;
+      this.sizePhase += this.sizeSpeed;
+      this.brightness = Math.max(0.06, Math.min(1, this.glow + Math.sin(this.glowPhase) * this.glowAmp));
+
       const depth = Math.max(0, Math.min(1, this.y / Math.max(height, 1)));
       const climb = 1 - depth;
-      // A little faster at the bottom than before. Still eases to about 31% of that speed at the top.
-      this.y -= this.rise * (0.42 + 0.94 * depth);
+      // Dimmer rises faster, brighter rises slower. Height still eases the rise to about 31% at the top.
+      const byBright = 2.05 - this.brightness * 1.77;
+      this.y -= byBright * this.riseJitter * (0.42 + 0.94 * depth);
       // Wider sideways travel higher up, but the wobble slows and the sharp harmonic fades so it is not twitchy.
       const pace = 0.62 - 0.34 * climb;
       const swayScale = 0.32 + 1.9 * climb;
@@ -140,31 +151,38 @@
         const force = (mouse.radius - dist) / mouse.radius;
         this.x -= (dx / dist) * force * 1.5;
         this.y -= (dy / dist) * force * 1.5;
-        this.alpha = Math.min(1, this.baseAlpha + force * 0.5);
+        this.drawAlpha = Math.min(1, this.brightness + force * 0.35);
       } else {
-        this.alpha = this.baseAlpha * (0.86 + 0.14 * Math.sin(this.phase));
+        this.drawAlpha = this.brightness;
       }
 
       if (this.y < -24) {
         this.x = Math.random() * width;
         this.y = height + Math.random() * 30;
-        this.alpha = this.baseAlpha;
+        this.drawAlpha = this.brightness;
       }
       if (this.x < -30) this.x = width + 8;
       if (this.x > width + 30) this.x = -8;
     }
 
     draw() {
-      const radius = this.radiusAt(this.y);
       const depth = Math.max(0, Math.min(1, this.y / Math.max(height, 1)));
+      const sizePulse = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(this.sizePhase));
+      const radius = this.radiusAt(this.y) * sizePulse;
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
       ctx.beginPath();
-      ctx.arc(this.x, this.y, radius, 0, Math.PI * 2);
+      ctx.moveTo(0, -radius);
+      ctx.lineTo(radius * 0.9, radius * 0.62);
+      ctx.lineTo(-radius * 0.9, radius * 0.62);
+      ctx.closePath();
       ctx.fillStyle = this.color;
-      ctx.globalAlpha = this.alpha * (0.5 + 0.5 * depth);
-      ctx.shadowBlur = Math.min(4, radius);
+      ctx.globalAlpha = this.drawAlpha * (0.55 + 0.45 * depth);
+      ctx.shadowBlur = Math.min(3, radius * 0.45);
       ctx.shadowColor = this.color;
       ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.restore();
     }
   }
 
