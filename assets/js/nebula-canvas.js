@@ -101,15 +101,15 @@
       hue = 4 + Math.random() * 14;
       sat = 52 + Math.random() * 26;
       light = 40 + Math.random() * 16;
-    } else if (roll < 0.74) {
+    } else if (roll < 0.8) {
       hue = 20 + Math.random() * 24;
       sat = 46 + Math.random() * 28;
       light = 40 + Math.random() * 18;
     } else {
-      // Dusty blue-gray. Hue stays off cyan, and saturation stays low.
-      hue = 206 + Math.random() * 22;
-      sat = 10 + Math.random() * 14;
-      light = 42 + Math.random() * 12;
+      // A slight cool lean. Hue stays off cyan, and saturation stays low.
+      hue = 208 + Math.random() * 18;
+      sat = 6 + Math.random() * 8;
+      light = 44 + Math.random() * 10;
     }
     return 'hsl(' + hue.toFixed(1) + ', ' + sat.toFixed(1) + '%, ' + light.toFixed(1) + '%)';
   }
