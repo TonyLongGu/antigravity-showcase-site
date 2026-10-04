@@ -209,21 +209,34 @@ html[data-theme="ember"] .step-badge {
   box-shadow: none;
 }
 
+html[data-theme="ember"] .ai-prompt-card,
+html[data-theme="ember"] .ai-prompt-card:hover {
+  background: rgba(36, 31, 27, 0.9);
+  border-color: rgba(255, 206, 168, 0.16);
+  box-shadow: none;
+}
+
+html[data-theme="ember"] .install-action-bubble {
+  background: rgba(28, 24, 21, 0.92);
+  border-color: rgba(255, 176, 110, 0.32);
+  color: #f3e6d6;
+}
+
+html[data-theme="ember"] .install-action-bubble code {
+  color: #f3e6d6;
+}
+
+html[data-theme="ember"] .ai-status-dot {
+  background: #ff7a1a;
+  box-shadow: 0 0 8px rgba(255, 122, 26, 0.85);
+}
+
 html[data-theme="ember"] .terminal-code {
   color: #f3ebe3;
 }
 
 html[data-theme="ember"] .terminal-prompt {
   color: #ff7a1a;
-}
-
-html[data-theme="ember"] .info-card-svg path[stroke="#38bdf8"] {
-  stroke: #ff9a3c;
-}
-
-html[data-theme="ember"] #shieldGradRight stop:first-child,
-html[data-theme="ember"] #shieldGradLeft stop:first-child {
-  stop-color: #ff9a3c;
 }
 
 /* Developer notes — warm off-white body, orange only as small markers */
