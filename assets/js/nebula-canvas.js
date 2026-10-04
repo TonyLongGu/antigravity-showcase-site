@@ -89,8 +89,30 @@
     }
   }
 
-  const EMBER_COLORS = ['#b85a2a', '#d4783a', '#8d4e32', '#e8b07a', '#ff8f3c', '#6e4634'];
   const EMBER_BRIGHT_CAP = 0.82;
+  const EMBER_BRIGHT_FLOOR = 0.42;
+
+  function emberColor() {
+    const roll = Math.random();
+    let hue;
+    let sat;
+    let light;
+    if (roll < 0.4) {
+      hue = 4 + Math.random() * 14;
+      sat = 52 + Math.random() * 26;
+      light = 40 + Math.random() * 16;
+    } else if (roll < 0.74) {
+      hue = 20 + Math.random() * 24;
+      sat = 46 + Math.random() * 28;
+      light = 40 + Math.random() * 18;
+    } else {
+      // Dusty blue-gray. Hue stays off cyan, and saturation stays low.
+      hue = 206 + Math.random() * 22;
+      sat = 10 + Math.random() * 14;
+      light = 42 + Math.random() * 12;
+    }
+    return 'hsl(' + hue.toFixed(1) + ', ' + sat.toFixed(1) + '%, ' + light.toFixed(1) + '%)';
+  }
 
   class EmberParticle {
     constructor() {
@@ -100,22 +122,24 @@
       this.phase = Math.random() * Math.PI * 2;
       this.phase2 = Math.random() * Math.PI * 2;
       this.angle = Math.random() * Math.PI * 2;
-      this.spin = (Math.random() < 0.5 ? -1 : 1) * (0.002 + Math.random() * 0.006);
+      this.spin = (Math.random() < 0.5 ? -1 : 1) * (0.0035 + Math.random() * 0.009);
       this.swayAmp = 0.35 + Math.random() * 1.45;
       this.swaySpeed = 0.007 + Math.random() * 0.055;
       this.swaySpeed2 = 0.004 + Math.random() * 0.033;
-      this.color = EMBER_COLORS[(Math.random() * EMBER_COLORS.length) | 0];
+      this.color = emberColor();
       // Persistent lean to one side, so the path is not a symmetric wave.
       this.drift = (Math.random() < 0.5 ? -1 : 1) * (0.12 + Math.random() * 0.4);
-      // Own brightness and size clocks, so neither stays fixed.
-      this.glow = 0.16 + Math.random() * 0.4;
-      this.glowAmp = 0.12 + Math.random() * 0.16;
+      // Center and amplitude stay inside the floor and cap, so the sine never needs a clamp.
+      const span = EMBER_BRIGHT_CAP - EMBER_BRIGHT_FLOOR;
+      this.glow = EMBER_BRIGHT_FLOOR + span * (0.3 + Math.random() * 0.4);
+      const room = Math.min(this.glow - EMBER_BRIGHT_FLOOR, EMBER_BRIGHT_CAP - this.glow);
+      this.glowAmp = room * (0.55 + Math.random() * 0.45);
       this.glowPhase = Math.random() * Math.PI * 2;
       this.glowSpeed = 0.006 + Math.random() * 0.016;
       this.sizePhase = Math.random() * Math.PI * 2;
       this.sizeSpeed = 0.005 + Math.random() * 0.014;
       this.riseJitter = 0.88 + Math.random() * 0.24;
-      this.brightness = this.glow;
+      this.brightness = this.glow + Math.sin(this.glowPhase) * this.glowAmp;
       this.drawAlpha = this.brightness;
     }
 
@@ -128,12 +152,13 @@
       this.glowPhase += this.glowSpeed;
       this.sizePhase += this.sizeSpeed;
       this.angle += this.spin;
-      this.brightness = Math.max(0.06, Math.min(EMBER_BRIGHT_CAP, this.glow + Math.sin(this.glowPhase) * this.glowAmp));
+      this.brightness = this.glow + Math.sin(this.glowPhase) * this.glowAmp;
 
       const depth = Math.max(0, Math.min(1, this.y / Math.max(height, 1)));
       const climb = 1 - depth;
-      // Dimmer rises faster, brighter rises slower. The cap is scaled so the speed range stays the same.
-      const byBright = 2.05 - (this.brightness / EMBER_BRIGHT_CAP) * 1.77;
+      // Dimmer rises faster, brighter rises slower. Floor and cap map onto the same speed range as before.
+      const brightT = (this.brightness - EMBER_BRIGHT_FLOOR) / (EMBER_BRIGHT_CAP - EMBER_BRIGHT_FLOOR);
+      const byBright = 2.05 - brightT * 1.77;
       this.y -= byBright * this.riseJitter * (0.42 + 0.94 * depth);
       // Wider sideways travel higher up, but the wobble slows and the sharp harmonic fades so it is not twitchy.
       const pace = 0.62 - 0.34 * climb;
@@ -150,19 +175,18 @@
       const dy = mouse.y - this.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
+      let brightTarget = this.brightness;
       if (dist < mouse.radius && dist > 0.5) {
         const force = (mouse.radius - dist) / mouse.radius;
         this.x -= (dx / dist) * force * 1.5;
         this.y -= (dy / dist) * force * 1.5;
-        this.drawAlpha = Math.min(EMBER_BRIGHT_CAP, this.brightness + force * 0.28);
-      } else {
-        this.drawAlpha = this.brightness;
+        brightTarget = Math.min(EMBER_BRIGHT_CAP, this.brightness + force * 0.22);
       }
+      this.drawAlpha += (brightTarget - this.drawAlpha) * 0.08;
 
       if (this.y < -24) {
         this.x = Math.random() * width;
         this.y = height + Math.random() * 30;
-        this.drawAlpha = this.brightness;
       }
       if (this.x < -30) this.x = width + 8;
       if (this.x > width + 30) this.x = -8;
@@ -181,7 +205,7 @@
       ctx.lineTo(-radius * 0.9, radius * 0.62);
       ctx.closePath();
       ctx.fillStyle = this.color;
-      ctx.globalAlpha = this.drawAlpha * (0.55 + 0.45 * depth);
+      ctx.globalAlpha = this.drawAlpha * (0.8 + 0.2 * depth);
       ctx.shadowBlur = Math.min(1.5, radius * 0.2);
       ctx.shadowColor = this.color;
       ctx.fill();
