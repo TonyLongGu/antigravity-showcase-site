@@ -13,7 +13,7 @@
 
   const PARTICLE_COUNT = 75;
   /* Embers have no connecting lines, so a slightly higher count keeps a similar visual density. */
-  const EMBER_COUNT = 100;
+  const EMBER_COUNT = 150;
   const CONNECT_DISTANCE = 130;
   const MOUSE_CONNECT_DISTANCE = 160;
 
@@ -97,8 +97,8 @@
       this.y = Math.random() * height;
       const hot = Math.random();
       this.hot = hot > 0.72;
-      this.radius = this.hot ? Math.random() * 0.7 + 0.5 : Math.random() * 1.3 + 0.75;
-      this.baseAlpha = this.hot ? Math.random() * 0.28 + 0.5 : Math.random() * 0.26 + 0.18;
+      this.radius = this.hot ? Math.random() * 0.75 + 0.55 : Math.random() * 1.25 + 0.7;
+      this.baseAlpha = this.hot ? Math.random() * 0.22 + 0.62 : Math.random() * 0.22 + 0.32;
       this.alpha = this.baseAlpha;
       this.phase = Math.random() * Math.PI * 2;
       this.flickerSpeed = 0.02 + Math.random() * 0.045;

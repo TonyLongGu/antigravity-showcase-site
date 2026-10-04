@@ -59,11 +59,10 @@
     }).filter(Boolean);
 
     function update() {
-      const marker = window.scrollY + 140;
+      const line = Math.min(200, window.innerHeight * 0.32);
       let current = null;
       sections.forEach((item) => {
-        const top = item.el.getBoundingClientRect().top + window.scrollY;
-        if (top <= marker) current = item.link;
+        if (item.el.getBoundingClientRect().top <= line) current = item.link;
       });
       links.forEach((link) => {
         link.classList.toggle('nav-current', link === current);

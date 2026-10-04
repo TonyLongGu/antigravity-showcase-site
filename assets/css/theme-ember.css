@@ -285,3 +285,7 @@ html[data-theme="ember"] .callout-desc {
 html[data-theme="ember"] .footer-disclaimer {
   color: rgba(232, 220, 206, 0.55);
 }
+
+html[data-theme="ember"] #author {
+  background: rgba(28, 24, 21, 0.55) !important;
+}
