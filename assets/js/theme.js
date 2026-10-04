@@ -1,7 +1,8 @@
 /**
- * Visual style switcher.
- * 星空 (starfield) is the default and leaves the original theme untouched.
- * 熱情橘 (ember) is stored in the browser and restored on reload.
+ * Visual style switcher on the hero pills.
+ * Antigravity selects 星空 (starfield). Cursor selects 熱情橘 (ember).
+ * VS Code is visible and does not select a theme.
+ * The choice is stored in the browser and restored on reload.
  */
 (function () {
   const STORAGE_KEY = 'antigravity_visual_theme';
@@ -40,10 +41,8 @@
       }
     }
 
-    const label = document.getElementById('theme-select-label');
-    if (label) label.textContent = next === 'ember' ? '熱情橘' : '星空';
-    document.querySelectorAll('#theme-menu [role="option"]').forEach((opt) => {
-      opt.setAttribute('aria-selected', opt.getAttribute('data-value') === next ? 'true' : 'false');
+    document.querySelectorAll('.hero-ide-pills [data-theme-value]').forEach((btn) => {
+      btn.setAttribute('aria-pressed', btn.getAttribute('data-theme-value') === next ? 'true' : 'false');
     });
 
     if (window.NebulaEngine && typeof window.NebulaEngine.setMode === 'function') {
@@ -78,48 +77,15 @@
   }
 
   function initThemeSwitcher() {
-    const root = document.querySelector('.theme-switcher');
-    const button = document.getElementById('theme-select');
-    const menu = document.getElementById('theme-menu');
-    const options = menu ? Array.from(menu.querySelectorAll('[role="option"]')) : [];
-
-    function closeMenu() {
-      if (!menu || !button) return;
-      menu.hidden = true;
-      button.setAttribute('aria-expanded', 'false');
-    }
-
-    function openMenu() {
-      if (!menu || !button) return;
-      menu.hidden = false;
-      button.setAttribute('aria-expanded', 'true');
-    }
-
     applyTheme(readTheme(), false);
 
-    if (button && menu) {
-      button.addEventListener('click', (event) => {
-        event.stopPropagation();
-        if (menu.hidden) openMenu();
-        else closeMenu();
+    document.querySelectorAll('.hero-ide-pills [data-theme-value]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const value = btn.getAttribute('data-theme-value');
+        if (value !== 'starfield' && value !== 'ember') return;
+        applyTheme(value, true);
       });
-
-      options.forEach((opt) => {
-        opt.addEventListener('click', (event) => {
-          event.stopPropagation();
-          applyTheme(opt.getAttribute('data-value'), true);
-          closeMenu();
-        });
-      });
-
-      document.addEventListener('click', (event) => {
-        if (root && !root.contains(event.target)) closeMenu();
-      });
-
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') closeMenu();
-      });
-    }
+    });
 
     initNavCurrent();
   }
