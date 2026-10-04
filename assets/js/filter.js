@@ -3,13 +3,11 @@
  */
 
 let activeCategory = 'all';
-let activeIde = 'all';
 let searchQuery = '';
 
 function initFilters() {
   const searchInput = document.getElementById('search-input');
   const tabBtns = document.querySelectorAll('.tab-btn');
-  const ideTabBtns = document.querySelectorAll('.ide-tab-btn');
 
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -34,20 +32,6 @@ function initFilters() {
       renderPlugins();
     });
   });
-
-  ideTabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      ideTabBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeIde = btn.getAttribute('data-ide');
-      renderPlugins();
-    });
-  });
-}
-
-function pluginSupportsIde(plugin, ideId) {
-  const ides = Array.isArray(plugin.ides) ? plugin.ides : IDE_ALL;
-  return ides.includes(ideId);
 }
 
 function renderIdeBadges(plugin) {
@@ -75,7 +59,6 @@ function renderPlugins() {
     const matchesCategory = activeCategory === 'all' || plugin.category === activeCategory;
     if (!matchesCategory) return false;
 
-    if (activeIde !== 'all' && !pluginSupportsIde(plugin, activeIde)) return false;
     if (!searchQuery) return true;
 
     const name = (plugin.name[currentLang] || '').toLowerCase();

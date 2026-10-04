@@ -5,11 +5,11 @@
 @keyframes pulse-slow {
   0%, 100% {
     transform: scale(1);
-    filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.4));
+    filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.4));
   }
   50% {
     transform: scale(1.05);
-    filter: drop-shadow(0 0 16px rgba(127, 0, 255, 0.6));
+    filter: drop-shadow(0 0 16px rgba(var(--accent-purple-rgb), 0.6));
   }
 }
 

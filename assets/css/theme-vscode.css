@@ -1,0 +1,429 @@
+/* ==========================================================================
+   VS Code Dark+ — editor skin.
+   Starfield (no data-theme) and 熱情橘 are unchanged.
+   Coverage mirrors theme-ember.css 1:1 so every surface is accounted for.
+   The blue ramp sits one step brighter than stock Dark+: buttons keep a status-bar
+   blue, while #4DA3FF drives links, tags, borders, the current nav item and the caret.
+   Dark+ syntax colours stay as small markers only, and every grey carries a cool
+   cast so the page never reads as flat mid-grey.
+   ========================================================================== */
+
+html[data-theme="vscode"] {
+  --accent-rgb: 77, 163, 255;
+  --accent-purple-rgb: 104, 176, 232;
+  --link-hover: #84c3ff;
+
+  /* 深炭黑底：頁面壓暗，面板才浮得起來。
+     原本底色與面板同階（都是 #1e1e1e 上下），整頁才會糊成一片灰平。 */
+  --bg-space: #0a0c10;
+  --bg-primary: #12161c;
+  --bg-secondary: #1b2129;
+  --bg-tertiary: #242d38;
+  --bg-card: rgba(31, 39, 48, 0.78);
+  --bg-card-hover: rgba(42, 52, 63, 0.92);
+  --bg-glass: rgba(16, 21, 27, 0.84);
+  --bg-glass-heavy: rgba(11, 14, 19, 0.94);
+
+  --border-subtle: rgba(150, 190, 230, 0.1);
+  --border-medium: rgba(160, 198, 236, 0.18);
+  --border-focus: rgba(77, 163, 255, 0.62);
+  --border-glow: rgba(77, 163, 255, 0.34);
+
+  /* 藍色階梯比 VS Code 原生亮一階：#4DA3FF 給連結、標籤與描邊，
+     按鈕則用狀態列藍的提亮版，避免強調色在深底上顯得暗沉。 */
+  --accent-cyan: #4da3ff;
+  --accent-blue: #84c3ff;
+  --accent-purple: #6aaee6;
+  --grad-primary: linear-gradient(135deg, #6fd0ff 0%, #3d8cff 100%);
+  --grad-glow: radial-gradient(circle at 50% 0%, rgba(77, 163, 255, 0.12), transparent 70%);
+
+  /* 帶一點冷調的灰白，貼齊編輯器藍，避免整頁死灰。 */
+  --text-primary: #e9eef4;
+  --text-secondary: #c2cdd9;
+  --text-muted: #8a96a5;
+  --text-inverse: #ffffff;
+
+  --shadow-neon: 0 8px 20px rgba(77, 163, 255, 0.28);
+  --shadow-purple: 0 8px 18px rgba(104, 176, 232, 0.14);
+}
+
+/* Editor depth: 深色底 + 一道明顯的編輯器藍，讓整頁有色彩溫度而不是灰平。 */
+html[data-theme="vscode"] body {
+  background-color: #0a0c10;
+  background-image:
+    radial-gradient(ellipse 72% 46% at 12% -4%, rgba(77, 163, 255, 0.3), transparent 58%),
+    radial-gradient(ellipse 58% 46% at 104% 20%, rgba(104, 176, 232, 0.18), transparent 60%),
+    radial-gradient(ellipse 92% 42% at 50% 110%, rgba(6, 34, 71, 0.62), transparent 60%),
+    linear-gradient(176deg, #1a1f27 0%, #12161c 42%, #0a0c10 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  padding-bottom: 24px;
+}
+
+/* 標題漸層：#A5E0FF → #84C3FF → #4DA3FF，整體比 VS Code 原生藍再亮一階。 */
+html[data-theme="vscode"] .text-gradient {
+  background: linear-gradient(120deg, #a5e0ff 0%, #84c3ff 44%, #4da3ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* The editor selection colour. */
+html[data-theme="vscode"] ::selection {
+  background: rgba(38, 79, 120, 0.8);
+  color: #ffffff;
+}
+
+html[data-theme="vscode"] .ambient-glow {
+  opacity: 0.34;
+  width: 720px;
+  height: 720px;
+}
+
+html[data-theme="vscode"] .ambient-glow-1 {
+  background: radial-gradient(circle, #0d8ae0 0%, transparent 70%);
+}
+
+html[data-theme="vscode"] .ambient-glow-2 {
+  opacity: 0.26;
+  background: radial-gradient(circle, #3d84e0 0%, transparent 70%);
+}
+
+/* Buttons */
+html[data-theme="vscode"] .btn-primary,
+html[data-theme="vscode"] a.btn-primary {
+  background: linear-gradient(135deg, #2f9be8 0%, #0d8ae0 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 22px rgba(77, 163, 255, 0.34) !important;
+}
+
+html[data-theme="vscode"] .btn-primary:hover,
+html[data-theme="vscode"] a.btn-primary:hover {
+  color: #ffffff !important;
+  box-shadow: 0 12px 26px rgba(77, 163, 255, 0.48) !important;
+}
+
+html[data-theme="vscode"] .btn-secondary {
+  color: #e9eef4;
+  border-color: rgba(77, 163, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme="vscode"] .btn-secondary:hover {
+  color: #9dd6ff;
+  border-color: #4da3ff !important;
+  background: rgba(77, 163, 255, 0.14);
+}
+
+html[data-theme="vscode"] .install-dl-btn {
+  background: linear-gradient(135deg, #2f9be8 0%, #0d8ae0 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(77, 163, 255, 0.34);
+}
+
+html[data-theme="vscode"] .install-dl-btn:hover {
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(77, 163, 255, 0.48);
+}
+
+html[data-theme="vscode"] .btn-copy:hover,
+html[data-theme="vscode"] .callout-btn:hover {
+  background: #1488e0;
+  color: #ffffff;
+  border-color: #1488e0;
+  box-shadow: none;
+}
+
+/* 目前所在區塊：導覽列唯一會亮起的項目（滑過其他項目不再另開第二條底線） */
+html[data-theme="vscode"] .nav-link.nav-current {
+  color: #84c3ff;
+}
+
+html[data-theme="vscode"] .nav-link.nav-current::after {
+  width: 100%;
+  background: #4da3ff;
+}
+
+/* 導覽列品牌徽章「IDE」：原本 12% 的深藍底在深色導覽列上太暗，底色／描邊提亮並補一點微光。 */
+html[data-theme="vscode"] .badge-ide {
+  background: rgba(77, 163, 255, 0.24);
+  border-color: rgba(77, 163, 255, 0.62);
+  color: #9dd6ff;
+  box-shadow: 0 0 10px rgba(77, 163, 255, 0.34);
+}
+
+/* Editor panels: 較淺的冷灰藍面板，浮在更深的頁面底色之上 */
+html[data-theme="vscode"] .hero-badge,
+html[data-theme="vscode"] .hero-badge-update,
+html[data-theme="vscode"] .hero-badge-update:hover {
+  background: rgba(31, 39, 48, 0.82);
+}
+
+html[data-theme="vscode"] .install-tab-btn,
+html[data-theme="vscode"] .info-card,
+html[data-theme="vscode"] .ai-flow-item {
+  background: rgba(31, 39, 48, 0.72);
+}
+
+html[data-theme="vscode"] .ai-chat-bubble.preview-only,
+html[data-theme="vscode"] .ai-chat-bubble.preview-only:hover {
+  background: rgba(31, 39, 48, 0.78);
+}
+
+html[data-theme="vscode"] .video-player-container {
+  background: #0f1216;
+}
+
+html[data-theme="vscode"] .video-showcase-wrapper,
+html[data-theme="vscode"] .plugin-card:hover,
+html[data-theme="vscode"] .notes-image-container,
+html[data-theme="vscode"] .notes-image-container:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="vscode"] .player-feedback-badge {
+  background: rgba(31, 39, 48, 0.85);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="vscode"] .player-progress-filled {
+  background: linear-gradient(90deg, #84c3ff, #3d8cff);
+  box-shadow: none;
+}
+
+html[data-theme="vscode"] .custom-ctrl-btn:hover,
+html[data-theme="vscode"] .custom-ctrl-btn#ctrl-cc-btn.active {
+  color: #84c3ff;
+  filter: none;
+}
+
+html[data-theme="vscode"] .custom-volume-slider {
+  --vol-color: #1488e0;
+}
+
+html[data-theme="vscode"] .subtitle-bubble {
+  background: rgba(25, 31, 39, 0.9);
+  border-color: rgba(77, 163, 255, 0.32);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.72);
+}
+
+html[data-theme="vscode"] .subtitle-text {
+  color: #e9eef4;
+}
+
+html[data-theme="vscode"] .video-player-container:focus-visible,
+html[data-theme="vscode"] .player-progress-container:focus-visible {
+  outline-color: rgba(77, 163, 255, 0.75);
+}
+
+html[data-theme="vscode"] .step-badge {
+  color: #6aaee6;
+  background: linear-gradient(135deg, rgba(77, 163, 255, 0.16), rgba(104, 176, 232, 0.1));
+  border-color: rgba(77, 163, 255, 0.4);
+  box-shadow: none;
+}
+
+html[data-theme="vscode"] .ai-prompt-card {
+  background: rgba(28, 35, 43, 0.9);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+html[data-theme="vscode"] .ai-prompt-card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(77, 163, 255, 0.85);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(77, 163, 255, 0.28), inset 0 0 12px rgba(77, 163, 255, 0.1);
+}
+
+html[data-theme="vscode"] .install-action-bubble {
+  background: rgba(25, 31, 39, 0.92);
+  border-color: rgba(77, 163, 255, 0.35);
+  color: #d8e0ea;
+}
+
+html[data-theme="vscode"] .install-action-bubble code {
+  color: #a5e0ff;
+}
+
+html[data-theme="vscode"] .ai-status-dot {
+  background: #4da3ff;
+  box-shadow: 0 0 8px rgba(77, 163, 255, 0.85);
+}
+
+/* Terminal: 主體維持編輯器文字色，提示符用關鍵字藍 */
+html[data-theme="vscode"] .terminal-code {
+  color: #d8e0ea;
+}
+
+html[data-theme="vscode"] .terminal-prompt {
+  color: #6aaee6;
+}
+
+/* Developer notes — editor body text, blue only as small markers */
+html[data-theme="vscode"] .notes-article-card {
+  background: rgba(28, 35, 43, 0.88);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="vscode"] .notes-article-card:hover {
+  border-color: rgba(77, 163, 255, 0.32);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.48);
+}
+
+html[data-theme="vscode"] .notes-article-body,
+html[data-theme="vscode"] .notes-paragraph,
+html[data-theme="vscode"] .notes-list-item,
+html[data-theme="vscode"] .notes-ordered-item,
+html[data-theme="vscode"] .notes-blockquote {
+  color: #d8e0ea;
+}
+
+html[data-theme="vscode"] .notes-list-item-nested {
+  color: #b9c4d0;
+}
+
+html[data-theme="vscode"] .notes-heading,
+html[data-theme="vscode"] .notes-subheading,
+html[data-theme="vscode"] .notes-title-main,
+html[data-theme="vscode"] .callout-title,
+html[data-theme="vscode"] .notes-article-body strong {
+  color: #eef3f8;
+}
+
+html[data-theme="vscode"] .notes-article-body em,
+html[data-theme="vscode"] .notes-image-caption {
+  color: #8a96a5;
+}
+
+html[data-theme="vscode"] .notes-inline-code {
+  color: #a5e0ff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+html[data-theme="vscode"] .notes-blockquote {
+  background: rgba(77, 163, 255, 0.06);
+}
+
+html[data-theme="vscode"] .notes-image-container {
+  background: rgba(25, 31, 39, 0.72);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="vscode"] .notes-image-caption {
+  background: rgba(20, 26, 33, 0.94);
+}
+
+html[data-theme="vscode"] .notes-footer-callout {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(77, 163, 255, 0.24);
+  box-shadow: none;
+}
+
+html[data-theme="vscode"] .callout-desc {
+  color: #c2cdd9;
+}
+
+html[data-theme="vscode"] .footer-disclaimer {
+  color: rgba(168, 188, 208, 0.52);
+}
+
+html[data-theme="vscode"] #author {
+  background: rgba(25, 31, 39, 0.55) !important;
+}
+
+/* --------------------------------------------------------------------------
+   VS Code 招牌細節
+   -------------------------------------------------------------------------- */
+
+/* 狀態列：純裝飾，預設不出現，只在 VS Code 風格顯示，且不攔截任何點擊。 */
+.vscode-statusbar {
+  display: none;
+}
+
+html[data-theme="vscode"] .vscode-statusbar {
+  display: flex;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+  height: 24px;
+  align-items: center;
+  gap: 16px;
+  padding: 0 14px;
+  background: #1488e0;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  user-select: none;
+}
+
+html[data-theme="vscode"] .vscode-statusbar .sb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0.94;
+  white-space: nowrap;
+}
+
+html[data-theme="vscode"] .vscode-statusbar .sb-branch {
+  font-weight: 600;
+  opacity: 1;
+}
+
+html[data-theme="vscode"] .vscode-statusbar .sb-spacer {
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  /* 小螢幕只留分支與檔案類型，避免擁擠 */
+  html[data-theme="vscode"] .vscode-statusbar .sb-hide-sm {
+    display: none;
+  }
+}
+
+/* 網頁內全螢幕播放影片時，狀態列與頂部導覽一致退場，避免遮住影片。 */
+body.has-web-fullscreen .vscode-statusbar {
+  display: none !important;
+}
+
+/* 編輯器分頁感：卡片上緣的指示線＝選中分頁；圓角改為上大下小。 */
+html[data-theme="vscode"] .plugin-card {
+  border-radius: 10px 10px var(--radius-sm) var(--radius-sm);
+}
+
+html[data-theme="vscode"] .plugin-card::before {
+  opacity: 0.32; /* 平時像未選取分頁的淡指示線 */
+}
+
+html[data-theme="vscode"] .plugin-card:hover::before {
+  opacity: 1; /* 滑過＝分頁被選中 */
+}
+
+/* 主標題尾端的編輯器游標 */
+html[data-theme="vscode"] .hero-title::after {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 0.86em;
+  margin-left: 8px;
+  vertical-align: -0.06em;
+  background: #6fd0ff;
+  animation: vscode-caret 1.06s steps(1, end) infinite;
+}
+
+@keyframes vscode-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="vscode"] .hero-title::after {
+    animation: none;
+  }
+}
