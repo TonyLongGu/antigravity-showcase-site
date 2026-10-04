@@ -90,15 +90,17 @@
   }
 
   const EMBER_COLORS = ['#b85a2a', '#d4783a', '#8d4e32', '#e8b07a', '#ff8f3c', '#6e4634'];
+  const EMBER_BRIGHT_CAP = 0.82;
 
   class EmberParticle {
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      this.baseRadius = 1.35 + Math.random() * 5.4;
+      this.baseRadius = 1.7 + Math.random() * 6.5;
       this.phase = Math.random() * Math.PI * 2;
       this.phase2 = Math.random() * Math.PI * 2;
       this.angle = Math.random() * Math.PI * 2;
+      this.spin = (Math.random() < 0.5 ? -1 : 1) * (0.002 + Math.random() * 0.006);
       this.swayAmp = 0.35 + Math.random() * 1.45;
       this.swaySpeed = 0.007 + Math.random() * 0.055;
       this.swaySpeed2 = 0.004 + Math.random() * 0.033;
@@ -106,8 +108,8 @@
       // Persistent lean to one side, so the path is not a symmetric wave.
       this.drift = (Math.random() < 0.5 ? -1 : 1) * (0.12 + Math.random() * 0.4);
       // Own brightness and size clocks, so neither stays fixed.
-      this.glow = 0.22 + Math.random() * 0.58;
-      this.glowAmp = 0.24 + Math.random() * 0.28;
+      this.glow = 0.16 + Math.random() * 0.4;
+      this.glowAmp = 0.12 + Math.random() * 0.16;
       this.glowPhase = Math.random() * Math.PI * 2;
       this.glowSpeed = 0.006 + Math.random() * 0.016;
       this.sizePhase = Math.random() * Math.PI * 2;
@@ -125,12 +127,13 @@
     update() {
       this.glowPhase += this.glowSpeed;
       this.sizePhase += this.sizeSpeed;
-      this.brightness = Math.max(0.06, Math.min(1, this.glow + Math.sin(this.glowPhase) * this.glowAmp));
+      this.angle += this.spin;
+      this.brightness = Math.max(0.06, Math.min(EMBER_BRIGHT_CAP, this.glow + Math.sin(this.glowPhase) * this.glowAmp));
 
       const depth = Math.max(0, Math.min(1, this.y / Math.max(height, 1)));
       const climb = 1 - depth;
-      // Dimmer rises faster, brighter rises slower. Height still eases the rise to about 31% at the top.
-      const byBright = 2.05 - this.brightness * 1.77;
+      // Dimmer rises faster, brighter rises slower. The cap is scaled so the speed range stays the same.
+      const byBright = 2.05 - (this.brightness / EMBER_BRIGHT_CAP) * 1.77;
       this.y -= byBright * this.riseJitter * (0.42 + 0.94 * depth);
       // Wider sideways travel higher up, but the wobble slows and the sharp harmonic fades so it is not twitchy.
       const pace = 0.62 - 0.34 * climb;
@@ -151,7 +154,7 @@
         const force = (mouse.radius - dist) / mouse.radius;
         this.x -= (dx / dist) * force * 1.5;
         this.y -= (dy / dist) * force * 1.5;
-        this.drawAlpha = Math.min(1, this.brightness + force * 0.35);
+        this.drawAlpha = Math.min(EMBER_BRIGHT_CAP, this.brightness + force * 0.28);
       } else {
         this.drawAlpha = this.brightness;
       }
