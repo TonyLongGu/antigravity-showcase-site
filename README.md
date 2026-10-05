@@ -79,3 +79,18 @@ C5 會擋住漏掉的任何一項：
 
 改完 CSS 後也別忘了同步 `index.html` 的 `?v=` 版本號（快取失效）。
 
+---
+
+## 🧹 死碼盤點（選用）
+
+移除區塊後常留下沒人引用的樣式。這支工具會列出「CSS 有定義、但 `index.html` 與任何 JS 都沒引用」的 class：
+
+```bash
+node tools/dead-css.js            # 只報告
+node tools/dead-css.js --strict   # 有死碼時以退出碼 1 結束（可掛 hook／CI）
+```
+
+- 先移除 CSS 註解，再以**詞邊界**比對引用（`.card` 不會誤命中 `.card-icon`）。
+- 只盤點、不改檔。由 JS 字串拼接產生的類別（例如 ``badge-${type}``）只要字串片段有出現在程式碼就算有引用，仍可能漏判，需人工確認後再刪。
+- 目前狀態：6 個 CSS 檔、329 個 class 全部有引用（2026-10 已清掉 `.feature-box` 系列、舊版子模式卡、`.hero-ide-pill`、`.shortcut-*`、`.chat-quote`、`.code-snippet`，以及沒人用的 `@keyframes float／pulse-slow／shimmer`）。
+

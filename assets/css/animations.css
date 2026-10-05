@@ -1,17 +1,10 @@
 /* ==========================================================================
    Antigravity Animations & Micro-Interactions
+   只保留實際使用中的 keyframes：
+     pulse-fast → .badge-dot（components.css）
+     fadeIn     → .install-method-panel 切換（components.css）
+   2026-10 清除未被任何地方使用的 float／pulse-slow／shimmer 與 .animate-float／.animate-pulse-slow。
    ========================================================================== */
-
-@keyframes pulse-slow {
-  0%, 100% {
-    transform: scale(1);
-    filter: drop-shadow(0 0 8px rgba(var(--accent-rgb), 0.4));
-  }
-  50% {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 16px rgba(var(--accent-purple-rgb), 0.6));
-  }
-}
 
 @keyframes pulse-fast {
   0%, 100% {
@@ -21,15 +14,6 @@
   50% {
     opacity: 0.4;
     transform: scale(0.85);
-  }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
   }
 }
 
@@ -44,19 +28,3 @@
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 4s ease-in-out infinite;
-}

@@ -250,30 +250,6 @@
   }
 }
 
-.hero-ide-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-subtle);
-  transition: all var(--transition-fast);
-}
-
-.hero-ide-pill.primary {
-  color: var(--accent-cyan);
-  background: rgba(var(--accent-rgb), 0.08);
-  border-color: rgba(var(--accent-rgb), 0.35);
-  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.15);
-}
-
-
-
 .nav-sub-title {
   font-size: 0.72rem;
   font-weight: 600;
@@ -991,7 +967,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   5.5 Video Tutorials Section
+   5. Video Tutorials Section
    -------------------------------------------------------------------------- */
 .video-showcase-wrapper {
   max-width: 960px;
@@ -1697,7 +1673,7 @@ body.has-web-fullscreen .video-showcase-wrapper {
 }
 
 /* --------------------------------------------------------------------------
-   5.8 About Creator Section
+   6. About Creator Section
    -------------------------------------------------------------------------- */
 .author-card-wrapper {
   max-width: 920px;
@@ -1917,7 +1893,7 @@ body.has-web-fullscreen .video-showcase-wrapper {
 }
 
 /* --------------------------------------------------------------------------
-   6. Installation Guide Section
+   7. Installation Guide Section
    -------------------------------------------------------------------------- */
 .install-container {
   max-width: 920px;
@@ -2135,105 +2111,6 @@ body.has-web-fullscreen .video-showcase-wrapper {
   border-radius: var(--radius-full);
 }
 
-/* Sub-mode List (Full vs Selective - Vertical Stack) */
-.install-submode-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 12px;
-}
-
-.submode-card {
-  background: rgba(10, 14, 23, 0.7);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 18px 20px;
-  display: flex;
-  flex-direction: column;
-  transition: all var(--transition-fast);
-}
-
-.submode-card.highlight {
-  border-color: rgba(var(--accent-rgb), 0.35);
-  background: rgba(var(--accent-rgb), 0.03);
-}
-
-.submode-card:hover {
-  border-color: var(--border-focus);
-  transform: translateY(-2px);
-  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.1);
-}
-
-.submode-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.submode-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.submode-badge {
-  font-size: 0.7rem;
-  padding: 3px 8px;
-  border-radius: var(--radius-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.badge-recommended {
-  background: rgba(var(--accent-rgb), 0.15);
-  color: var(--accent-cyan);
-  border: 1px solid rgba(var(--accent-rgb), 0.3);
-}
-
-.badge-custom {
-  background: rgba(168, 85, 247, 0.15);
-  color: var(--accent-violet);
-  border: 1px solid rgba(168, 85, 247, 0.3);
-}
-
-.submode-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 12px;
-  flex: 1;
-}
-
-/* Shortcut Tag Group */
-.shortcut-pill-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--bg-space);
-  border: 1px solid var(--border-subtle);
-  padding: 8px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  flex-wrap: wrap;
-  margin-top: 4px;
-}
-
-.shortcut-tag {
-  display: inline-flex;
-  gap: 4px;
-}
-
-.shortcut-arrow {
-  color: var(--accent-cyan);
-}
-
-.shortcut-cmd {
-  color: var(--accent-cyan);
-  font-family: var(--font-mono);
-  font-weight: 600;
-}
-
 /* AI Prompts Container */
 .ai-prompts-container {
   display: flex;
@@ -2360,13 +2237,6 @@ body.has-web-fullscreen .video-showcase-wrapper {
   overflow-wrap: anywhere;
 }
 
-.chat-quote {
-  color: #fdba74;
-  font-weight: 700;
-  font-family: serif;
-  font-size: 1.15rem;
-}
-
 /* AI Flow Interactive Workflow Steps */
 .ai-flow-steps {
   display: flex;
@@ -2476,28 +2346,8 @@ body.has-web-fullscreen .video-showcase-wrapper {
   margin-bottom: 0;
 }
 
-.code-snippet {
-  background: var(--bg-space);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.code-snippet code {
-  color: var(--accent-cyan);
-  font-size: 0.88rem;
-  overflow-x: auto;
-}
-
 @media (max-width: 768px) {
   .install-method-switcher {
-    grid-template-columns: 1fr;
-  }
-  .install-submode-grid {
     grid-template-columns: 1fr;
   }
   .install-info-grid {
@@ -2529,7 +2379,7 @@ body.has-web-fullscreen .video-showcase-wrapper {
 }
 
 /* --------------------------------------------------------------------------
-   7. Toast Notification
+   8. Toast Notification
    -------------------------------------------------------------------------- */
 .toast {
   position: fixed;
@@ -2719,7 +2569,7 @@ body.has-web-fullscreen .video-showcase-wrapper {
 }
 
 /* --------------------------------------------------------------------------
-   9. Developer Notes Article Section (#notes)
+   11. Developer Notes Article Section (#notes)
    -------------------------------------------------------------------------- */
 .notes-article-wrapper {
   max-width: 960px;
