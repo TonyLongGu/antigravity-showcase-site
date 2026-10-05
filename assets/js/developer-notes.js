@@ -40,7 +40,7 @@ const DEVELOPER_NOTES_ARTICLE = {
 - **Cursor + Codex**：代碼開發 + 圖文
 - **Antigravity**：單純文書工作
 - **Antigravity + Codex**：圖文創作
-- **VS Code（Cline + Codex）or（Copilot + OpenRouter）**：影音 + 3D 創作
+- **VS Code（Cline, Copilot, Codex, OpenRouter）**：影音 + 3D 創作
 `
   },
 
@@ -74,7 +74,7 @@ Our toolchain development began with Antigravity (high cost-performance ratio). 
 - **Cursor + Codex**: Code development + text/graphics
 - **Antigravity**: Pure documentation & writing
 - **Antigravity + Codex**: Graphic & text creation
-- **VS Code (Cline + Codex) or (Copilot + OpenRouter)**: Video & 3D creation
+- **VS Code (Cline, Copilot, Codex, OpenRouter)**: Video & 3D creation
 `
   }
 };

@@ -99,9 +99,11 @@
   appearance: none;
   -webkit-appearance: none;
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  /* 較原尺寸放大（原 0.7rem / 內距 1px 6px），提升點擊區域與辨識度 */
+  font-size: 0.84rem;
   font-weight: 600;
   line-height: 1.2;
+  padding: 3px 11px;
   cursor: pointer;
   opacity: 0.58;
   box-shadow: none;
@@ -139,6 +141,112 @@
   border-color: rgba(77, 163, 255, 1);
   background: rgba(77, 163, 255, 0.26);
   box-shadow: 0 0 16px rgba(77, 163, 255, 0.5);
+}
+
+/* 啟用中的風格按鈕：金幣式掃光（coin sheen），只沿 1px 邊框流動。
+   為何不用「沿邊框繞行的光點」：
+   舊版用 offset-path + offset-rotate: auto，但那顆光點是「剛體直線段」，
+   只能整體旋轉、無法彎曲；按鈕圓角半徑僅 4px，
+   遠小於光點長度（24px），走到轉角必定「切直線」，視覺上就很突兀。
+   現行改為：一道斜向高光帶橫掃而過，並用 mask 把內部挖空，
+   只留下邊框環 → 掃光僅出現在邊框上，幾何上沒有貼合路徑的問題。
+   --pill-flow 由各主題色決定。 */
+.hero-ide-pills .ide-badge[aria-pressed="true"] {
+  position: relative;
+  isolation: isolate;
+  --pill-flow: 0, 242, 254;
+  /* 文字掃光用的底色（＝該主題的啟用態文字色） */
+  --pill-text: #00f2fe;
+}
+
+.hero-ide-pills .ide-cursor[aria-pressed="true"] {
+  --pill-flow: 255, 184, 48;
+  --pill-text: #ffb830;
+}
+
+.hero-ide-pills .ide-vscode[aria-pressed="true"] {
+  --pill-flow: 77, 163, 255;
+  --pill-text: #9dd6ff;
+}
+
+.hero-ide-pills .ide-badge[aria-pressed="true"]::before {
+  content: '';
+  position: absolute;
+  /* inset: -1px 讓疊層擴到邊框外緣，完整涵蓋按鈕的 1px 邊框 */
+  inset: -1px;
+  pointer-events: none;
+  /* 置於內容（文字）之下、按鈕底色／邊框之上：掃光只提亮邊框，不影響文字 */
+  z-index: -1;
+  border-radius: inherit;
+  /* padding 決定邊框環厚度，需等於按鈕邊框寬度（1px） */
+  padding: 1px;
+  /* 斜向高光帶：兩端透明（貼圖左右邊緣皆透明 → 平鋪無接縫），
+     中央為主題色暈開的白色反光。亮帶寬＝貼圖的 30%（35%→65%） */
+  background: linear-gradient(
+    115deg,
+    rgba(var(--pill-flow), 0) 35%,
+    rgba(var(--pill-flow), 0.38) 42%,
+    rgba(255, 255, 255, 0.72) 50%,
+    rgba(var(--pill-flow), 0.38) 58%,
+    rgba(var(--pill-flow), 0) 65%
+  );
+  /* 平鋪貼圖：亮帶一道接一道、不間斷（週期與換算見下方 keyframes） */
+  background-repeat: repeat-x;
+  background-size: 140% 100%;
+  background-position: 0% 0;
+  /* 挖空內部：content-box 與整塊相減，只留 1px 邊框環，讓掃光僅在邊框上流動 */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  /* screen 疊加：只提亮、不遮蔽邊框底色，像金屬反光 */
+  mix-blend-mode: screen;
+  animation: pill-coin-sheen 1.8s linear infinite;
+}
+
+/* 貼圖式無縫循環：亮帶以 repeat-x 平鋪，掃動「一個貼圖週期」後圖形完全重合，
+   因此循環無跳頓、可無限接續。
+   貼圖寬 140%：亮帶佔 30%（＝約按鈕寬 42%），空檔為 (1-0.3)×140% = 0.98c；
+   空檔 0.98c 小於按鈕寬 c → 任何時刻至少有一道亮帶落在按鈕內 → 不間斷。
+   週期位移換算：background-position 350% → 0%（＝平移一個貼圖寬），首尾重合。 */
+@keyframes pill-coin-sheen {
+  from {
+    background-position: 350% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+/* 文字同步掃光：讓按鈕文字也掃過同一道亮帶。
+   用 background-color 打底（文字恆為主題色，掃光離場時不至於變透明），
+   再疊一層「透明底＋白色亮帶」的漸層；兩者一起被 background-clip: text 裁進字形內。
+   與邊框掃光共用同一組貼圖參數（140%）與 keyframes → 相對位置一致、同步流動。 */
+.hero-ide-pills .ide-badge[aria-pressed="true"] .ide-badge-label {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-color: var(--pill-text);
+  background-image: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0) 35%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0) 65%
+  );
+  background-repeat: repeat-x;
+  background-size: 140% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: pill-coin-sheen 1.8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ide-pills .ide-badge[aria-pressed="true"]::before,
+  .hero-ide-pills .ide-badge[aria-pressed="true"] .ide-badge-label {
+    animation: none;
+    /* 靜態時固定一道置中反光，保留金屬質感但不動 */
+    background-position: 50% 0;
+  }
 }
 
 .hero-ide-pill {

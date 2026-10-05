@@ -280,9 +280,16 @@ html[data-theme="ember"] .notes-image-caption {
 }
 
 html[data-theme="ember"] .notes-inline-code {
-  color: #f6efe6;
-  background: rgba(255, 220, 190, 0.08);
-  border-color: rgba(255, 200, 160, 0.2);
+  color: #ffb066;
+  background: rgba(255, 154, 60, 0.12);
+  border-color: rgba(255, 154, 60, 0.3);
+}
+
+/* 粗體內的程式碼標記（例如 **`AGENTS.md`**）需更高特異性，才能蓋過 strong 的暖白字色。 */
+html[data-theme="ember"] .notes-article-body strong .notes-inline-code {
+  color: #ffb066;
+  background: rgba(255, 154, 60, 0.12);
+  border-color: rgba(255, 154, 60, 0.3);
 }
 
 html[data-theme="ember"] .notes-blockquote {

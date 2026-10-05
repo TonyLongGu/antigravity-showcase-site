@@ -303,6 +303,13 @@ html[data-theme="vscode"] .notes-inline-code {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
+/* 粗體內的程式碼標記需更高特異性，才能蓋過 strong 的亮白字色。 */
+html[data-theme="vscode"] .notes-article-body strong .notes-inline-code {
+  color: #a5e0ff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
 html[data-theme="vscode"] .notes-blockquote {
   background: rgba(77, 163, 255, 0.06);
 }
