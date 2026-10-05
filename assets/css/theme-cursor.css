@@ -1,0 +1,348 @@
+/* ==========================================================================
+   Cursor 風格模式（暖橘炭黑）— warm charcoal skin.
+   風格鍵＝cursor：theme.js 的 THEMES、index.html 的 data-theme-value／data-theme
+   與本檔檔名 theme-cursor.css 全部同名，不必再對照。
+   「Antigravity 風格模式」（不掛 data-theme）與「VS Code 風格模式」（vscode）不受本檔影響。
+   Orange is reserved for buttons, the current nav item, and small highlights.
+   Long-form text stays warm off-white.
+   ========================================================================== */
+
+html[data-theme="cursor"] {
+  --accent-rgb: 255, 122, 26;
+  --accent-purple-rgb: 255, 154, 60;
+  --link-hover: #ffc48a;
+
+  --bg-space: #161310;
+  --bg-primary: #211c19;
+  --bg-secondary: #2a2420;
+  --bg-tertiary: #352d28;
+  --bg-card: rgba(42, 36, 32, 0.74);
+  --bg-card-hover: rgba(54, 46, 40, 0.9);
+  --bg-glass: rgba(33, 28, 25, 0.8);
+  --bg-glass-heavy: rgba(26, 23, 20, 0.94);
+
+  --border-subtle: rgba(255, 220, 190, 0.08);
+  --border-medium: rgba(255, 206, 168, 0.16);
+  /* --border-focus 不在此覆蓋：沿用 :root 的統一 alpha，懸停外框高亮才會三風格同亮度。 */
+  --border-glow: rgba(255, 154, 70, 0.28);
+
+  --accent-cyan: #ff7a1a;
+  --accent-blue: #ff9a3c;
+  --accent-purple: #ffb066;
+  --grad-primary: linear-gradient(135deg, #ff9a3c 0%, #ff5c00 100%);
+  --grad-glow: radial-gradient(circle at 50% 0%, rgba(255, 122, 26, 0.08), transparent 70%);
+
+  --text-primary: #f6f1ea;
+  --text-secondary: #e6dcd0;
+  --text-muted: #c4b6a6;
+  --text-inverse: #1c120c;
+
+  --shadow-neon: 0 8px 20px rgba(255, 92, 0, 0.18);
+  --shadow-purple: 0 8px 18px rgba(255, 122, 26, 0.1);
+}
+
+/* Warm depth, same idea as the Antigravity washes: lighter charcoal above, deeper below. */
+html[data-theme="cursor"] body {
+  background-color: #161310;
+  background-image:
+    radial-gradient(ellipse 85% 55% at 10% -8%, rgba(156, 96, 58, 0.55), transparent 58%),
+    radial-gradient(ellipse 68% 62% at 108% 34%, rgba(96, 58, 42, 0.62), transparent 60%),
+    radial-gradient(ellipse 100% 36% at 50% 112%, rgba(36, 22, 16, 0.75), transparent 55%),
+    linear-gradient(168deg, #534236 0%, #312620 32%, #1b1613 64%, #100d0b 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* Headline gradient in warm orange, matching the Antigravity title treatment. */
+html[data-theme="cursor"] .text-gradient {
+  background: linear-gradient(120deg, #ffc989 0%, #ff9a3c 46%, #e85a12 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html[data-theme="cursor"] ::selection {
+  background: rgba(255, 122, 26, 0.28);
+  color: #fff8f2;
+}
+
+/* Same glow placement as the Antigravity style, recolored to muted warm brown so the page has depth without an orange veil. */
+html[data-theme="cursor"] .ambient-glow {
+  opacity: 0.28;
+  width: 680px;
+  height: 680px;
+}
+
+html[data-theme="cursor"] .ambient-glow-1 {
+  background: radial-gradient(circle, #b47a52 0%, transparent 70%);
+}
+
+html[data-theme="cursor"] .ambient-glow-2 {
+  opacity: 0.22;
+  background: radial-gradient(circle, #6e4536 0%, transparent 70%);
+}
+
+/* Buttons */
+html[data-theme="cursor"] .btn-primary,
+html[data-theme="cursor"] a.btn-primary {
+  background: linear-gradient(135deg, #ff9a3c 0%, #ff5c00 100%) !important;
+  color: #1c120c !important;
+  box-shadow: 0 8px 22px rgba(255, 92, 0, 0.28) !important;
+}
+
+html[data-theme="cursor"] .btn-primary:hover,
+html[data-theme="cursor"] a.btn-primary:hover {
+  color: #1c120c !important;
+  box-shadow: 0 12px 26px rgba(255, 92, 0, 0.4) !important;
+}
+
+html[data-theme="cursor"] .btn-secondary {
+  color: #f6f1ea;
+  border-color: rgba(255, 138, 42, 0.55) !important;
+  background: rgba(255, 244, 232, 0.04);
+}
+
+html[data-theme="cursor"] .btn-secondary:hover {
+  color: #ffd2a8;
+  border-color: #ff7a1a !important;
+  background: rgba(255, 122, 26, 0.1);
+}
+
+html[data-theme="cursor"] .install-dl-btn {
+  background: linear-gradient(135deg, #ff9a3c 0%, #ff5c00 100%);
+  color: #1c120c;
+  box-shadow: 0 8px 18px rgba(255, 92, 0, 0.28);
+}
+
+html[data-theme="cursor"] .install-dl-btn:hover {
+  color: #1c120c;
+  box-shadow: 0 10px 22px rgba(255, 92, 0, 0.4);
+}
+
+html[data-theme="cursor"] .btn-copy:hover,
+html[data-theme="cursor"] .callout-btn:hover {
+  background: #ff7a1a;
+  color: #1c120c;
+  border-color: #ff7a1a;
+  box-shadow: none;
+}
+
+/* 目前所在區塊：導覽列唯一會亮起的項目（滑過其他項目不再另開第二條底線） */
+html[data-theme="cursor"] .nav-link.nav-current {
+  color: #ff7a1a;
+}
+
+html[data-theme="cursor"] .nav-link.nav-current::after {
+  width: 100%;
+  background: #ff7a1a;
+}
+
+/* 導覽列品牌徽章「IDE」：處理方式與 VS Code 風格對齊，
+   只是暖色系上 #ff7a1a 的明度較低，文字／描邊／底色與微光都提亮一階。 */
+html[data-theme="cursor"] .badge-ide {
+  background: rgba(255, 122, 26, 0.24);
+  border-color: rgba(255, 154, 60, 0.62);
+  color: #ffb066;
+  box-shadow: 0 0 10px rgba(255, 122, 26, 0.34);
+}
+
+/* Blue-black panels become the same warm charcoal */
+html[data-theme="cursor"] .hero-badge,
+html[data-theme="cursor"] .hero-badge-update,
+html[data-theme="cursor"] .hero-badge-update:hover {
+  background: rgba(36, 31, 27, 0.82);
+}
+
+html[data-theme="cursor"] .install-tab-btn,
+html[data-theme="cursor"] .info-card,
+html[data-theme="cursor"] .ai-flow-item {
+  background: rgba(36, 31, 27, 0.72);
+}
+
+html[data-theme="cursor"] .ai-chat-bubble.preview-only,
+html[data-theme="cursor"] .ai-chat-bubble.preview-only:hover {
+  background: rgba(36, 31, 27, 0.78);
+}
+
+html[data-theme="cursor"] .video-player-container {
+  background: #1a1714;
+}
+
+html[data-theme="cursor"] .video-showcase-wrapper,
+html[data-theme="cursor"] .plugin-card:hover,
+html[data-theme="cursor"] .notes-image-container,
+html[data-theme="cursor"] .notes-image-container:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
+}
+
+html[data-theme="cursor"] .player-feedback-badge {
+  background: rgba(36, 30, 26, 0.82);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="cursor"] .player-progress-filled {
+  background: linear-gradient(90deg, #ff9a3c, #ff5c00);
+  box-shadow: none;
+}
+
+html[data-theme="cursor"] .custom-ctrl-btn:hover,
+html[data-theme="cursor"] .custom-ctrl-btn#ctrl-cc-btn.active {
+  color: #ffb066;
+  filter: none;
+}
+
+html[data-theme="cursor"] .custom-volume-slider {
+  --vol-color: #ff8a2a;
+}
+
+html[data-theme="cursor"] .subtitle-bubble {
+  background: rgba(32, 26, 22, 0.9);
+  border-color: rgba(255, 176, 110, 0.28);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.72);
+}
+
+html[data-theme="cursor"] .subtitle-text {
+  color: #f7f3ee;
+}
+
+html[data-theme="cursor"] .video-player-container:focus-visible,
+html[data-theme="cursor"] .player-progress-container:focus-visible {
+  outline-color: rgba(255, 154, 60, 0.7);
+}
+
+/* 影片選項按鈕：懸停只提亮文字（由基底規則處理，不動外框與底色）；
+   選中態把底色壓暗成微底色（橘色亮度天生比藍色高，故再低一階），
+   明度改由提亮的外框與文字承擔，排序為 選中 > 懸停 > 預設。 */
+html[data-theme="cursor"] .playlist-btn.active {
+  background: rgba(255, 154, 60, 0.14);
+  border-color: #ffb066;
+  color: #ffb066;
+}
+
+/* 區塊小標題（.section-tag）：暖炭底上 #ff7a1a 偏暗，
+   文字提亮一階到 --accent-blue，描邊與底色同步加一點，小標題才跟得上標題層級。 */
+html[data-theme="cursor"] .section-tag {
+  color: var(--accent-blue);
+  background: rgba(255, 154, 60, 0.12);
+  border-color: rgba(255, 154, 60, 0.42);
+}
+
+/* 文字與底色用主題色；外框由基底樣式的中性框決定（子部件不發亮，三風格一致）。 */
+html[data-theme="cursor"] .step-badge {
+  color: #ff8a2a;
+  background: linear-gradient(135deg, rgba(255, 122, 26, 0.16), rgba(255, 176, 92, 0.1));
+}
+
+/* 面板底色用主題的暖炭色；外框沿用基底的中性微框。 */
+html[data-theme="cursor"] .ai-prompt-card {
+  background: rgba(36, 31, 27, 0.9);
+}
+
+/* 代碼框底色用主題的暖炭色；虛線框與文字沿用基底的中性設定。 */
+html[data-theme="cursor"] .install-action-bubble {
+  background: rgba(28, 24, 21, 0.92);
+}
+
+html[data-theme="cursor"] .install-action-bubble code {
+  color: #f3e6d6;
+}
+
+html[data-theme="cursor"] .ai-status-dot {
+  background: #ff7a1a;
+  box-shadow: 0 0 8px rgba(255, 122, 26, 0.85);
+}
+
+html[data-theme="cursor"] .terminal-code {
+  color: #f3ebe3;
+}
+
+html[data-theme="cursor"] .terminal-prompt {
+  color: #ff7a1a;
+}
+
+/* Developer notes — warm off-white body, orange only as small markers */
+html[data-theme="cursor"] .notes-article-card {
+  background: rgba(36, 31, 27, 0.88);
+  border-color: rgba(255, 206, 168, 0.16);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="cursor"] .notes-article-card:hover {
+  border-color: rgba(255, 154, 70, 0.32);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.48);
+}
+
+html[data-theme="cursor"] .notes-article-body,
+html[data-theme="cursor"] .notes-paragraph,
+html[data-theme="cursor"] .notes-list-item,
+html[data-theme="cursor"] .notes-ordered-item,
+html[data-theme="cursor"] .notes-blockquote {
+  color: #f0e6da;
+}
+
+html[data-theme="cursor"] .notes-list-item-nested {
+  color: #e2d5c6;
+}
+
+html[data-theme="cursor"] .notes-heading,
+html[data-theme="cursor"] .notes-subheading,
+html[data-theme="cursor"] .notes-title-main,
+html[data-theme="cursor"] .callout-title,
+html[data-theme="cursor"] .notes-article-body strong {
+  color: #f7f2eb;
+}
+
+html[data-theme="cursor"] .notes-article-body em,
+html[data-theme="cursor"] .notes-image-caption {
+  color: #cbbbaa;
+}
+
+html[data-theme="cursor"] .notes-inline-code {
+  color: #ffb066;
+  background: rgba(255, 154, 60, 0.12);
+  border-color: rgba(255, 154, 60, 0.3);
+}
+
+/* 粗體內的程式碼標記（例如 **`AGENTS.md`**）需更高特異性，才能蓋過 strong 的暖白字色。 */
+html[data-theme="cursor"] .notes-article-body strong .notes-inline-code {
+  color: #ffb066;
+  background: rgba(255, 154, 60, 0.12);
+  border-color: rgba(255, 154, 60, 0.3);
+}
+
+html[data-theme="cursor"] .notes-blockquote {
+  background: rgba(255, 122, 26, 0.05);
+}
+
+html[data-theme="cursor"] .notes-image-container {
+  background: rgba(28, 24, 21, 0.72);
+  border-color: rgba(255, 206, 168, 0.16);
+}
+
+html[data-theme="cursor"] .notes-image-caption {
+  background: rgba(26, 22, 19, 0.94);
+}
+
+html[data-theme="cursor"] .notes-footer-callout {
+  background: rgba(255, 244, 232, 0.03);
+  border-color: rgba(255, 176, 110, 0.22);
+  box-shadow: none;
+}
+
+html[data-theme="cursor"] .callout-desc {
+  color: #e6dcd0;
+}
+
+html[data-theme="cursor"] .footer-disclaimer {
+  color: rgba(232, 220, 206, 0.55);
+}
+
+html[data-theme="cursor"] #author {
+  background: rgba(28, 24, 21, 0.55) !important;
+}
+
+/* 聯絡資訊面板（.author-details-grid）：原設計沿用 Antigravity 風格的冷黑底 rgba(6,8,13,0.5)，
+   在暖炭卡片上偏黑又偏灰；改成暖炭色但只提亮一半（介於原冷黑底與過亮版本之間）。 */
+html[data-theme="cursor"] .author-details-grid {
+  background: rgba(28, 24, 21, 0.5);
+}

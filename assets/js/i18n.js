@@ -28,7 +28,6 @@ const I18N = {
     btn_copy_cmd: '複製',
     btn_copied: '已複製！',
     
-    search_placeholder: '搜尋擴充套件名稱、指令、功能關鍵字...',
     tab_all: '全部插件',
     tab_sidebar: '側邊欄面板',
     tab_status: '狀態列監控',
@@ -36,8 +35,8 @@ const I18N = {
     tab_script: '腳本與工具箱',
     
     btn_github_repo: '前往 GitHub 倉庫 ↗',
-    empty_search_title: '查無符合的擴充套件',
-    empty_search_desc: '請嘗試搜尋其他關鍵字，或切換分類篩選。',
+    empty_filter_title: '查無此分類的擴充套件',
+    empty_filter_desc: '請切換其他分類篩選。',
     
     section_video_tag: '影片教學',
     section_video_title: '精選影音示範與實戰教學',
@@ -125,7 +124,7 @@ const I18N = {
     
     section_plugins_tag: '探索插件',
     section_plugins_title: '全方位 Antigravity IDE 擴充套件',
-    section_plugins_desc: '即時搜尋、分類過濾，探索各項專屬功能並一鍵前往 GitHub 倉庫。',
+    section_plugins_desc: '分類過濾，探索各項專屬功能並一鍵前往 GitHub 倉庫。',
     
     footer_brand: 'Antigravity Plugins',
     footer_desc: 'Google Antigravity IDE 專屬原生擴充套件生態系，亦可掛載至 Cursor 與 VS Code，賦予 AI 輔助編程前所未有的掌控力與流暢度。',
@@ -165,7 +164,6 @@ const I18N = {
     btn_copy_cmd: 'Copy',
     btn_copied: 'Copied!',
     
-    search_placeholder: 'Search plugin name, commands, features...',
     tab_all: 'All Plugins',
     tab_sidebar: 'Sidebar Panels',
     tab_status: 'Status Bar Metrics',
@@ -173,8 +171,8 @@ const I18N = {
     tab_script: 'Scripts & Toolbox',
     
     btn_github_repo: 'View on GitHub ↗',
-    empty_search_title: 'No Matching Plugins Found',
-    empty_search_desc: 'Try different keywords, or switch the category filter.',
+    empty_filter_title: 'No Plugins In This Category',
+    empty_filter_desc: 'Switch to another category filter.',
     
     section_video_tag: 'Video Guides',
     section_video_title: 'Featured Video Walkthroughs',
@@ -262,7 +260,7 @@ const I18N = {
     
     section_plugins_tag: 'Ecosystem Suite',
     section_plugins_title: 'Antigravity IDE Extension Suite',
-    section_plugins_desc: 'Instant search and category filtering. Explore tailored features and head straight to GitHub repositories.',
+    section_plugins_desc: 'Category filtering. Explore tailored features and head straight to GitHub repositories.',
     
     footer_brand: 'Antigravity Plugins',
     footer_desc: 'Native extension suite for Google Antigravity IDE, also mountable on Cursor and VS Code, bringing unmatched clarity and control to your AI-assisted workflow.',

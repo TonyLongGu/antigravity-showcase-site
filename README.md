@@ -60,7 +60,7 @@ node tools/health-check.js
 | C5 | **主題契約**：`theme.js` 的 `THEMES`、`index.html` 的 head 白名單與 `data-theme-value` 標籤、`nebula-canvas.js` 的 `MODE_SPECS`、`theme-<key>.css` 四處是否一致 |
 | C6 | **i18n 契約**：`index.html`／JS 用到的鍵，在每個語系是否都存在 |
 | C7 | 殘留／備份檔、未被任何地方引用的孤兒資產 |
-| C8 | **主題覆蓋平整性**：新主題是否漏掉既有主題（`theme-ember.css`）已處理的選擇器 |
+| C8 | **主題覆蓋平整性**：其他風格是否漏掉基準風格（`theme-cursor.css`）已處理的選擇器 |
 
 **未涵蓋**（需人工確認）：瀏覽器實際渲染與 CSS 疊層視覺、外部資源可達性、GitHub Pages 部署結果。細節見腳本檔頭的「測不到什麼」。
 
@@ -68,11 +68,14 @@ node tools/health-check.js
 
 C5 會擋住漏掉的任何一項：
 
-1. `assets/js/theme.js` 的 `THEMES` 加一筆（`attr: null` 代表沿用預設星空、不掛 `data-theme`）
+1. `assets/js/theme.js` 的 `THEMES` 加一筆（`attr: null` 代表沿用 Antigravity 風格、不掛 `data-theme`）
 2. 建立 `assets/css/theme-<key>.css`，並在 `index.html` 用 `<link>` 掛載
 3. `assets/js/nebula-canvas.js` 的 `MODE_SPECS` 加一筆（對應的粒子模式）
-4. `index.html` `<head>` 的 bootstrap 白名單加入 `'<key>'`——**漏了會在載入時先閃一下星空（FOUC）**
+4. `index.html` `<head>` 的 bootstrap 白名單加入 `'<key>'`——**漏了會在載入時先閃一下預設風格（FOUC）**
 5. 加一顆 `data-theme-value="<key>"` 的標籤，否則使用者切不到
+
+風格鍵一律用 IDE 名稱（`antigravity`／`vscode`／`cursor`），視覺描述只留在粒子類別（`EmberParticle` 等）；
+首次造訪的預設風格是 `vscode`（`theme.js` 的 `DEFAULT_THEME`）。
 
 改完 CSS 後也別忘了同步 `index.html` 的 `?v=` 版本號（快取失效）。
 

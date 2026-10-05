@@ -1,28 +1,12 @@
 /**
- * Antigravity Plugins Showcase - Search & Filtering Engine
+ * Antigravity Plugins Showcase - Category Filtering Engine
  */
 
+/* 搜尋框與 Ctrl+K／「/」快捷鍵已移除，只保留分類篩選。 */
 let activeCategory = 'all';
-let searchQuery = '';
 
 function initFilters() {
-  const searchInput = document.getElementById('search-input');
   const tabBtns = document.querySelectorAll('.tab-btn');
-
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      searchQuery = e.target.value.trim().toLowerCase();
-      renderPlugins();
-    });
-
-    window.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey && e.key === 'k') || (e.key === '/' && document.activeElement !== searchInput)) {
-        e.preventDefault();
-        searchInput.focus();
-        searchInput.select();
-      }
-    });
-  }
 
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -55,37 +39,17 @@ function renderPlugins() {
   const grid = document.getElementById('plugins-grid');
   if (!grid) return;
 
-  const filtered = PLUGINS_DATA.filter(plugin => {
-    const matchesCategory = activeCategory === 'all' || plugin.category === activeCategory;
-    if (!matchesCategory) return false;
+  const filtered = PLUGINS_DATA.filter(
+    plugin => activeCategory === 'all' || plugin.category === activeCategory
+  );
 
-    if (!searchQuery) return true;
-
-    const name = (plugin.name[currentLang] || '').toLowerCase();
-    const desc = (plugin.shortDesc[currentLang] || '').toLowerCase();
-    const note = (plugin.ideNote && (plugin.ideNote[currentLang] || '')) || '';
-    const id = plugin.id.toLowerCase();
-    const tags = plugin.tags.map(t => t.toLowerCase()).join(' ');
-    const commands = plugin.commands.map(c => (c.name + ' ' + c.id).toLowerCase()).join(' ');
-    const featuresStr = (plugin.features[currentLang] || []).join(' ').toLowerCase();
-    const ideNames = (plugin.ides || IDE_ALL).map((ideId) => (IDE_META[ideId] ? IDE_META[ideId].short : ideId).toLowerCase()).join(' ');
-
-    return name.includes(searchQuery) ||
-      desc.includes(searchQuery) ||
-      note.toLowerCase().includes(searchQuery) ||
-      id.includes(searchQuery) ||
-      tags.includes(searchQuery) ||
-      commands.includes(searchQuery) ||
-      featuresStr.includes(searchQuery) ||
-      ideNames.includes(searchQuery);
-  });
-
+  // 保險用的空狀態：搜尋移除後，只有分類標籤與資料對不上時才會走到這裡。
   if (filtered.length === 0) {
     grid.innerHTML = `
       <div class="empty-state">
         <div class="empty-icon">🔍</div>
-        <h3 class="section-title">${t('empty_search_title')}</h3>
-        <p class="section-desc">${t('empty_search_desc')}</p>
+        <h3 class="section-title">${t('empty_filter_title')}</h3>
+        <p class="section-desc">${t('empty_filter_desc')}</p>
       </div>
     `;
     return;

@@ -1,43 +1,50 @@
 /**
- * Visual style switcher on the hero pills.
- * Antigravity → 星空 (starfield, the default). Cursor → 熱情橘 (ember).
- * VS Code → 編輯器 (vscode).
- * The choice is stored in the browser and restored on reload.
+ * 三種視覺風格的切換器（Hero 上的風格按鈕）。
+ * 風格鍵＝對外稱呼，四個地方同名（THEMES 鍵／按鈕 data-theme-value／data-theme 屬性值／檔名）：
+ *   'antigravity' ＝ Antigravity 風格模式（attr: null → 不掛 data-theme，沿用預設青藍星空）
+ *   'vscode'      ＝ VS Code 風格模式（theme-vscode.css）
+ *   'cursor'      ＝ Cursor 風格模式（theme-cursor.css）
+ * 首次造訪（本機尚無紀錄）＝ VS Code 風格模式；之後一律依使用者的選擇還原。
+ * 舊鍵名（starfield／ember）由 LEGACY_KEYS 自動遷移，舊訪客不必重選。
  */
 (function () {
   const STORAGE_KEY = 'antigravity_visual_theme';
-  const DEFAULT_THEME = 'starfield';
+  const DEFAULT_THEME = 'vscode';
 
-  /* 主題註冊表。鍵＝按鈕上的 data-theme-value，同時也是 data-theme 的屬性值。
-     attr 為 null 表示沿用預設星空（不掛 data-theme，既有 CSS 依賴這一點）。
-     新增主題：這裡補一筆 → 建 theme-<鍵>.css → nebula-canvas.js 的 MODE_SPECS 補一筆，
-     並同步 index.html <head> 的 bootstrap 白名單，否則載入時會先閃一下星空。 */
+  /* 主題註冊表。鍵＝風格名，同時是 data-theme-value 與 data-theme 的屬性值。
+     attr 為 null 表示沿用預設樣式（不掛 data-theme，Antigravity 風格的既有 CSS 依賴這一點）。
+     新增風格：這裡補一筆 → 建 theme-<鍵>.css → nebula-canvas.js 的 MODE_SPECS 補一筆，
+     並同步 index.html <head> 的 bootstrap 白名單（健檢 C5 會檢查），否則載入時會先閃一下預設風格。 */
   const THEMES = {
-    starfield: { attr: null },
-    ember: { attr: 'ember' },
-    vscode: { attr: 'vscode' }
+    antigravity: { attr: null },
+    vscode: { attr: 'vscode' },
+    cursor: { attr: 'cursor' }
   };
+
+  /* 2026-10 風格鍵改名：starfield → antigravity、ember → cursor。
+     舊訪客的 localStorage 還存著舊值，這裡做一次性轉換（不轉會被當成未知值而回預設風格）。 */
+  const LEGACY_KEYS = { starfield: 'antigravity', ember: 'cursor' };
+
+  function normalizeTheme(value) {
+    return LEGACY_KEYS[value] || value;
+  }
 
   function resolveTheme(value) {
     return THEMES[value] ? value : DEFAULT_THEME;
   }
 
-  function readTheme() {
-    let stored = DEFAULT_THEME;
-    if (typeof SafeStorage !== 'undefined') {
-      stored = SafeStorage.get(STORAGE_KEY, DEFAULT_THEME);
-    } else {
-      try {
-        stored = window.localStorage.getItem(STORAGE_KEY) || DEFAULT_THEME;
-      } catch (err) {
-        stored = DEFAULT_THEME;
-      }
+  function readStored() {
+    if (typeof SafeStorage !== 'undefined') return SafeStorage.get(STORAGE_KEY, '');
+    try {
+      return window.localStorage.getItem(STORAGE_KEY) || '';
+    } catch (err) {
+      /* 無痕模式等取用失敗：一律視為沒有紀錄 */
+      return '';
     }
-    return resolveTheme(stored);
   }
 
   function applyTheme(theme, persist) {
-    const next = resolveTheme(theme);
+    const next = resolveTheme(normalizeTheme(theme));
     const attr = THEMES[next].attr;
     if (attr) {
       document.documentElement.setAttribute('data-theme', attr);
@@ -150,7 +157,12 @@
   }
 
   function initThemeSwitcher() {
-    applyTheme(readTheme(), false);
+    const stored = readStored();
+    /* 目前風格：舊鍵名（starfield／ember）會在這裡被換成新鍵名。 */
+    const current = resolveTheme(normalizeTheme(stored));
+    /* 紀錄值與正規鍵名不同時（首次造訪的空值、舊鍵名、垃圾值）寫回正規鍵名，
+       之後只會用到新鍵名，head 白名單的比對也永遠命中。 */
+    applyTheme(current, stored !== current);
 
     document.querySelectorAll('.hero-ide-pills [data-theme-value]').forEach((btn) => {
       btn.addEventListener('click', () => {

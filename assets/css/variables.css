@@ -1,10 +1,13 @@
 /* ==========================================================================
    Antigravity Design Tokens & Variables
+   :root 的值＝「Antigravity 風格模式」（頁面不掛 data-theme）。
+   「VS Code 風格模式」= theme-vscode.css、「Cursor 風格模式」= theme-cursor.css，
+   兩者以 data-theme 屬性選擇器覆蓋這裡的 token。
    ========================================================================== */
 
 :root {
-  /* Accent channels. The starfield theme keeps the original cyan / violet.
-     熱情橘 overrides these on html[data-theme="ember"]. */
+  /* Accent channels：Antigravity 風格用原本的青藍／紫。
+     Cursor 風格（theme-cursor.css）與 VS Code 風格（theme-vscode.css）各自覆蓋這兩個通道。 */
   --accent-rgb: 0, 242, 254;
   --accent-purple-rgb: 127, 0, 255;
   --link-hover: #38bdf8;
@@ -22,7 +25,11 @@
   /* Borders & Highlights */
   --border-subtle: rgba(255, 255, 255, 0.06);
   --border-medium: rgba(255, 255, 255, 0.12);
-  --border-focus: rgba(var(--accent-rgb), 0.5);
+  /* 滑鼠懸停的「外框高亮」統一亮度：三種風格共用同一個 alpha，色相由各主題的 --accent-rgb 決定。
+     規則：懸停外框一律用這個值（0.65）；選中／啟用態才用滿版主題色 var(--accent-cyan)。
+     會吃這個值的地方：安裝區的方式一／方式二全部部件（頁籤、步驟卡、AI 提示卡、AI 流程列、
+     安裝資訊卡、頁籤內的圖示框、步驟編號徽章）。主題檔不再各自覆蓋，避免同一部件在不同風格亮暗不一。 */
+  --border-focus: rgba(var(--accent-rgb), 0.65);
   --border-glow: rgba(var(--accent-rgb), 0.25);
 
   /* Neon Accent Gradients */

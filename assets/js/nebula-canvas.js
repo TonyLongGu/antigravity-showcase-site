@@ -8,8 +8,8 @@
   const ctx = canvas.getContext('2d');
   let width, height;
   let particles = [];
-  // 粒子模式＝主題鍵。實際值於下方 MODE_SPECS 定義後，依 data-theme 校正。
-  let mode = 'starfield';
+  // 粒子模式＝風格鍵。實際值於下方 MODE_SPECS 定義後，依 data-theme 校正。
+  let mode = 'antigravity';
   let mouse = { x: -1000, y: -1000, vx: 0, vy: 0, radius: 160 };
 
   const PARTICLE_COUNT = 75;
@@ -125,7 +125,9 @@
       this.phase = Math.random() * Math.PI * 2;
       this.phase2 = Math.random() * Math.PI * 2;
       this.angle = Math.random() * Math.PI * 2;
-      this.spin = (Math.random() < 0.5 ? -1 : 1) * (0.0035 + Math.random() * 0.009);
+      // 旋轉（自轉）再強一些：原本 0.0035–0.0125 rad/幀（約 12–43°/s），
+      // 提高到 0.007–0.025 rad/幀（約 24–86°/s），幅度約 2×。
+      this.spin = (Math.random() < 0.5 ? -1 : 1) * (0.007 + Math.random() * 0.018);
       this.swayAmp = 0.35 + Math.random() * 1.45;
       this.swaySpeed = 0.007 + Math.random() * 0.055;
       this.swaySpeed2 = 0.004 + Math.random() * 0.033;
@@ -146,9 +148,12 @@
       this.drawAlpha = this.brightness;
     }
 
+    /* 越靠下越大：原本是線性 (0.24 → 1.0)，上下差距不夠明顯。
+       改成 gamma 1.55 的曲線（上半收得更快）＋ 底部再放大 25%，
+       底部／頂部比由約 4.2× 拉到約 7.8×，深淺層次更強。 */
     radiusAt(y) {
       const depth = Math.max(0, Math.min(1, y / Math.max(height, 1)));
-      return this.baseRadius * (0.24 + 0.76 * depth);
+      return this.baseRadius * (0.16 + 1.09 * Math.pow(depth, 1.55));
     }
 
     update() {
@@ -218,7 +223,7 @@
 
   /* ---------------------------------------------------------------------
      VS Code — 程式碼字符模式
-     以極低透明度的等寬字元漂浮，取代星空的連線與餘燼的上升感；
+     以極低透明度的等寬字元漂浮，取代星空（Antigravity 風格）的連線與餘燼（Cursor 風格）的上升感；
      游標掠過時把附近的字微微照亮，像編輯器照亮游標所在的程式碼。
      --------------------------------------------------------------------- */
   const CODE_GLYPHS = [
@@ -296,17 +301,18 @@
     }
   }
 
-  /* 主題 → 粒子模式註冊表。
-     新增主題只要在這裡補一筆（粒子類別 / 數量 / 是否畫連線 / 是否阻尼滑鼠慣性）。
+  /* 風格 → 粒子模式註冊表。鍵＝風格鍵（與 theme.js 的 THEMES、data-theme 屬性同名）。
+     粒子類別名稱刻意保留視覺描述：Particle（星空點）／EmberParticle（餘燼）／CodeParticle（程式碼字元）。
+     新增風格只要在這裡補一筆（粒子類別 / 數量 / 是否畫連線 / 是否阻尼滑鼠慣性）。
      注意：必須放在類別定義之後，否則會踩到 class 的 TDZ。 */
   const MODE_SPECS = {
-    starfield: { Ctor: Particle, count: PARTICLE_COUNT, lines: true, dampMouse: false },
-    ember: { Ctor: EmberParticle, count: EMBER_COUNT, lines: false, dampMouse: true },
-    vscode: { Ctor: CodeParticle, count: CODE_COUNT, lines: false, dampMouse: false }
+    antigravity: { Ctor: Particle, count: PARTICLE_COUNT, lines: true, dampMouse: false },
+    vscode: { Ctor: CodeParticle, count: CODE_COUNT, lines: false, dampMouse: false },
+    cursor: { Ctor: EmberParticle, count: EMBER_COUNT, lines: false, dampMouse: true }
   };
 
   function specFor(name) {
-    return MODE_SPECS[name] || MODE_SPECS.starfield;
+    return MODE_SPECS[name] || MODE_SPECS.antigravity;
   }
 
   function spawn() {
@@ -408,7 +414,7 @@
     pause,
     resume,
     setMode(next) {
-      const resolved = MODE_SPECS[next] ? next : 'starfield';
+      const resolved = MODE_SPECS[next] ? next : 'antigravity';
       if (resolved === mode) return;
       mode = resolved;
       mouse.radius = 160;

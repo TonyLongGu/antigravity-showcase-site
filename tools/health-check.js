@@ -13,6 +13,9 @@
  *                      theme-<key>.css 四處的主題鍵集合是否一致
  *   C6 i18n 契約    —— index.html 與 JS 用到的鍵，在每個語系是否都存在
  *   C7 殘留掃描     —— 是否有臨時／備份檔、未掛載的孤兒資產
+ *   C8 主題覆蓋平整 —— 各風格（theme-<key>.css）是否涵蓋基準風格已處理的每個選擇器
+ *
+ * 註：掃描 CSS 前會先移除註解，避免說明用的示意選擇器（例如主題選擇器範例）被當成真的規則。
  *
  * 測不到什麼（覆蓋邊界）：
  *   - 瀏覽器實際渲染、CSS 疊層與視覺結果（沒有真實瀏覽器）
@@ -38,6 +41,11 @@ const note = (m) => notes.push(m);
 
 const read = (r) => fs.readFileSync(path.join(ROOT, r), 'utf8');
 const exists = (r) => fs.existsSync(path.join(ROOT, r));
+
+/* 掃描 CSS 時先拔掉註解：註解裡若出現示意的 data-theme 選擇器（說明用），
+   會被 C5／C8 當成真的選擇器而誤報，實作本身其實沒問題。 */
+const stripCssComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '');
+const readCss = (r) => stripCssComments(read(r));
 
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.github', '.vscode']);
 
@@ -140,20 +148,31 @@ function loadModeSpecs() {
   return [...block.matchAll(/^\s{4}(\w+)\s*:\s*\{/gm)].map((m) => m[1]);
 }
 
+/* 預設風格由 theme.js 決定（首次造訪用），這裡改為解析而非寫死，
+   換預設風格時健檢才不會跟著要求錯誤的白名單。 */
+function loadDefaultTheme() {
+  const m = read('assets/js/theme.js').match(/DEFAULT_THEME\s*=\s*'([^']+)'/);
+  return m ? m[1] : 'antigravity';
+}
+
 function checkThemeContract() {
   const themes = loadThemeRegistry();
   const keys = Object.keys(themes);
   if (!keys.length) return err('C5 無法從 theme.js 解析 THEMES 註冊表');
 
-  const DEFAULT_KEY = 'starfield';
+  const DEFAULT_KEY = loadDefaultTheme();
+  if (!keys.includes(DEFAULT_KEY)) {
+    err(`C5 theme.js 的 DEFAULT_THEME「${DEFAULT_KEY}」不在 THEMES 內`);
+  }
+
   const html = read('index.html');
 
-  // (a) head 的 bootstrap 白名單必須涵蓋每個非預設主題（漏了會 FOUC）
+  // (a) head 的 bootstrap 白名單必須涵蓋每一個主題鍵：
+  //     漏掉任一鍵，該風格的舊訪客在載入時會被誤判成「無紀錄」而閃一下預設風格（FOUC）
   const head = html.slice(0, html.indexOf('</head>'));
   for (const k of keys) {
-    if (k === DEFAULT_KEY) continue;
     if (!head.includes(`'${k}'`)) {
-      err(`C5 head 白名單缺「${k}」：載入時會先閃一下預設主題（FOUC）`);
+      err(`C5 head 白名單缺「${k}」：載入時會先閃一下預設風格（FOUC）`);
     }
   }
 
@@ -181,7 +200,7 @@ function checkThemeContract() {
     const css = `assets/css/theme-${attr}.css`;
     if (!exists(css)) { err(`C5 主題「${k}」缺少樣式檔 ${css}`); continue; }
     if (!html.includes(css)) err(`C5 ${css} 存在但沒有被 index.html 掛載`);
-    if (!read(css).includes(`html[data-theme="${attr}"]`)) {
+    if (!readCss(css).includes(`html[data-theme="${attr}"]`)) {
       err(`C5 ${css} 內找不到 html[data-theme="${attr}"] 選擇器`);
     }
   }
@@ -189,7 +208,7 @@ function checkThemeContract() {
   // (e) CSS 內出現的 data-theme 值不得是孤兒
   const attrSet = new Set(Object.values(themes).filter(Boolean));
   for (const f of byExt('.css')) {
-    for (const m of read(f).matchAll(/html\[data-theme="([^"]+)"\]/g)) {
+    for (const m of readCss(f).matchAll(/html\[data-theme="([^"]+)"\]/g)) {
       if (!attrSet.has(m[1])) err(`C5 ${f} 使用未註冊的 data-theme="${m[1]}"`);
     }
   }
@@ -292,27 +311,43 @@ function checkResidue() {
 function pickSelectors(file, key) {
   const re = new RegExp('html\\[data-theme="' + key + '"]\\s*([^,{]+?)\\s*(?=[,{])', 'g');
   const out = new Set();
+  const src = readCss(file);
   let m;
-  while ((m = re.exec(read(file)))) {
+  while ((m = re.exec(src))) {
     const sel = m[1].trim().replace(/\s+/g, ' ');
     if (sel) out.add(sel);
   }
   return out;
 }
 
+/* C8 的基準風格：其他風格必須涵蓋它已處理的每個選擇器（它的清單＝共用元件表面）。
+   取 cursor（暖橘炭黑）當基準，因為 vscode 另有自己專屬的裝飾（狀態列等），
+   拿 vscode 當基準會把那些專屬選擇器也算成「大家都該有」而誤報。
+   風格鍵改名時記得同步這裡；查不到會退回第一個有 data-theme 的風格並發出警告。 */
+const PARITY_BASE_KEY = 'cursor';
+
 function checkThemeParity() {
-  if (!exists('assets/css/theme-ember.css')) return;   // 基準主題不存在就略過
-  const base = pickSelectors('assets/css/theme-ember.css', 'ember');
-  for (const [key, attr] of Object.entries(loadThemeRegistry())) {
-    if (!attr || attr === 'ember') continue;
+  const themes = loadThemeRegistry();
+  if (!themes[PARITY_BASE_KEY]) {
+    warn(`C8 找不到基準風格「${PARITY_BASE_KEY}」（可能已改名），暫用第一個有 data-theme 的風格；請同步 PARITY_BASE_KEY`);
+  }
+  const fallbackEntry = Object.entries(themes).find(([, attr]) => attr);
+  const baseAttr = themes[PARITY_BASE_KEY] || (fallbackEntry && fallbackEntry[1]);
+  if (!baseAttr) return;   // 沒有可當基準的風格就略過
+  const baseFile = `assets/css/theme-${baseAttr}.css`;
+  if (!exists(baseFile)) return;   // 缺檔已由 C5 回報
+  const base = pickSelectors(baseFile, baseAttr);
+
+  for (const [key, attr] of Object.entries(themes)) {
+    if (!attr || attr === baseAttr) continue;
     const f = `assets/css/theme-${attr}.css`;
     if (!exists(f)) continue;   // 缺檔已由 C5 回報
     const cur = pickSelectors(f, attr);
     const missing = [...base].filter((s) => !cur.has(s));
     if (missing.length) {
-      warn(`C8 ${f} 未覆蓋 ${missing.length} 個 ember 已處理的選擇器（可能殘留別的主題配色）：${missing.slice(0, 5).join(' | ')}${missing.length > 5 ? ' …' : ''}`);
+      warn(`C8 ${f} 未覆蓋 ${missing.length} 個 ${baseFile} 已處理的選擇器（可能殘留基準風格的配色）：${missing.slice(0, 5).join(' | ')}${missing.length > 5 ? ' …' : ''}`);
     } else {
-      note(`C8 ${f} 覆蓋完整（${cur.size} 個選擇器，含 ember 全部 ${base.size} 個）`);
+      note(`C8 ${f} 覆蓋完整（${cur.size} 個選擇器，含 ${baseFile} 全部 ${base.size} 個）`);
     }
   }
 }

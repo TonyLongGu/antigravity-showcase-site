@@ -1,7 +1,8 @@
 /* ==========================================================================
    VS Code Dark+ — editor skin.
-   Starfield (no data-theme) and 熱情橘 are unchanged.
-   Coverage mirrors theme-ember.css 1:1 so every surface is accounted for.
+   對外統一稱呼：「VS Code 風格模式」。
+   「Antigravity 風格模式」（不掛 data-theme）與「Cursor 風格模式」（cursor）不受本檔影響。
+   Coverage mirrors theme-cursor.css 1:1 so every surface is accounted for.
    The blue ramp sits one step brighter than stock Dark+: buttons keep a status-bar
    blue, while #4DA3FF drives links, tags, borders, the current nav item and the caret.
    Dark+ syntax colours stay as small markers only, and every grey carries a cool
@@ -26,7 +27,7 @@ html[data-theme="vscode"] {
 
   --border-subtle: rgba(150, 190, 230, 0.1);
   --border-medium: rgba(160, 198, 236, 0.18);
-  --border-focus: rgba(77, 163, 255, 0.62);
+  /* --border-focus 不在此覆蓋：沿用 :root 的統一 alpha，懸停外框高亮才會三風格同亮度。 */
   --border-glow: rgba(77, 163, 255, 0.34);
 
   /* 藍色階梯比 VS Code 原生亮一階：#4DA3FF 給連結、標籤與描邊，
@@ -159,6 +160,17 @@ html[data-theme="vscode"] .hero-badge-update:hover {
   background: rgba(31, 39, 48, 0.82);
 }
 
+/* 更新時間徽章：冷灰藍底上 --text-muted 顯得灰暗，
+   文字提亮到次要文字色、圖示換亮一階的藍並取消透明，兩者才與右側時間膠囊同級。 */
+html[data-theme="vscode"] .hero-badge-update {
+  color: var(--text-secondary);
+}
+
+html[data-theme="vscode"] .hero-badge-update .hero-badge-icon {
+  stroke: var(--accent-blue);
+  opacity: 1;
+}
+
 html[data-theme="vscode"] .install-tab-btn,
 html[data-theme="vscode"] .info-card,
 html[data-theme="vscode"] .ai-flow-item {
@@ -216,30 +228,37 @@ html[data-theme="vscode"] .player-progress-container:focus-visible {
   outline-color: rgba(77, 163, 255, 0.75);
 }
 
+/* 影片選項按鈕：懸停只提亮文字（由基底規則處理，不動外框與底色）；
+   選中態把底色壓暗成微底色（與 Antigravity 風格的 0.15 對齊），明度改由提亮的外框與文字承擔，
+   明度排序為 選中 > 懸停 > 預設。 */
+html[data-theme="vscode"] .playlist-btn.active {
+  background: rgba(77, 163, 255, 0.15);
+  border-color: #84c3ff;
+  color: #9dd6ff;
+}
+
+/* 區塊小標題（.section-tag）：深底＋藍調上 #4da3ff 偏暗，
+   文字提亮一階到 --accent-blue，描邊與底色同步加一點，小標題才跟得上標題層級。 */
+html[data-theme="vscode"] .section-tag {
+  color: var(--accent-blue);
+  background: rgba(77, 163, 255, 0.12);
+  border-color: rgba(77, 163, 255, 0.42);
+}
+
+/* 文字與底色用主題色；外框由基底樣式的中性框決定（子部件不發亮，三風格一致）。 */
 html[data-theme="vscode"] .step-badge {
   color: #6aaee6;
   background: linear-gradient(135deg, rgba(77, 163, 255, 0.16), rgba(104, 176, 232, 0.1));
-  border-color: rgba(77, 163, 255, 0.4);
-  box-shadow: none;
 }
 
+/* 面板底色用主題的冷灰藍；外框沿用基底的中性微框。 */
 html[data-theme="vscode"] .ai-prompt-card {
   background: rgba(28, 35, 43, 0.9);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: none;
 }
 
-html[data-theme="vscode"] .ai-prompt-card:hover {
-  background: var(--bg-card-hover);
-  border-color: rgba(77, 163, 255, 0.85);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(77, 163, 255, 0.28), inset 0 0 12px rgba(77, 163, 255, 0.1);
-}
-
+/* 代碼框底色用主題的冷灰藍；虛線框與文字沿用基底的中性設定（code 仍保留主題的語法色）。 */
 html[data-theme="vscode"] .install-action-bubble {
   background: rgba(25, 31, 39, 0.92);
-  border-color: rgba(77, 163, 255, 0.35);
-  color: #d8e0ea;
 }
 
 html[data-theme="vscode"] .install-action-bubble code {
@@ -339,6 +358,12 @@ html[data-theme="vscode"] .footer-disclaimer {
 
 html[data-theme="vscode"] #author {
   background: rgba(25, 31, 39, 0.55) !important;
+}
+
+/* 聯絡資訊面板（.author-details-grid）：與 Cursor 風格對稱處理，
+   冷黑底改成主題的冷灰藍（--bg-tertiary #242d38 的色調）＋ 同樣 0.5 透明度。 */
+html[data-theme="vscode"] .author-details-grid {
+  background: rgba(20, 25, 31, 0.5);
 }
 
 /* --------------------------------------------------------------------------
