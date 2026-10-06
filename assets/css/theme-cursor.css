@@ -205,7 +205,7 @@ html[data-theme="cursor"] .subtitle-text {
   color: #f7f3ee;
 }
 
-html[data-theme="cursor"] .video-player-container:focus-visible,
+/* 進度條的鍵盤聚焦提示色（容器本身已不再繪製外框，故只留進度條） */
 html[data-theme="cursor"] .player-progress-container:focus-visible {
   outline-color: rgba(255, 154, 60, 0.7);
 }

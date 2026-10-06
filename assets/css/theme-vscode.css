@@ -223,7 +223,7 @@ html[data-theme="vscode"] .subtitle-text {
   color: #e9eef4;
 }
 
-html[data-theme="vscode"] .video-player-container:focus-visible,
+/* 進度條的鍵盤聚焦提示色（容器本身已不再繪製外框，故只留進度條） */
 html[data-theme="vscode"] .player-progress-container:focus-visible {
   outline-color: rgba(77, 163, 255, 0.75);
 }

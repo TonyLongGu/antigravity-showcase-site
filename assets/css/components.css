@@ -1008,13 +1008,14 @@
   user-select: none;
 }
 
+/* 容器焦點外框：一律不繪製 outline。
+   成因（2026-10 以 CDP 實測 Chrome）：容器帶 tabindex="0"，而 JS 會在 pointerdown
+   與「控制列自動收合」時呼叫 container.focus()；程式化聚焦同樣會命中 :focus-visible，
+   於是點一下播放器畫面就會閃出 2px 藍框（時有時無＝取決於當下焦點是否落在容器）。
+   容器本身沒有可互動的外觀，這個外框只是視覺雜訊，故完整移除；
+   鍵盤使用者的可見焦點改由進度條與控制列按鈕各自的 :focus-visible 提示承擔。 */
 .video-player-container:focus {
   outline: none;
-}
-
-.video-player-container:focus-visible {
-  outline: 2px solid rgba(56, 189, 248, 0.4);
-  outline-offset: 2px;
 }
 
 /* 僅在支援真正滑鼠懸停的裝置套用光暈：避免行動端點擊後 :hover 黏著，形成持續發光的假「選中」狀態 */
@@ -1404,6 +1405,13 @@ body.has-web-fullscreen .video-showcase-wrapper {
   outline: none !important;
   box-shadow: none !important;
 }
+
+/* 鍵盤聚焦提示（僅 :focus-visible）：控制列按鈕原本只靠 UA 預設外框，
+   在深色播放器上（Chrome 為 1px auto rgb(16,16,16)）幾乎不可見，故補上白色細框。 */
+.custom-ctrl-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+}
 .custom-ctrl-btn {
   -webkit-tap-highlight-color: transparent; /* 消除行動端點擊灰色高亮方塊 */
 }
@@ -1570,6 +1578,12 @@ body.has-web-fullscreen .video-showcase-wrapper {
   outline: none;
   cursor: pointer;
   transition: opacity 0.2s ease;
+}
+
+/* 音量滑桿的鍵盤聚焦提示：上面的 outline: none 會讓鍵盤使用者完全看不到焦點位置 */
+.custom-volume-slider:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 5px;
 }
 
 .custom-volume-slider::-webkit-slider-thumb {

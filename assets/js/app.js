@@ -639,6 +639,12 @@ function enterWebFullscreen() {
   }
 
   tryLockLandscape();
+  // 與原生全螢幕路徑（updateFullscreenState）一致：全螢幕時暫停背景粒子繪製，
+  // 把 GPU/CPU 讓給影片解碼。手機（iOS Safari／社群 App WebView）走的就是本路徑，
+  // 原本沒有這行 → 背景 canvas 仍以 60fps 繪製，是全螢幕播放/拖曳卡頓的殘留風險。
+  if (window.NebulaEngine && typeof window.NebulaEngine.pause === 'function') {
+    window.NebulaEngine.pause();
+  }
   isDraggingProgress = false;
   wakePlayerUI();
 }
@@ -660,6 +666,10 @@ function exitWebFullscreen() {
   }
 
   tryUnlockOrientation();
+  // 與原生全螢幕路徑一致：退出後恢復背景粒子繪製
+  if (window.NebulaEngine && typeof window.NebulaEngine.resume === 'function') {
+    window.NebulaEngine.resume();
+  }
 
   // 退出時瞬間校準置中
   requestAnimationFrame(() => {
@@ -817,12 +827,13 @@ let justDraggedProgress = false;
 let dragCooldownTimer = null;
 
 function safeSeekHtml5Video(targetTime) {
-  if (!html5VideoEl) return;
+  if (!html5VideoEl) return false;
   const dur = html5VideoEl.duration;
-  if (!dur || dur <= 0 || !isFinite(dur)) return;
+  if (!dur || dur <= 0 || !isFinite(dur)) return false;
   const clamped = Math.max(0, Math.min(dur, targetTime));
 
   html5VideoEl.currentTime = clamped;
+  return true; // 呼叫端可據此判斷「這次跳轉是否真的成立」
 }
 
 function seekRelative(seconds) {
@@ -1154,10 +1165,14 @@ function initCustomVideoPlayer() {
   });
 
   // 計算進度條點擊/拖曳比例 (0 ~ 1)
+  // rect 只在「每次互動開始時」量一次並快取：拖曳期間進度條不會位移，
+  // 若每 move 都 getBoundingClientRect()，會與 updateSeekUI 的樣式寫入形成
+  // 「寫 → 讀 → 寫 → 讀」的讀寫交錯，迫使瀏覽器每幀同步重排（長頁面成本更高）。
+  let progressRect = null;
   const getProgressPos = (e) => {
-    const rect = progContainer.getBoundingClientRect();
-    if (!rect.width) return 0;
-    return Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    if (!progressRect) progressRect = progContainer.getBoundingClientRect();
+    if (!progressRect.width) return 0;
+    return Math.max(0, Math.min(1, (e.clientX - progressRect.left) / progressRect.width));
   };
 
   // 僅即時更新 UI（不頻繁請求影片解碼，保證 60fps 極速響應與 0 卡頓）
@@ -1170,13 +1185,15 @@ function initCustomVideoPlayer() {
   };
 
   // 真正執行跳轉（僅在點擊釋放或拖曳結束時執行一次）
+  // 時長未知（剛切換影片、metadata 尚未取得）時不跳轉、也不更新 UI：
+  // 否則進度條會停在實際播放位置之外，形成「畫面說的」與「播放位置」不一致的假狀態。
   const applySeek = (pos) => {
-    if (html5VideoEl) {
-      const dur = html5VideoEl.duration || 0;
-      const targetTime = pos * dur;
-      safeSeekHtml5Video(targetTime);
+    const dur = html5VideoEl ? (html5VideoEl.duration || 0) : 0;
+    if (dur > 0 && safeSeekHtml5Video(pos * dur)) {
+      updateSeekUI(pos);
+    } else {
+      updateTimeAndDuration();
     }
-    updateSeekUI(pos);
     wakePlayerUI();
   };
 
@@ -1185,7 +1202,10 @@ function initCustomVideoPlayer() {
 
   progContainer.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
+    // 時長未知時不接受拖曳（切換影片的瞬間）：既不跳轉也不顯示假進度
+    if (!html5VideoEl || !(html5VideoEl.duration > 0)) return;
     isDraggingProgress = true;
+    progressRect = null; // 每次互動重新量一次（版面可能已因全螢幕/旋轉改變）
     try {
       progContainer.setPointerCapture(e.pointerId);
     } catch (err) {}
@@ -1219,6 +1239,7 @@ function initCustomVideoPlayer() {
 
     lastPointerPos = getProgressPos(e);
     applySeek(lastPointerPos);
+    progressRect = null; // 拖曳結束即釋放快取，下次互動重新量測
   };
 
   // 觸控中斷保護：若被手勢或來電 cancel，僅釋放指標捕獲，絕不執行無效跳轉
@@ -1236,6 +1257,7 @@ function initCustomVideoPlayer() {
     dragCooldownTimer = setTimeout(() => {
       justDraggedProgress = false;
     }, 280);
+    progressRect = null; // 觸控中斷同樣釋放快取
     updateTimeAndDuration();
   };
 
