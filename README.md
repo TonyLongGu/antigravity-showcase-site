@@ -23,15 +23,37 @@
 
 直接以瀏覽器雙擊開啟 [`index.html`](./index.html) 或執行 [`preview-site.bat`](./preview-site.bat) 預覽。
 
-`preview-site.bat`（底層為 [`preview.js`](./preview.js)）**可以重複執行**，行為固定為：
+本機預覽有兩支批次檔（底層都是 [`preview.js`](./preview.js)）：
 
-1. 本機預覽伺服器已在執行（埠 3300）→ **只開啟網站後結束**，不重複佔埠、也不會噴 `EADDRINUSE` 錯誤。
-2. 埠被其他程式或另一份站點副本佔用 → 自動往後找下一個可用埠（3300–3309），並在訊息中告知改用哪個埠。
-3. 連續 10 個埠都不可用 → 以退出碼 `1` 結束，並提示改用 `--port`。
+| 批次檔 | 用途 |
+| --- | --- |
+| [`preview-site.bat`](./preview-site.bat) | 啟動預覽（**可重複執行**：已在跑就只開網站） |
+| [`preview-site-stop.bat`](./preview-site-stop.bat) | 關閉預覽伺服器（自動找出 PID，不必自己關視窗） |
 
-`preview.js` 另有兩個參數：`--port <埠>`（指定起始埠）、`--no-open`（只啟動伺服器，不自動開啟瀏覽器）。
+`preview-site.bat` 的行為固定為：
+
+1. 先跑 `preview.js --probe`（同步、輸出乾淨）判斷狀態：
+   - **已有本站的預覽伺服器** → **只開啟網站後結束**（不重複佔埠、不會噴 `EADDRINUSE`，也不會冒出第二個視窗）。
+   - 埠被其他程式或另一份站點副本佔用 → 自動往後找下一個可用埠（3300–3309）。
+   - 連續 10 個埠都不可用 → 顯示原因後以退出碼 `1` 結束。
+2. 確認沒有伺服器時，才由 `preview.js --detach` **背景啟動**：以 `spawn(detached, stdio→NUL)` 建立
+   **完全脫離終端機／管線**的伺服器行程（不繼承任何 handle），因此用終端機、管線或重導向呼叫都不會被卡住，
+   也不會冒出額外視窗。啟動後會**等伺服器就緒才開站**（最多約 6 秒），起不來就直接顯示錯誤。
+3. 停止：跑 `preview-site-stop.bat`（背景伺服器在隱藏主控台中執行，不會佔用你的終端機）。
+
+`preview.js` 也可直接使用：
+
+```bash
+node preview.js          # 前景啟動（佔用終端機直到 Ctrl+C）
+node preview.js --detach # 背景啟動（脫離終端機；等就緒才開站）
+node preview.js --stop   # 關閉伺服器
+node preview.js --probe  # 只檢查（已有伺服器就開站並以 2 結束）
+```
+
+其他參數：`--port <埠>`（指定起始埠）、`--no-open`（不自動開啟瀏覽器）、`PREVIEW_PORT` 環境變數。
 辨識方式：新版伺服器提供 `GET /__preview_health`（回傳 `app`／`pid`／`port`／`root`）供下一次執行認人；
 沒有這個端點的舊版伺服器，則以「首頁與本目錄逐字相同」判定後直接沿用。
+退出碼：`0`＝正常結束、`2`＝沿用既有伺服器（已開站）、`1`＝啟動失敗。
 
 ---
 
