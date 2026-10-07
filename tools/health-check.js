@@ -18,7 +18,7 @@
  * 註：掃描 CSS 前會先移除註解，避免說明用的示意選擇器（例如主題選擇器範例）被當成真的規則。
  *
  * 測不到什麼（覆蓋邊界）：
- *   - 瀏覽器實際渲染、CSS 疊層與視覺結果（沒有真實瀏覽器）
+ *   - 瀏覽器實際渲染、CSS 疊層與視覺結果（沒有真實瀏覽器）→ 這一塊改由 tools/health-check-browser.js 覆蓋
  *   - 外部資源（Google Fonts、GitHub 連結）的可達性
  *   - GitHub Pages 的部署結果（本腳本只看原始碼）
  *
@@ -379,7 +379,7 @@ if (errors.length) {
 console.log('\n' + bar);
 console.log(errors.length ? `結果：不通過（ERROR ${errors.length}、WARN ${warns.length}）`
   : `結果：通過（WARN ${warns.length}）`);
-console.log('未驗證：瀏覽器實際渲染、CSS 疊層視覺、外部資源可達性、Pages 部署結果');
+console.log('未驗證：瀏覽器實際渲染（→ tools/health-check-browser.js）、CSS 疊層視覺、外部資源可達性、Pages 部署結果');
 console.log(bar);
 process.exit(errors.length ? 1 : 0);
 

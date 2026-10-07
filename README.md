@@ -94,7 +94,26 @@ node tools/health-check.js
 | C7 | 殘留／備份檔、未被任何地方引用的孤兒資產 |
 | C8 | **主題覆蓋平整性**：其他風格是否漏掉基準風格（`theme-cursor.css`）已處理的選擇器 |
 
-**未涵蓋**（需人工確認）：瀏覽器實際渲染與 CSS 疊層視覺、外部資源可達性、GitHub Pages 部署結果。細節見腳本檔頭的「測不到什麼」。
+**未涵蓋**（需人工確認）：外部資源（Google Fonts、GitHub 連結）的可達性、GitHub Pages 部署結果、CSS 疊層的視覺結果。細節見腳本檔頭的「測不到什麼」。
+
+### 🧪 瀏覽器實測（選用第二層）
+
+原始碼層的 C1–C8 驗不到「真的跑起來長怎樣」，所以另有一支用 CDP 驅動本機 Chrome／Edge 的工具：
+
+```bash
+node tools/health-check-browser.js               # B1–B20，約 40 秒
+node tools/health-check-browser.js --calibrate   # 負對照自我校準：故意注入缺陷，證明它真的抓得到
+node tools/health-check-browser.js --only B7,B8  # 只跑指定項目（除錯用）
+node tools/health-check-browser.js --keep-profile  # 保留暫存 profile
+```
+
+驗什麼：粒子顆數契約（各模式每幀 fills）、殘影、視窗縮放的密度同步、餘燼的滑鼠互動
+（推力存在／不越過 160px／無順勢帶橫向漂移／提亮不變暗）、像素層（無烙暗）、生命週期
+（切風格、reduced-motion 單幀、pause／resume）、rAF 效能、console 例外。
+
+它會自己開一個**隨機埠**的臨時靜態伺服器（不動 `preview.js` 的 3300）、自動偵測 Chrome／Edge／Chromium，
+測完自動清掉暫存 profile；**找不到瀏覽器或 Node < 22 時一律 SKIP 並以退出碼 `0` 結束**（不誤報）。
+退出碼：`0` = 無 FAIL、`1` = 有 FAIL。涵蓋邊界（真實手感、高刷新率、DPR≠1、Safari／Firefox、觸控）寫在腳本檔頭。
 
 ### 新增／修改一個視覺主題時要同步五個地方
 
@@ -102,7 +121,7 @@ C5 會擋住漏掉的任何一項：
 
 1. `assets/js/theme.js` 的 `THEMES` 加一筆（`attr: null` 代表沿用 Antigravity 風格、不掛 `data-theme`）
 2. 建立 `assets/css/theme-<key>.css`，並在 `index.html` 用 `<link>` 掛載
-3. `assets/js/nebula-canvas.js` 的 `MODE_SPECS` 加一筆（粒子類別／數量／是否畫連線／滑鼠阻尼／`blend` 合成模式；
+3. `assets/js/nebula-canvas.js` 的 `MODE_SPECS` 加一筆（粒子類別／數量／是否畫連線／`blend` 合成模式；
    目前三個風格都是 `'source-over'`（餘燼曾用 `'lighter'`，改成銳利三角形平塗後不再疊光））
 4. `index.html` `<head>` 的 bootstrap 白名單加入 `'<key>'`——**漏了會在載入時先閃一下預設風格（FOUC）**
 5. 加一顆 `data-theme-value="<key>"` 的標籤，否則使用者切不到

@@ -10,9 +10,9 @@
   let particles = [];
   // 粒子模式＝風格鍵。實際值於下方 MODE_SPECS 定義後，依 data-theme 校正。
   let mode = 'antigravity';
-  /* 滑鼠狀態：x／y＝座標；vx／vy＝「上次事件 → 這次事件」的位移（px/事件）。
-     4.8 起這是最初版（61a86e6）的語意：不做 dt 正規化、不平滑、不阻尼。 */
-  let mouse = { x: -1000, y: -1000, vx: 0, vy: 0, radius: 160 };
+  /* 滑鼠狀態：x／y＝座標；radius＝互動半徑（三種風格共用，setMode 會重設成 160）。
+     4.12 移除只寫不讀的 vx／vy（原本是「上次事件 → 這次事件」的位移，4.11 起已無任何讀取者）。 */
+  let mouse = { x: -1000, y: -1000, radius: 160 };
   /* 餘燼的底部熱源。刻意宣告在 resize() 之前：resize() 會在檔尾定義前就先跑一次
      （靠 refreshEmberSources 的函式宣告提升），這裡先初始化才不會踩 TDZ。 */
   let emberSources = [];
@@ -62,15 +62,10 @@
   resize();
 
   /* 滑鼠輸入＝最初版（61a86e6）。4.8 依使用者「比照最原本」整段回退：
-     mousemove 的**逐事件位移**直接當 vx／vy —— 不做 dt 正規化、不做 0.7/0.3 平滑、
-     不做每幀阻尼，也不再走 pointer events（觸控不做互動）。
-     原始行為的兩個副作用（刻意保留）：①值域隨裝置的事件密度而異；
-     ②滑鼠停住後 vx／vy 停在最後一次的位移值、不會自己歸零（只有移出視窗才歸零）。 */
+     只取座標 —— 不做 dt 正規化、不做 0.7/0.3 平滑、不做每幀阻尼，也不走 pointer events（觸控不做互動）。
+     4.12：原本還會把逐事件位移存成 mouse.vx／vy，但 4.11 之後已無任何讀取者（4.8–4.10 的順勢帶是唯一用戶），
+     留著只會是「沒有阻尼、也不會歸零」的陷阱，故移除。 */
   window.addEventListener('mousemove', (e) => {
-    if (mouse.x > -500) {
-      mouse.vx = e.clientX - mouse.x;
-      mouse.vy = e.clientY - mouse.y;
-    }
     mouse.x = e.clientX;
     mouse.y = e.clientY;
   });
@@ -78,8 +73,6 @@
   window.addEventListener('mouseleave', () => {
     mouse.x = -1000;
     mouse.y = -1000;
-    mouse.vx = 0;
-    mouse.vy = 0;
   });
 
   class Particle {
@@ -103,12 +96,12 @@
       if (this.y < 0) this.y = height;
       if (this.y > height) this.y = 0;
 
-      // Mouse attraction / interaction
+      // 滑鼠互動＝推開（斥力）：下面兩行把粒子往「游標 − 粒子」的反方向位移
       const dx = mouse.x - this.x;
       const dy = mouse.y - this.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < mouse.radius) {
+      if (dist < mouse.radius && dist > 0.5) {
         const force = (mouse.radius - dist) / mouse.radius;
         this.x -= (dx / dist) * force * 1.5;
         this.y -= (dy / dist) * force * 1.5;
@@ -136,7 +129,7 @@
      越往上越冷（橘 → 暗紅 → 灰）、越慢越小越淡，在抵達畫面上緣前淡出熄滅。
      繪製＝銳利三角形平塗（剪紙感）：幾何沿用最初版的三角形路徑，顏色吃所屬家族的冷卻色階，
      不用漸層、不用 shadowBlur、也不加外圈光暈；自轉照舊——滑鼠只平移粒子
-     （推開＋順勢帶＋側向剪切＋上抬）並在靠近時提亮，絕不改變它的角度。
+     （4.11 起只剩**純徑向推開**；順勢帶／側向剪切／上抬已於 4.11 隨互動改回 HEAD 而移除）並在靠近時提亮，絕不改變它的角度。
      --------------------------------------------------------------------- */
 
   /* 色相家族（4.4）：每顆出生抽一個家族、終身固定，家族內再抽一個明度變體 → 9 張 24 階色表。
@@ -663,8 +656,8 @@
     ctx.clearRect(0, 0, width, height);
 
     const spec = specFor(mode);
-    /* 4.8：這裡原本還有「阻尼 mouse.vx／vy（×0.82）」與「每幀算 mouse.speed（陣風用）」兩段，
-       已隨最初版互動一起移除 —— mouse.vx／vy 現在只由 mousemove 寫入，不會被其他任何地方動過。 */
+    /* 4.8：這裡原本還有「阻尼 mouse.vx／vy（×0.82）」與「每幀算 mouse.speed（陣風用）」兩段；
+       4.12 起連 mouse.vx／vy 本身都移除（4.11 之後已無任何讀取者，見檔頭滑鼠輸入處的說明）。 */
 
     ctx.globalCompositeOperation = spec.blend;
     for (let p of particles) {
@@ -742,6 +735,9 @@
       const resolved = MODE_SPECS[next] ? next : 'antigravity';
       if (resolved === mode) return;
       mode = resolved;
+      /* 互動半徑是共用可變狀態：切風格時一律重設成 160（HEAD 也是這樣做）。
+         沒有這行的話，餘燼（4.11 起改用共用 radius）的半徑就變成「靠全檔沒人改它」的隱性耦合。 */
+      mouse.radius = 160;
       // 熱源位置隨視窗寬度決定，切風格時重新配置
       refreshEmberSources();
       spawn();
