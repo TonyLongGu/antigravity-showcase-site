@@ -102,7 +102,8 @@ C5 會擋住漏掉的任何一項：
 
 1. `assets/js/theme.js` 的 `THEMES` 加一筆（`attr: null` 代表沿用 Antigravity 風格、不掛 `data-theme`）
 2. 建立 `assets/css/theme-<key>.css`，並在 `index.html` 用 `<link>` 掛載
-3. `assets/js/nebula-canvas.js` 的 `MODE_SPECS` 加一筆（對應的粒子模式）
+3. `assets/js/nebula-canvas.js` 的 `MODE_SPECS` 加一筆（粒子類別／數量／是否畫連線／滑鼠阻尼／`blend` 合成模式；
+   目前三個風格都是 `'source-over'`（餘燼曾用 `'lighter'`，改成銳利三角形平塗後不再疊光））
 4. `index.html` `<head>` 的 bootstrap 白名單加入 `'<key>'`——**漏了會在載入時先閃一下預設風格（FOUC）**
 5. 加一顆 `data-theme-value="<key>"` 的標籤，否則使用者切不到
 
