@@ -16,8 +16,6 @@ const I18N = {
     lang_btn: 'EN',
     
     hero_badge: '專為 AI Agent IDE 打造的原生擴充套件生態系',
-    hero_ide_antigravity: 'Antigravity (原生)',
-    hero_ide_vscode: 'VS Code (相容)',
     hero_last_updated_label: '網站更新時間：',
     hero_title_1: '極致擴展你的',
     hero_title_gradient: 'AI 協同開發體驗',
@@ -152,8 +150,6 @@ const I18N = {
     lang_btn: '繁中',
     
     hero_badge: 'Native Extension Ecosystem for AI Agent IDEs',
-    hero_ide_antigravity: 'Antigravity (Native)',
-    hero_ide_vscode: 'VS Code (Compatible)',
     hero_last_updated_label: 'Site Updated:',
     hero_title_1: 'Supercharge Your',
     hero_title_gradient: 'AI Pair Programming Flow',
