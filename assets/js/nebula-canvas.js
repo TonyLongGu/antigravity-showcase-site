@@ -29,6 +29,16 @@
   const CONNECT_DISTANCE = 130;
   const MOUSE_CONNECT_DISTANCE = 160;
 
+  /* VS Code 字形模式的動態速度旋鈕（4.14：使用者要求「VS Code 那組字形的粒子動態速度提高 10%」）。
+     只乘在字形自己的「每幀位移量」與「每幀相位推進量」上——引擎全程 per-frame（沒有做 dt 正規化），
+     所以速率等比放大＝節奏等比變快，不需要動計時器，也不會改變顆數與密度。
+     **只作用於 CodeParticle**：星空（Particle）與餘燼（EmberParticle）維持原速，
+     使用者只指定要 VS Code 這組字形變快。
+     **不動**的：顆數、尺寸、亮度、顏色、連線門檻，以及滑鼠互動（推力常數與提亮低通 `0.09`）——
+     那是「手感」不是背景動態，跟著放大會讓游標推開的距離、提亮的跟隨速度一起變，
+     而且會讓游標「掠過程式碼」的亮度感變得急躁，屬於另一件事。 */
+  const CODE_MOTION_SPEED = 1.1;
+
   /* 高解析度螢幕必須做 DPR 縮放：原本 canvas.width = innerWidth，等於整個畫布被瀏覽器
      放大 DPR 倍，1–8px 的粒子永遠是糊的。上限夾在 2，兼顧清晰度與填充成本。 */
   let dpr = 1;
@@ -79,6 +89,7 @@
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
+      // 星空點的漂移速度（px/幀）：沿用原速（4.14 的速度旋鈕只給 VS Code 字形用）
       this.vx = (Math.random() - 0.5) * 0.6;
       this.vy = (Math.random() - 0.5) * 0.6;
       this.radius = Math.random() * 1.8 + 0.8;
@@ -331,7 +342,8 @@
       this.swaySpeed = 0.008 + Math.random() * 0.03;
       this.swayPhase = Math.random() * Math.PI * 2;
       /* 自轉：剪紙片是剛體，翻起來才靈動，不然會像一群釘住的碎屑。
-         速率沿用最初版（±0.007–0.025 rad/幀）。滑鼠只會把粒子推開，不影響這個角度。 */
+         速率沿用最初版（±0.007–0.025 rad/幀）。滑鼠只會把粒子推開，不影響這個角度。
+         註：4.14 的速度旋鈕只給 VS Code 字形用，餘燼維持原速。 */
       this.angle = Math.random() * Math.PI * 2;
       this.spin = (Math.random() < 0.5 ? -1 : 1) * (0.007 + Math.random() * 0.018);
       /* 滑鼠互動的狀態：near＝離游標多近（0–1，經 EMBER_NEAR_EASE 低通；draw() 用來提亮）。
@@ -520,13 +532,13 @@
       this.color = codeColor();
       this.x = Math.random() * width;
       this.y = Math.random() * height;
-      // 緩慢朝左上飄移，像程式碼往上捲動。
-      this.vx = -(0.06 + Math.random() * 0.22);
-      this.vy = -(0.1 + Math.random() * 0.34);
+      // 緩慢朝左上飄移，像程式碼往上捲動（4.14：漂移速度 ×1.1，只此模式）
+      this.vx = -(0.06 + Math.random() * 0.22) * CODE_MOTION_SPEED;
+      this.vy = -(0.1 + Math.random() * 0.34) * CODE_MOTION_SPEED;
       this.baseAlpha = 0.12 + Math.random() * 0.22;
       this.alpha = this.baseAlpha;
       this.bobPhase = Math.random() * Math.PI * 2;
-      this.bobSpeed = 0.004 + Math.random() * 0.01;
+      this.bobSpeed = (0.004 + Math.random() * 0.01) * CODE_MOTION_SPEED;   // 4.14：上下浮動頻率 +10%
     }
 
     // 從底部重新進場並換一個字元，讓畫面不重複。
