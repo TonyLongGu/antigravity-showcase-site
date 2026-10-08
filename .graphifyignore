@@ -1,0 +1,5 @@
+# Graphify 掃描排除清單（gitignore 語法）
+# 排除純資料檔：內含大量字串常數，會在圖譜中產生數十個孤立節點（雜訊），
+# 且其內容不具架構意義。程式邏輯檔（app.js / theme.js / i18n.js …）仍照常抽取。
+assets/js/subtitles-data.js
+assets/js/plugins-data.js

@@ -1,0 +1,2 @@
+# Graphify 產物（graph.html / graph.json / cache 等）不進版控，避免被 GitHub Pages 部署
+graphify-out/
