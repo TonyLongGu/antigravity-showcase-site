@@ -26,6 +26,19 @@
   const EMBER_COUNT = 90;
   /* Code glyphs have no connecting lines either; the count carries the texture. */
   const CODE_COUNT = 92;
+  /* 字形模式的字級範圍與分布（10–21px；顆數由小到大遞減）。
+     4.16：（11 + rand×7）＝ 11–18px、均勻分布。
+     4.17：使用者要求「粒子大小差異再大一些」＋「越大的粒子數量越少」→
+       ① 範圍加寬成 10 + rand×11（10–21px）：最大／最小由 1.64× 變 **2.1×**；
+       ② 分布改用 t = rand^CODE_SIZE_BIAS（密度隨尺寸遞減）：>18px 佔 19%、>15.5px 佔 37%
+          （4.16 均勻分布下分別是 0% 與 50%）。
+       平均值刻意守住：E[t] = 1/(1+bias) = 0.4 → E[size] = 14.4px（4.16 是 14.5px），
+       所以「大顆變少」不是靠整片變小換來的，只是把顆數從大顆挪到小顆。
+       註：t 同時是速度與亮度的自變數 → 改分布會連帶影響兩者的分布，
+       兩者都以 E[t] 為基準正規化過（見 CODE_SIZE_T_MEAN、CODE_ALPHA_BY_SIZE_*），平均值不會跑掉。 */
+  const CODE_SIZE_MIN = 10;
+  const CODE_SIZE_RANGE = 11;
+  const CODE_SIZE_BIAS = 1.5;
   const CONNECT_DISTANCE = 130;
   const MOUSE_CONNECT_DISTANCE = 160;
 
@@ -41,14 +54,47 @@
      相對最初版累計 +21%）。動的仍然只有同一件事（字形的每幀位移與相位推進），上面「不動」的項目全部照舊。 */
   const CODE_MOTION_SPEED = 1.21;
 
-  /* VS Code 字形模式的「顆與顆之間」速度離散度（4.15：使用者要求「不同粒子之間速度差異增加一些」）。
-     每顆字在生成時抽一個固定倍率 drift ∈ [1 − x, 1 + x] 乘在它的基準速度上：
-     x 越大，最慢與最快的字差距越大；因為區間對稱，**平均速度不變**（不會偷動到上面的 +10%）。
-     4.14 的等效離散度是 ±0.63（隨機項半寬 ÷ 平均值：0.11/0.17、0.17/0.27）→ 最慢：最快 ＝ 1 : 4.4；
-     這裡放大到 ±0.75，變成 1 : 7.0（差距約 1.6 倍）。
-     倍率「每顆固定、不隨時間變」：看起來是「有的字本來就跑得快、有的慢」，
-     若改成每幀重抽，變成整片一起忽快忽慢＝呼吸感，反而看不出粒子之間的差異。 */
-  const CODE_DRIFT_SPREAD = 0.75;
+  /* 字級 → 速度倍率的兩個端點（越小的越慢、越大的越快）＋正規化基準。
+     4.15：使用者要求「不同粒子之間速度差異增加一些」→ 每顆字生成時**隨機抽**一個固定倍率
+           drift ∈ [1 − 0.75, 1 + 0.75]（0.25×–1.75×）。因為區間對稱，平均速度不變。
+           4.14 的等效離散度是 ±0.63（隨機項半寬 ÷ 平均值：0.11/0.17、0.17/0.27）→ 1 : 4.4，那時放大成 1 : 7.0。
+     4.16：使用者要求「**越大的粒子移動越快、越小的越慢**」→ 倍率不再隨機抽，改由字級決定；
+           均勻分布下仍是 0.25×–1.75×（平均剛好 1×），差別只在把「排序」改成**嚴格單調**。
+     4.17：使用者要求「越大的粒子，速度再快一些些」→ **只抬高端**：低端維持 0.25×，高端 1.75× → **2.05×**。
+           但 4.17 的尺寸分布偏小字（E[t] = 0.4），若直接套用會讓整片偷慢 15%，
+           故除以 E[mult]（＝CODE_SPEED_MIN + E[t] × 端點差）**正規化**：
+           等效端點 **0.258×–2.11×**，最大顆比 4.16 快 **21%**、最小顆同 4.16（+3%）、
+           **平均速度仍是 ×1.21**（＝上面那個旋鈕沒有被偷偷動到）。
+     倍率仍是「每顆算定、不隨時間變」：若改成每幀重算，會變成整片一起忽快忽慢＝呼吸感。
+     4.17 **不動**的：顆數（CODE_COUNT）、顏色、連線門檻，以及滑鼠互動（推力常數與提亮低通 0.09）。 */
+  const CODE_SPEED_MIN = 0.25;
+  const CODE_SPEED_MAX = 2.05;
+  /* 分布的平均 t（E[t] = 1 / (1 + bias)）：所有「跟著尺寸走」的旋鈕都以它為基準，
+     這樣調整尺寸分布（越大的越少）時，平均速度／亮度不會被連帶拉走。 */
+  const CODE_SIZE_T_MEAN = 1 / (1 + CODE_SIZE_BIAS);
+
+  /* 漂移方向隨機化（4.18：使用者「目前粒子動向有點一致，希望稍微隨機一些」）。
+     原因：4.15 把「每軸各自隨機」換成單一倍率後，92 顆字的位移**方向就完全一樣**（只差快慢），
+     看起來像整片被同一陣風推著走。4.14 的每軸隨機其實帶著方向變化，這一版把它補回來。
+     作法：每顆字生成時抽一個固定角度，把 (vx, vy) **繞基準方向旋轉**（±CODE_DRIFT_ANGLE_SPREAD）。
+     為什麼用旋轉而不是再改兩軸分量：
+       ① 旋轉**不改向量長度** ⇒ 速度分布、平均速度、大小↔速度的關聯與 4.17 實測值完全不變；
+       ② 角度區間對稱 ⇒ 全場平均漂移方向仍是原本的左上（0.17 : 0.27），不會變成整體往某邊偏。
+     角度在生成時抽定、終身不變（recycle() 不重抽）——與「速度／尺寸終身不變」同一套語意，
+     避免整片一起轉向的呼吸感。**要更隨機就加大這個數字**（0.35 rad ≈ ±20°，方向斜率因此橫跨 tan38°–tan78°）。 */
+  const CODE_DRIFT_ANGLE_SPREAD = 0.35;
+
+  /* 字級 → 亮度（4.17：使用者要求「粒子越大，亮度提升一些」）。
+     乘在既有的個體基準 alpha（0.12–0.34，隨機抽）上，不取代它 ——
+     所以大顆是「整體再亮一些」，顆與顆之間原本的明暗差仍在。
+     最小字 ×0.82、最大字 ×1.30（端到端 1.59×）：
+     第一版用 0.92–1.22 實測 r 只有 0.14 —— 個體隨機差（2.8×）把大小梯度整個蓋掉，
+     端點拉開到 ±19%／+30% 後，最大四分位與最小四分位差 ≈ +39%，才看得出「越大越亮」。
+     分布平均 = 0.82 + E[t]×0.48 = **1.01**（E[t] = 0.4）→ 整片平均亮度幾乎不動
+     （設計上字形本來就是「極低透明度漂浮」，故刻意不做整體提亮）。
+     只動 alpha，不動顏色、字形、連線門檻與滑鼠提亮上限 0.74。 */
+  const CODE_ALPHA_BY_SIZE_MIN = 0.82;
+  const CODE_ALPHA_BY_SIZE_MAX = 1.30;
 
   /* 高解析度螢幕必須做 DPR 縮放：原本 canvas.width = innerWidth，等於整個畫布被瀏覽器
      放大 DPR 倍，1–8px 的粒子永遠是糊的。上限夾在 2，兼顧清晰度與填充成本。 */
@@ -535,7 +581,10 @@
 
   class CodeParticle {
     constructor() {
-      const size = 11 + Math.random() * 7;
+      /* 字級＝範圍 × 偏態分布：t = rand^CODE_SIZE_BIAS，密度隨尺寸遞減
+         （4.17：越大的粒子數量越少；取值後才是後面速度與亮度的自變數）。 */
+      const sizeT = Math.pow(Math.random(), CODE_SIZE_BIAS);
+      const size = CODE_SIZE_MIN + sizeT * CODE_SIZE_RANGE;
       this.size = size;
       // 先把字型字串組好，避免每幀重新拼接。
       this.font = '600 ' + size.toFixed(1) + 'px "JetBrains Mono", Consolas, Monaco, monospace';
@@ -546,15 +595,30 @@
       /* 緩慢朝左上飄移，像程式碼往上捲動。4.14：漂移速度 ×1.1（只此模式）。
          4.15：由「每軸各自隨機」改成「基準速度 × 每顆字固定的離散倍率」——
          0.17 ＝ (0.06+0.28)/2、0.27 ＝ (0.1+0.44)/2 正是 4.14 隨機區間的中點，
-         所以平均值與 4.14 完全相同，拉開的只有顆與顆之間的差距（見 CODE_DRIFT_SPREAD）。
-         倍率生成時抽定後就不再變動（recycle() 也不重抽），同一顆字才會維持「它自己的速度」。 */
-      const driftScale = CODE_MOTION_SPEED * (1 + (Math.random() * 2 - 1) * CODE_DRIFT_SPREAD);
-      this.vx = -0.17 * driftScale;
-      this.vy = -0.27 * driftScale;
-      this.baseAlpha = 0.12 + Math.random() * 0.22;
+         所以平均值與 4.14 完全相同，拉開的只有顆與顆之間的差距。
+         4.16：倍率改由**字級**決定（越大越快）。4.17：只抬高端並做平均正規化
+         （見 CODE_SPEED_MIN／CODE_SPEED_MAX／CODE_SIZE_T_MEAN）。
+         4.18：位移方向再繞基準方向轉一個固定小角度（動向隨機化，見 CODE_DRIFT_ANGLE_SPREAD）——
+         旋轉不改長度，所以「速度」這條線的實測值（平均、分布、與字級的關聯）全部沿用 4.17。
+         倍率與角度都算定後就不再變動（recycle() 也不重算），同一顆字才會維持「它自己的速度與方向」。 */
+      const speedMul = (CODE_SPEED_MIN + sizeT * (CODE_SPEED_MAX - CODE_SPEED_MIN)) /
+        (CODE_SPEED_MIN + CODE_SIZE_T_MEAN * (CODE_SPEED_MAX - CODE_SPEED_MIN));
+      const speedScale = CODE_MOTION_SPEED * speedMul;
+      /* 基準漂移向量（左上）→ 繞原點旋轉 driftAngle 得到這顆字自己的方向。 */
+      const driftAngle = (Math.random() * 2 - 1) * CODE_DRIFT_ANGLE_SPREAD;
+      const driftCos = Math.cos(driftAngle);
+      const driftSin = Math.sin(driftAngle);
+      const baseVX = -0.17 * speedScale;
+      const baseVY = -0.27 * speedScale;
+      this.vx = baseVX * driftCos - baseVY * driftSin;
+      this.vy = baseVX * driftSin + baseVY * driftCos;
+      /* 亮度＝個體隨機基準 × 字級係數（4.17：越大越亮，見 CODE_ALPHA_BY_SIZE_*）。 */
+      const alphaScale = CODE_ALPHA_BY_SIZE_MIN +
+        sizeT * (CODE_ALPHA_BY_SIZE_MAX - CODE_ALPHA_BY_SIZE_MIN);
+      this.baseAlpha = (0.12 + Math.random() * 0.22) * alphaScale;
       this.alpha = this.baseAlpha;
       this.bobPhase = Math.random() * Math.PI * 2;
-      this.bobSpeed = 0.009 * driftScale;   // 0.009 ＝ (0.004+0.014)/2（4.14 的中點，平均同 4.14）
+      this.bobSpeed = 0.009 * speedScale;   // 0.009 ＝ (0.004+0.014)/2（4.14 的中點，平均同 4.14）
     }
 
     // 從底部重新進場並換一個字元，讓畫面不重複。
