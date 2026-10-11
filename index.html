@@ -105,7 +105,7 @@
             <path d="M21 3v5h-5"/>
           </svg>
           <span data-i18n="hero_last_updated_label">網站更新時間：</span>
-          <span id="hero-last-updated-date" class="hero-update-time">2026-10-08 23:24</span>
+          <span id="hero-last-updated-date" class="hero-update-time">2026-10-11 20:26</span>
         </div>
       </div>
 
@@ -320,21 +320,7 @@
       <div class="install-container">
         <!-- Dual Method Switcher Tabs -->
         <div class="install-method-switcher">
-          <button id="tab-btn-zip" class="install-tab-btn active" onclick="switchInstallMethod('zip')">
-            <div class="install-tab-icon">
-              <svg class="install-tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16.5 9.4 7.55 4.24"/>
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                <polyline points="3.29 7 12 12 20.71 7"/>
-                <line x1="12" y1="22" x2="12" y2="12"/>
-              </svg>
-            </div>
-            <div class="install-tab-text">
-              <div class="install-tab-title" data-i18n="install_tab_zip">方式一：下載 ZIP 壓縮包</div>
-              <div class="install-tab-sub" data-i18n="install_tab_zip_sub">免 Git • 本機雙擊即用</div>
-            </div>
-          </button>
-          <button id="tab-btn-git" class="install-tab-btn" onclick="switchInstallMethod('git')">
+          <button id="tab-btn-git" class="install-tab-btn active" onclick="switchInstallMethod('git')">
             <div class="install-tab-icon">
               <svg class="install-tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 8V4H8"/>
@@ -347,14 +333,103 @@
               </svg>
             </div>
             <div class="install-tab-text">
-              <div class="install-tab-title" data-i18n="install_tab_git">方式二：AI 智能引導安裝</div>
+              <div class="install-tab-title" data-i18n="install_tab_git">方式一：AI 智能引導安裝</div>
               <div class="install-tab-sub" data-i18n="install_tab_git_sub">一鍵複製提示詞 • AI 自動對話配置</div>
+            </div>
+          </button>
+          <button id="tab-btn-zip" class="install-tab-btn" onclick="switchInstallMethod('zip')">
+            <div class="install-tab-icon">
+              <svg class="install-tab-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16.5 9.4 7.55 4.24"/>
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.29 7 12 12 20.71 7"/>
+                <line x1="12" y1="22" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <div class="install-tab-text">
+              <div class="install-tab-title" data-i18n="install_tab_zip">方式二：下載 ZIP 壓縮包</div>
+              <div class="install-tab-sub" data-i18n="install_tab_zip_sub">免 Git • 本機雙擊即用</div>
             </div>
           </button>
         </div>
 
-        <!-- Method 1: Download ZIP Panel -->
-        <div id="install-panel-zip" class="install-method-panel active">
+        <!-- Method 1: AI Guided Installation Panel -->
+        <div id="install-panel-git" class="install-method-panel active">
+          <div class="steps-list">
+            <!-- Step 1: Copy AI Guided Prompt -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">01</span>
+                <span data-i18n="install_ai_step1_title">複製 AI 智能安裝提示詞</span>
+              </h3>
+              <p class="step-desc" data-i18n="install_ai_step1_desc">點擊下方按鈕複製結構化安裝 Prompt，提示詞內建 GitHub 倉庫來源與全流程對話引導：</p>
+              
+              <div class="ai-prompts-container">
+                <div class="ai-prompt-card">
+                  <div class="ai-prompt-header">
+                    <div class="ai-agent-indicator">
+                      <span class="ai-status-dot"></span>
+                      <span data-i18n="install_ai_installer_title">AI 智能安裝引導（支援跨 IDE）</span>
+                    </div>
+                  </div>
+                  <div class="ai-chat-bubble preview-only">
+                    <span class="ai-prompt-preview-text" data-i18n-html="install_ai_preview_prompt">
+                      “請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity Plugins。<br><br>
+                      請依序執行以下引導流程：<br>
+                      1. 先確認我目前使用的 IDE（Antigravity / Cursor / VS Code）。<br>
+                      2. 詢問我要安裝哪些套件（全部，或自選）。不相容目前 IDE 的套件請略過並說明原因（目前僅 Quota Status 不支援 VS Code。MCP Manager 在 Cursor / VS Code 只顯示底部狀態列，不開左側儀表板；Cline 統計只在該 IDE 已啟用 Cline 時出現）。<br>
+                      3. 詢問本機放置目錄（預設建議 D:\antigravity-plugins），然後 Git Clone 並掛載到該 IDE 的 extensions 目錄。<br>
+                      4. 完成後提醒重載視窗 (Developer: Reload Window)；若是 VS Code，建議完整關閉再開。”
+                    </span>
+                  </div>
+                  <div class="install-action-row" style="margin-top: 14px;">
+                    <button class="btn-primary install-dl-btn" onclick="copyAiInstallPrompt()">
+                      <span class="btn-icon">📋</span>
+                      <span data-i18n="install_ai_prompt_copy_btn">複製 AI 智能安裝提示詞</span>
+                    </button>
+                    <span class="install-note-badge" data-i18n="install_ai_note_badge">零終端機操作 • AI 互動引導</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Paste into AI Chat -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">02</span>
+                <span data-i18n="install_ai_step2_title">貼到目前 IDE 的 AI Chat</span>
+              </h3>
+              <p class="step-desc" data-i18n="install_ai_step2_desc" style="margin-bottom: 0;">在 Cursor、Antigravity 或 VS Code（Copilot Chat 等）打開 AI 對話框，貼上提示詞並發送。</p>
+            </div>
+
+            <!-- Step 3: AI Dialog & Automated Execution -->
+            <div class="step-card">
+              <h3 class="step-title">
+                <span class="step-badge">03</span>
+                <span data-i18n="install_ai_step3_title">跟隨 AI 引導並全自動安裝</span>
+              </h3>
+              <p class="step-desc" data-i18n="install_ai_step3_desc">AI Agent 將主動向您確認安裝項目與本機目錄，隨後全自動完成 Git Clone 與軟連結掛載：</p>
+              
+              <div class="ai-flow-steps">
+                <div class="ai-flow-item">
+                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q1_badge">步驟 A</span>
+                  <span class="ai-flow-text" data-i18n="install_ai_flow_q1_text">AI 主動確認：目前使用的 IDE 與欲安裝套件（全部，或自選；自動略過不相容項目）</span>
+                </div>
+                <div class="ai-flow-item">
+                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q2_badge">步驟 B</span>
+                  <span class="ai-flow-text" data-i18n="install_ai_flow_q2_text">AI 主動詢問：希望將專案安裝在本機哪個資料夾？（預設建議 D:\antigravity-plugins）</span>
+                </div>
+                <div class="ai-flow-item success">
+                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q3_badge">步驟 C</span>
+                  <span class="ai-flow-text" data-i18n="install_ai_flow_q3_text">AI 自動執行：背景 Clone 倉庫 ➔ 建立 Junction 軟連結 ➔ 引導重載視窗即刻生效！</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Method 2: Download ZIP Panel -->
+        <div id="install-panel-zip" class="install-method-panel">
           <div class="steps-list">
             <!-- Step 1: Download & Extract -->
             <div class="step-card">
@@ -416,7 +491,7 @@
               </div>
             </div>
 
-            <!-- Shared Step 3: Reload IDE Window for Method 1 -->
+            <!-- Shared Step 3: Reload IDE Window for Method 2 -->
             <div class="step-card">
               <h3 class="step-title">
                 <span class="step-badge">03</span>
@@ -425,81 +500,6 @@
               <p class="step-desc" data-i18n="install_common_step3_desc" style="margin-bottom: 0;">
                 Antigravity 與 Cursor：Ctrl + Shift + P → Developer: Reload Window。VS Code：建議完整關閉後再重開，較不易被 extensions.json 快取覆寫。
               </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Method 2: AI Guided Installation Panel -->
-        <div id="install-panel-git" class="install-method-panel">
-          <div class="steps-list">
-            <!-- Step 1: Copy AI Guided Prompt -->
-            <div class="step-card">
-              <h3 class="step-title">
-                <span class="step-badge">01</span>
-                <span data-i18n="install_ai_step1_title">複製 AI 智能安裝提示詞</span>
-              </h3>
-              <p class="step-desc" data-i18n="install_ai_step1_desc">點擊下方按鈕複製結構化安裝 Prompt，提示詞內建 GitHub 倉庫來源與全流程對話引導：</p>
-              
-              <div class="ai-prompts-container">
-                <div class="ai-prompt-card">
-                  <div class="ai-prompt-header">
-                    <div class="ai-agent-indicator">
-                      <span class="ai-status-dot"></span>
-                      <span data-i18n="install_ai_installer_title">AI 智能安裝引導（支援跨 IDE）</span>
-                    </div>
-                  </div>
-                  <div class="ai-chat-bubble preview-only">
-                    <span class="ai-prompt-preview-text" data-i18n-html="install_ai_preview_prompt">
-                      “請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity Plugins。<br><br>
-                      請依序執行以下引導流程：<br>
-                      1. 先確認我目前使用的 IDE（Antigravity / Cursor / VS Code）。<br>
-                      2. 詢問我要安裝哪些套件（全部，或自選）。不相容目前 IDE 的套件請略過並說明原因（目前僅 Quota Status 不支援 VS Code；MCP Manager 在 Cursor / VS Code 為檢視模式）。<br>
-                      3. 詢問本機放置目錄（預設建議 D:\antigravity-plugins），然後 Git Clone 並掛載到該 IDE 的 extensions 目錄。<br>
-                      4. 完成後提醒重載視窗 (Developer: Reload Window)；若是 VS Code，建議完整關閉再開。”
-                    </span>
-                  </div>
-                  <div class="install-action-row" style="margin-top: 14px;">
-                    <button class="btn-primary install-dl-btn" onclick="copyAiInstallPrompt()">
-                      <span class="btn-icon">📋</span>
-                      <span data-i18n="install_ai_prompt_copy_btn">複製 AI 智能安裝提示詞</span>
-                    </button>
-                    <span class="install-note-badge" data-i18n="install_ai_note_badge">零終端機操作 • AI 互動引導</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Step 2: Paste into AI Chat -->
-            <div class="step-card">
-              <h3 class="step-title">
-                <span class="step-badge">02</span>
-                <span data-i18n="install_ai_step2_title">貼到目前 IDE 的 AI Chat</span>
-              </h3>
-              <p class="step-desc" data-i18n="install_ai_step2_desc" style="margin-bottom: 0;">在 Cursor、Antigravity 或 VS Code（Copilot Chat 等）打開 AI 對話框，貼上提示詞並發送。</p>
-            </div>
-
-            <!-- Step 3: AI Dialog & Automated Execution -->
-            <div class="step-card">
-              <h3 class="step-title">
-                <span class="step-badge">03</span>
-                <span data-i18n="install_ai_step3_title">跟隨 AI 引導並全自動安裝</span>
-              </h3>
-              <p class="step-desc" data-i18n="install_ai_step3_desc">AI Agent 將主動向您確認安裝項目與本機目錄，隨後全自動完成 Git Clone 與軟連結掛載：</p>
-              
-              <div class="ai-flow-steps">
-                <div class="ai-flow-item">
-                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q1_badge">步驟 A</span>
-                  <span class="ai-flow-text" data-i18n="install_ai_flow_q1_text">AI 主動確認：目前使用的 IDE 與欲安裝套件（全部，或自選；自動略過不相容項目）</span>
-                </div>
-                <div class="ai-flow-item">
-                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q2_badge">步驟 B</span>
-                  <span class="ai-flow-text" data-i18n="install_ai_flow_q2_text">AI 主動詢問：希望將專案安裝在本機哪個資料夾？（預設建議 D:\antigravity-plugins）</span>
-                </div>
-                <div class="ai-flow-item success">
-                  <span class="ai-flow-badge" data-i18n="install_ai_flow_q3_badge">步驟 C</span>
-                  <span class="ai-flow-text" data-i18n="install_ai_flow_q3_text">AI 自動執行：背景 Clone 倉庫 ➔ 建立 Junction 軟連結 ➔ 引導重載視窗即刻生效！</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

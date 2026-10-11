@@ -73,9 +73,9 @@ const I18N = {
     section_install_title: '兩種安裝方式 • 輕鬆無縫部署',
     section_install_desc: '支援「下載 ZIP 點擊安裝」與「AI 智能引導安裝（複製 Prompt 即裝）」雙路徑，自由選擇一鍵全安裝或個別插件自選啟用。',
     
-    install_tab_zip: '方式一：下載 ZIP 壓縮包',
+    install_tab_zip: '方式二：下載 ZIP 壓縮包',
     install_tab_zip_sub: '免 Git • 本機雙擊即用',
-    install_tab_git: '方式二：AI 智能引導安裝',
+    install_tab_git: '方式一：AI 智能引導安裝',
     install_tab_git_sub: '一鍵複製提示詞 • AI 自動對話配置',
     
     install_zip_step1_title: '下載全套套件包並解壓縮',
@@ -116,7 +116,7 @@ const I18N = {
     install_submode_custom_badge: '進入插件目錄執行',
     install_ai_note_badge: '零終端機操作 • AI 互動引導',
     install_ai_installer_title: 'AI 智能安裝引導（支援跨 IDE）',
-    install_ai_preview_prompt: '“請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity Plugins。<br><br>請依序執行以下引導流程：<br>1. 先確認我目前使用的 IDE（Antigravity / Cursor / VS Code）。<br>2. 詢問我要安裝哪些套件（全部，或自選）。不相容目前 IDE 的套件請略過並說明原因（目前僅 Quota Status 不支援 VS Code；MCP Manager 在 Cursor / VS Code 為檢視模式）。<br>3. 詢問本機放置目錄（預設建議 D:\\antigravity-plugins），然後 Git Clone 並掛載到該 IDE 的 extensions 目錄。<br>4. 完成後提醒重載視窗 (Developer: Reload Window)；若是 VS Code，建議完整關閉再開。”',
+    install_ai_preview_prompt: '“請幫我從 GitHub (https://github.com/TonyLongGu/antigravity-plugins.git) 安裝 Antigravity Plugins。<br><br>請依序執行以下引導流程：<br>1. 先確認我目前使用的 IDE（Antigravity / Cursor / VS Code）。<br>2. 詢問我要安裝哪些套件（全部，或自選）。不相容目前 IDE 的套件請略過並說明原因（目前僅 Quota Status 不支援 VS Code。MCP Manager 在 Cursor / VS Code 只顯示底部狀態列，不開左側儀表板；Cline 統計只在該 IDE 已啟用 Cline 時出現）。<br>3. 詢問本機放置目錄（預設建議 D:\\antigravity-plugins），然後 Git Clone 並掛載到該 IDE 的 extensions 目錄。<br>4. 完成後提醒重載視窗 (Developer: Reload Window)；若是 VS Code，建議完整關閉再開。”',
     git_clone_copied: '已複製 Git Clone 指令！',
     footer_issues: '問題回報 (Issues)',
     
@@ -206,9 +206,9 @@ const I18N = {
     section_install_title: 'Two Installation Methods • Seamless Setup',
     section_install_desc: 'Choose between "Download ZIP 1-Click Install" or "AI Guided Installation (Prompt-Driven)". Supports both full-suite batch install and selective individual plugin setups.',
     
-    install_tab_zip: 'Method 1: Download ZIP Package',
+    install_tab_zip: 'Method 2: Download ZIP Package',
     install_tab_zip_sub: 'No Git Required • Point & Click',
-    install_tab_git: 'Method 2: AI Guided Installation',
+    install_tab_git: 'Method 1: AI Guided Installation',
     install_tab_git_sub: 'One-Click Prompt • AI Conversational Setup',
     
     install_zip_step1_title: 'Download Suite Package & Extract',
@@ -250,7 +250,7 @@ const I18N = {
     install_submode_custom_badge: 'Run in plugin directory',
     install_ai_note_badge: 'Zero Terminal • AI Conversational',
     install_ai_installer_title: 'AI Interactive Installer (Multi-IDE)',
-    install_ai_preview_prompt: '“Please help me install Antigravity Plugins from GitHub (https://github.com/TonyLongGu/antigravity-plugins.git).<br><br>Please guide me through the following interactive workflow:<br>1. Confirm which IDE I am using (Antigravity / Cursor / VS Code).<br>2. Ask which plugins to install (all, or a selection). Skip plugins that do not support this IDE and explain why (currently only Quota Status does not support VS Code; MCP Manager is in view mode on Cursor / VS Code).<br>3. Ask where to clone the repo (recommended default: D:\\antigravity-plugins), then mount into that IDE’s extensions folder.<br>4. After install, remind me to reload the window (Developer: Reload Window); for VS Code, fully quit and reopen.”',
+    install_ai_preview_prompt: '“Please help me install Antigravity Plugins from GitHub (https://github.com/TonyLongGu/antigravity-plugins.git).<br><br>Please guide me through the following interactive workflow:<br>1. Confirm which IDE I am using (Antigravity / Cursor / VS Code).<br>2. Ask which plugins to install (all, or a selection). Skip plugins that do not support this IDE and explain why (currently only Quota Status does not support VS Code. On Cursor / VS Code, MCP Manager only shows a status-bar counter and does not open the left-side dashboard; Cline stats appear only when Cline is enabled in that IDE).<br>3. Ask where to clone the repo (recommended default: D:\\antigravity-plugins), then mount into that IDE’s extensions folder.<br>4. After install, remind me to reload the window (Developer: Reload Window); for VS Code, fully quit and reopen.”',
     git_clone_copied: 'Git Clone command copied!',
     footer_issues: 'Report Issues (Issues)',
     
