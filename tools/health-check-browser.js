@@ -13,7 +13,7 @@
  *   本工具真的開一個瀏覽器載入真檔、跑真 rAF，量畫布像素與粒子軌跡，約 30 秒、需要 Chromium 系瀏覽器。
  *   兩者互補：前者守契約，後者守「跑起來的樣子」。
  *
- * 驗什麼（B1–B20）：
+ * 驗什麼（B1–B21）：
  *   載入與契約
  *     B1  粒子引擎就緒（window.NebulaEngine 存在）
  *     B2  全程 console 例外 0
@@ -34,13 +34,14 @@
  *     B15 取消 reduced-motion 後動畫自動恢復
  *     B16 pause() 後不再產生新幀
  *     B17 resume() 後動畫恢復且顆數不變
+ *     B21 重複觸發 visibilitychange 不會多開一條 rAF 鏈（每幀仍只畫一次）
  *     B18 像素層沒有烙暗暗紅 #60120c
  *     B19 游標附近有墨點（不是空場）
  *     B20 平均 rAF 間隔 ≤ 20ms
  *
  * 測不到什麼（覆蓋邊界）：
  *   - 真實手感（本工具只給數值，好不好看要人眼）
- *   - 高刷新率螢幕（引擎全程 per-frame，量測固定為 60Hz 邏輯）
+ *   - 高刷新率螢幕（4.20 起已做 dt 正規化，速度與刷新率無關；本工具仍只量 60Hz 邏輯）
  *   - DPR ≠ 1 的實機；Safari／Firefox（只驅動 Chromium 系）
  *   - 觸控裝置（本站粒子設計上沒有觸控互動）
  *   - macOS／Linux 的瀏覽器路徑表只實作、未實測（開發機是 Windows）
@@ -424,10 +425,12 @@ function shutdown() {
     /* --calibrate：把「橫向漂移」這一類缺陷（順勢帶的等效指紋）注入到記憶體裡的回應，
        不動磁碟上的檔案；量完就結束，原始碼全程保持原樣。 */
     if (CALIBRATE) {
-      const needle = 'this.y -= (dy / dist) * force * EMBER_MOUSE_PUSH;';
+      /* needle 必須跟著那一行改：4.20 的 dt 正規化在句尾加了 `* dt`。
+         這裡用正則容忍 `* dt` 的有無，避免日後再微調係數又讓 --calibrate 失效。 */
+      const needle = /this\.y -= \(dy \/ dist\) \* force \* EMBER_MOUSE_PUSH(?: \* dt)?;/;
       const src = fs.readFileSync(path.join(ROOT, 'assets/js/nebula-canvas.js'), 'utf8');
-      if (!src.includes(needle)) throw new Error('--calibrate 找不到注入點（原始碼已改動？請更新 needle）');
-      const patched = src.replace(needle, needle + '\n        this.x += force * 10;   /* calibrate: 橫向漂移 */');
+      if (!needle.test(src)) throw new Error('--calibrate 找不到注入點（原始碼已改動？請更新 needle）');
+      const patched = src.replace(needle, (m) => m + '\n        this.x += force * 10;   /* calibrate: 橫向漂移 */');
       await S('Fetch.enable', { patterns: [{ urlPattern: '*nebula-canvas.js*', requestStage: 'Request' }] });
       dbg.on((m) => {
         if (m.method !== 'Fetch.requestPaused') return;
@@ -625,6 +628,18 @@ function shutdown() {
     check('B17', 'resume() 後動畫恢復且顆數不變（' + COUNTS.cursor + '）',
       q2.frames > 40 && Math.abs(q2.fills - COUNTS.cursor) < 0.51, 'frames=' + q2.frames + '，fills/frame=' + q2.fills);
 
+    /* -------------------------------------- B21 visibilitychange 不重複開鏈（4.21） */
+    /* 舊版（≤4.20）的可見分支是**無條件** animate()：只要在「迴圈已經在跑」時再收到一次
+       visibilitychange（被遮擋後恢復、螢幕喚醒、作業系統補發事件等都會遇到），
+       就會多出第二條 rAF 鏈 → 每幀繪製次數翻倍，粒子看起來快 2 倍，反覆觸發還會累加成 3×、4×。
+       這裡在可見狀態下連發 3 次：正確行為＝每幀仍只畫一次（900ms 約 54 幀，不是 108／216）。 */
+    const pageVisible = await ev('return !document.hidden;');
+    await ev('for (let i = 0; i < 3; i++) document.dispatchEvent(new Event("visibilitychange")); return true;');
+    const q3 = await sample(900);
+    check('B21', '重複觸發 visibilitychange 不會產生第二條 rAF 鏈（每幀仍只畫一次）',
+      pageVisible && q3.frames <= 75 && Math.abs(q3.fills - COUNTS.cursor) < 0.51,
+      'visible=' + pageVisible + '，frames=' + q3.frames + '（單鏈 ≈54、雙鏈 ≈108、四鏈 ≈216），fills/frame=' + q3.fills);
+
     /* ------------------------------------------------------------- B20 效能 */
     await ev('window.__t=[];(function s(t){window.__t.push(t);'
       + 'if(window.__t.length<200)requestAnimationFrame(s);})(performance.now());return true;');
@@ -679,7 +694,7 @@ function shutdown() {
   console.log('\n' + bar);
   console.log('結果：' + (fails.length ? `不通過（FAIL ${fails.length}）` : '通過（FAIL 0）')
     + '，共 ' + results.length + ' 項（通過 ' + pass + '）');
-  console.log('測不到：真實手感、高刷新率螢幕、DPR≠1、Safari／Firefox、觸控、非 Windows 的瀏覽器路徑表');
+  console.log('測不到：真實手感、高刷新率螢幕（4.20 起已 dt 正規化，本工具仍只量 60Hz）、DPR≠1、Safari／Firefox、觸控、非 Windows 的瀏覽器路徑表');
   if (fails.length) {
     console.log('\n--- FAIL (' + fails.length + ') ---');
     for (const f of fails) console.log('  ! ' + f);

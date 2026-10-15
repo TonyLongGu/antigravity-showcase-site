@@ -43,8 +43,8 @@
   const MOUSE_CONNECT_DISTANCE = 160;
 
   /* VS Code 字形模式的動態速度旋鈕（4.14：使用者要求「VS Code 那組字形的粒子動態速度提高 10%」）。
-     只乘在字形自己的「每幀位移量」與「每幀相位推進量」上——引擎全程 per-frame（沒有做 dt 正規化），
-     所以速率等比放大＝節奏等比變快，不需要動計時器，也不會改變顆數與密度。
+     只乘在字形自己的「每幀位移量」與「每幀相位推進量」上——這兩個量在 4.20 起都會再乘上 dt
+     （見檔頭 dt 正規化），所以速率等比放大＝節奏等比變快，不需要動計時器，也不會改變顆數與密度。
      **只作用於 CodeParticle**：星空（Particle）與餘燼（EmberParticle）維持原速，
      使用者只指定要 VS Code 這組字形變快。
      **不動**的：顆數、尺寸、亮度、顏色、連線門檻，以及滑鼠互動（推力常數與提亮低通 `0.09`）——
@@ -142,6 +142,29 @@
     mouse.y = -1000;
   });
 
+  /* ---------------------------------------------------------------------
+     dt 正規化（4.20）：讓粒子速度與螢幕刷新率完全無關。
+     引擎的每個位移都是「每 60fps 一幀」的位移（px/幀、相位/幀），所以視覺速度＝瀏覽器實際幀率：
+     60Hz 是設計基準，120Hz 快 2 倍、240Hz 快 4 倍。本機實測（同一顆 60Hz 外接螢幕）：
+     預設 60 幀／秒、每秒位移 13.8px；把幀率上限解除後變 1870 幀／秒、每秒位移約 1100px
+     ——顆數與圖樣完全不變（每幀固定 92 次 fill），證明「只有速度變」。
+     這裡改成**把時間當自變數**：每幀先算出「這一幀等於幾個基準幀」dt ＝ Δms ÷ (1000/60)，
+     所有累加量一律乘上 dt（位移、相位、壽命、角度、低通係數）。
+     於是「每秒推進量」恆等於 60Hz 的設計值，高刷螢幕多出來的是**更細的步進（更滑順）**，
+     而不是更快的速度 —— 這正是 4.19「鎖 60fps」做不到的（那個版本把高刷的滑順度丟掉了）。
+       dt = 1（60Hz）→ 每一項都與 4.18 完全相同（調校值一個都沒動）。
+       dt > 1（掉幀、30Hz 螢幕）→ 自動補回同樣的每秒推進量。
+       dt 上限 DT_MAX：切分頁回來／長卡頓（Δ 可能好幾秒）時夾住，
+       寧可讓它「慢一點點」也不要一次跳位。
+     低通（alpha／near 的 `x += (target − x) × k`）不是位移而是指數逼近，不能直接乘 dt，
+     要用 EASE(perFrame, dt) ＝ 1 − (1 − k)^dt —— dt = 1 時正好等於原本的 k。
+     --------------------------------------------------------------------- */
+  const FRAME_MS = 1000 / 60;   // 設計基準幀長
+  const DT_MAX = 3;             // 單幀最大補償（≈50ms）：涵蓋 20Hz 以上，再慢就當作卡頓
+  function EASE(perFrame, dt) {
+    return 1 - Math.pow(1 - perFrame, dt);
+  }
+
   class Particle {
     constructor() {
       this.x = Math.random() * width;
@@ -155,9 +178,9 @@
       this.color = Math.random() > 0.4 ? '#00f2fe' : '#7f00ff';
     }
 
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
+    update(dt) {
+      this.x += this.vx * dt;
+      this.y += this.vy * dt;
 
       if (this.x < 0) this.x = width;
       if (this.x > width) this.x = 0;
@@ -171,8 +194,8 @@
 
       if (dist < mouse.radius && dist > 0.5) {
         const force = (mouse.radius - dist) / mouse.radius;
-        this.x -= (dx / dist) * force * 1.5;
-        this.y -= (dy / dist) * force * 1.5;
+        this.x -= (dx / dist) * force * 1.5 * dt;
+        this.y -= (dy / dist) * force * 1.5 * dt;
         this.alpha = Math.min(1, this.baseAlpha + force * 0.5);
       } else {
         this.alpha = this.baseAlpha;
@@ -368,7 +391,8 @@
      ② 推力＝**每幀直接位移** `1.5 × force`：`this.x -= (dx/dist) * force * 1.5`
         → 沒有速度累積、沒有 0.988 滑行、沒有順勢帶／側向剪切／上抬（那四個是 61a86e6 的東西）
      ③ 靠近提亮 `+0.22 × force`，再用 `×0.08` 低通逼近（HEAD 的 drawAlpha 平滑）
-     ＝粒子只是「禮貌地讓開」，游標一離開就停，不會被帶著跑。 */
+     ＝粒子只是「禮貌地讓開」，游標一離開就停，不會被帶著跑。
+     4.20：② 是位移 → 整項乘 dt；③ 是低通 → 用 EASE(0.08, dt)。dt = 1（60Hz）時兩者都等於原值。 */
   const EMBER_MOUSE_PUSH = 1.5;         // HEAD：this.x -= (dx / dist) * force * 1.5
   const EMBER_NEAR_BRIGHT = 0.22;       // HEAD：brightTarget = brightness + force * 0.22
   /* 提亮後的上限：HEAD 是 EMBER_BRIGHT_CAP = 0.82，但那是作用在 HEAD 的 brightness 尺度上；
@@ -466,46 +490,48 @@
       return this.baseRadius * (0.38 + 0.87 * Math.pow(depth, 1.05));
     }
 
-    update() {
-      this.age += 1;
+    update(dt) {
+      this.age += dt;
       this.life = Math.min(1, this.age / this.lifespan);
-      this.flickerPhase += this.flickerSpeed;
-      this.riseWobblePhase += this.riseWobbleSpeed;
-      this.swayPhase += this.swaySpeed;
-      this.angle += this.spin;               // 純自轉：滑鼠互動不再影響角度
+      this.flickerPhase += this.flickerSpeed * dt;
+      this.riseWobblePhase += this.riseWobbleSpeed * dt;
+      this.swayPhase += this.swaySpeed * dt;
+      this.angle += this.spin * dt;          // 純自轉：滑鼠互動不再影響角度
 
       /* 浮力：熱氣柱把剛離火源的餘燼慢慢帶起來，越往上越快（4.4 起 0.28 → 1.72 倍）。
          這同時是密度梯度：底部慢＝停留久＝顆數集中（火源亮帶），
          上方快＝稀疏掠過（灰燼飄散），並讓「越往上越快」的加速感看得出來。 */
       const rise = this.baseRise * (EMBER_RISE_START + EMBER_RISE_GAIN * this.life) *
         (1 + 0.14 * Math.sin(this.riseWobblePhase));
-      this.y -= rise;
+      this.y -= rise * dt;
 
       /* 羽流：離熱源越遠越寬，但側向一律夾在「上升速度的一半」之內 ——
          舊版頂端側向可達 1.68 px/幀（比垂直快 3 倍以上，看起來是橫著飛出畫面）
          就是少了這道夾。垂直永遠主導，才是火的樣子。 */
       const push = (this.x - this.originX) * this.spread;
       const limit = rise * 0.5;
-      this.x += Math.max(-limit, Math.min(limit, push));
+      this.x += Math.max(-limit, Math.min(limit, push)) * dt;
       // 低頻蛇行 ＋ 持久側傾（越下面越明顯，頂端不再加速側移）
-      this.x += Math.sin(this.swayPhase) * this.swayAmp * 0.35 +
-        this.drift * (0.5 + 0.5 * (1 - this.life));
+      this.x += (Math.sin(this.swayPhase) * this.swayAmp * 0.35 +
+        this.drift * (0.5 + 0.5 * (1 - this.life))) * dt;
 
       /* 滑鼠互動＝HEAD（7f9f3d3）的 EmberParticle.update()，逐項照抄：
-         dx／dy 取「游標 − 粒子」→ 減掉法向分量＝把粒子推離游標，**每幀直接位移**（無速度累積、無滑行）。
+         dx／dy 取「游標 − 粒子」→ 減掉法向分量＝把粒子推離游標，**直接位移**（無速度累積、無滑行）。
          dist > 0.5 的守門照 HEAD；游標不在畫面時座標是 −1000，自然不會作用。
-         提亮目標＝force，再以 EMBER_NEAR_EASE 低通逼近（HEAD 的 drawAlpha 平滑）。 */
+         提亮目標＝force，再以 EMBER_NEAR_EASE 低通逼近（HEAD 的 drawAlpha 平滑）。
+         4.20：推力是位移，整項乘 dt（每秒推開的距離與刷新率無關）；
+         低通不是位移而是指數逼近，改用 EASE(EMBER_NEAR_EASE, dt)（dt = 1 時等於原值）。 */
       const dx = mouse.x - this.x;
       const dy = mouse.y - this.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
       let nearTarget = 0;
       if (dist < mouse.radius && dist > 0.5) {
         const force = (mouse.radius - dist) / mouse.radius;
-        this.x -= (dx / dist) * force * EMBER_MOUSE_PUSH;
-        this.y -= (dy / dist) * force * EMBER_MOUSE_PUSH;
+        this.x -= (dx / dist) * force * EMBER_MOUSE_PUSH * dt;
+        this.y -= (dy / dist) * force * EMBER_MOUSE_PUSH * dt;
         nearTarget = force;
       }
-      this.near += (nearTarget - this.near) * EMBER_NEAR_EASE;
+      this.near += (nearTarget - this.near) * EASE(EMBER_NEAR_EASE, dt);
 
       this.computeAlpha();
 
@@ -629,10 +655,10 @@
       this.y = height + this.size * 2;
     }
 
-    update() {
-      this.bobPhase += this.bobSpeed;
-      this.x += this.vx;
-      this.y += this.vy + Math.sin(this.bobPhase) * 0.12;
+    update(dt) {
+      this.bobPhase += this.bobSpeed * dt;
+      this.x += this.vx * dt;
+      this.y += (this.vy + Math.sin(this.bobPhase) * 0.12) * dt;
 
       if (this.y < -this.size * 2) this.recycle();
       if (this.x < -this.size * 3) this.x = width + this.size;
@@ -645,10 +671,10 @@
       if (dist < mouse.radius && dist > 0.5) {
         const force = (mouse.radius - dist) / mouse.radius;
         target = Math.min(0.74, this.baseAlpha + force * 0.5);
-        this.x -= (dx / dist) * force * 0.5;
-        this.y -= (dy / dist) * force * 0.5;
+        this.x -= (dx / dist) * force * 0.5 * dt;
+        this.y -= (dy / dist) * force * 0.5 * dt;
       }
-      this.alpha += (target - this.alpha) * 0.09;
+      this.alpha += (target - this.alpha) * EASE(0.09, dt);
     }
 
     draw() {
@@ -744,7 +770,11 @@
     : null;
   let reduceMotion = !!(reduceMotionQuery && reduceMotionQuery.matches);
 
-  function renderFrame() {
+  /* step＝「這一幀等於幾個基準幀」（dt 正規化，見檔頭）。
+     省略時視為 1：pause／resume、切風格、reduced-motion 的單幀補畫都是一次「正好一幀」，
+     與改動前的每幀語意完全相同。 */
+  function renderFrame(step) {
+    const dt = typeof step === 'number' && step > 0 ? step : 1;
     ctx.clearRect(0, 0, width, height);
 
     const spec = specFor(mode);
@@ -753,7 +783,7 @@
 
     ctx.globalCompositeOperation = spec.blend;
     for (let p of particles) {
-      p.update();
+      p.update(dt);
       p.draw();
     }
     if (spec.lines) drawLines();
@@ -761,30 +791,74 @@
     ctx.globalAlpha = 1;
   }
 
-  function animate() {
-    if (isPaused) return;
+  /* ---------------------------------------------------------------------
+     dt 的來源（4.20）：算出「這一幀等於幾個基準幀」再交給 renderFrame()。
+     60Hz → dt ≈ 1、120Hz → ≈ 0.5、240Hz → ≈ 0.25；
+     於是每秒推進量恆為設計值，高刷多出來的是更細的步進（更滑順），不是更快的速度。
+     時間戳缺席（pause／resume、切風格、媒體查詢變更等直接呼叫）＝一幀，
+     並把 lastFrameTs 歸零 → 下一次 rAF 重新起算，避免把暫停期間算成一大段 dt。
+     --------------------------------------------------------------------- */
+  let lastFrameTs = 0;
 
-    renderFrame();
+  function animate(ts) {
+    if (isPaused) return;
 
     // 減少動態：畫完這一幀就停（要更新時由 setMode／媒體查詢變更再重畫一次）
     if (reduceMotion) {
+      renderFrame();
       animationFrameId = null;
       return;
     }
 
+    let dt = 1;
+    if (typeof ts === 'number') {
+      if (lastFrameTs) {
+        dt = (ts - lastFrameTs) / FRAME_MS;
+        if (!(dt > 0)) dt = 1;              // 時間戳沒前進（異常）→ 當作一幀
+        else if (dt > DT_MAX) dt = DT_MAX;  // 長卡頓／切分頁回來 → 夾住，不一次跳位
+      }
+      lastFrameTs = ts;
+    } else {
+      lastFrameTs = 0;
+    }
+
+    renderFrame(dt);
     animationFrameId = requestAnimationFrame(animate);
+  }
+
+  /* ---------------------------------------------------------------------
+     迴圈狀態的唯一來源＝animationFrameId（非 null ＝ 已經有一幀在排隊）。
+     4.21：補掉「可能多出一條 rAF 鏈」的缺口 —— 舊版的 hidden 分支只 cancel、
+     沒有把 id 歸零，可見分支又無條件 animate()；只要有一次 cancel 沒生效
+     （事件與 rAF 的競態），就會同時有兩條迴圈在跑 → 粒子速度 2×，
+     反覆切分頁還會累加成 3×、4×。現在 cancel 一律連狀態一起清（stopLoop），
+     開鏈一律經過 startLoop 的守衛（已有鏈就什麼都不做）。
+     --------------------------------------------------------------------- */
+  function stopLoop() {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+  }
+
+  /* 起一條新的 rAF 鏈。paintNow＝先同步畫一幀（載入、resume、切回可見時不要等到
+     下一個 rAF 才更新畫面；reduced-motion 的單幀補畫也是走這條）。
+     暫停中或已有鏈在跑 → 直接不做（避免留下「已觸發但沒續接」的殘值 id）。 */
+  function startLoop(paintNow) {
+    if (isPaused || animationFrameId) return;
+    if (paintNow) animate();
+    else animationFrameId = requestAnimationFrame(animate);
   }
 
   if (reduceMotionQuery) {
     const onReduceMotionChange = (e) => {
       reduceMotion = e.matches;
       if (reduceMotion) {
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
+        stopLoop();
         // 影片全螢幕等暫停狀態下不補畫，維持 pause 的語意
         if (!isPaused) renderFrame();
       } else if (!isPaused && !document.hidden) {
-        animate();
+        startLoop(true);
       }
     };
     if (reduceMotionQuery.addEventListener) {
@@ -798,25 +872,24 @@
   function pause() {
     if (isPaused) return;
     isPaused = true;
-    if (animationFrameId) {
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = null;
-    }
+    stopLoop();
   }
 
   function resume() {
     if (!isPaused) return;
     isPaused = false;
     if (!document.hidden) {
-      animate();
+      startLoop(true);
     }
   }
 
+  /* 分頁切走 → 停鏈並把狀態清乾淨；切回來 → 只有在「沒有鏈在跑」時才重新起鏈
+     （4.21 起 hidden 分支也會把 animationFrameId 歸零，不再留殘值）。 */
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    } else {
-      if (!isPaused) animate();
+      stopLoop();
+    } else if (!isPaused) {
+      startLoop(true);
     }
   });
 
@@ -846,6 +919,6 @@
 
   spawn();
   ready = true;   // 之後的 resize 才能安全地比對 MODE_SPECS 顆數
-  animate();
+  startLoop(true);
 })();
 

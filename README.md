@@ -101,7 +101,7 @@ node tools/health-check.js
 原始碼層的 C1–C8 驗不到「真的跑起來長怎樣」，所以另有一支用 CDP 驅動本機 Chrome／Edge 的工具：
 
 ```bash
-node tools/health-check-browser.js               # B1–B20，約 40 秒
+node tools/health-check-browser.js               # B1–B21，約 40 秒
 node tools/health-check-browser.js --calibrate   # 負對照自我校準：故意注入缺陷，證明它真的抓得到
 node tools/health-check-browser.js --only B7,B8  # 只跑指定項目（除錯用）
 node tools/health-check-browser.js --keep-profile  # 保留暫存 profile
@@ -109,11 +109,13 @@ node tools/health-check-browser.js --keep-profile  # 保留暫存 profile
 
 驗什麼：粒子顆數契約（各模式每幀 fills）、殘影、視窗縮放的密度同步、餘燼的滑鼠互動
 （推力存在／不越過 160px／無順勢帶橫向漂移／提亮不變暗）、像素層（無烙暗）、生命週期
-（切風格、reduced-motion 單幀、pause／resume）、rAF 效能、console 例外。
+（切風格、reduced-motion 單幀、pause／resume、重複觸發 visibilitychange 不會多開一條 rAF 鏈）、
+rAF 效能、console 例外。
 
 它會自己開一個**隨機埠**的臨時靜態伺服器（不動 `preview.js` 的 3300）、自動偵測 Chrome／Edge／Chromium，
 測完自動清掉暫存 profile；**找不到瀏覽器或 Node < 22 時一律 SKIP 並以退出碼 `0` 結束**（不誤報）。
-退出碼：`0` = 無 FAIL、`1` = 有 FAIL。涵蓋邊界（真實手感、高刷新率、DPR≠1、Safari／Firefox、觸控）寫在腳本檔頭。
+退出碼：`0` = 無 FAIL、`1` = 有 FAIL。涵蓋邊界（真實手感、DPR≠1、Safari／Firefox、觸控）寫在腳本檔頭；
+高刷新率螢幕自 4.20 起已由 `nebula-canvas.js` 做 dt 正規化（速度與刷新率無關，高刷只換來更細的步進），本工具仍只量 60Hz 邏輯。
 
 ### 新增／修改一個視覺主題時要同步五個地方
 
