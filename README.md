@@ -148,3 +148,85 @@ node tools/dead-css.js --strict   # 有死碼時以退出碼 1 結束（可掛 h
 - 只盤點、不改檔。由 JS 字串拼接產生的類別（例如 ``badge-${type}``）只要字串片段有出現在程式碼就算有引用，仍可能漏判，需人工確認後再刪。
 - 目前狀態：6 個 CSS 檔、329 個 class 全部有引用（2026-10 已清掉 `.feature-box` 系列、舊版子模式卡、`.hero-ide-pill`、`.shortcut-*`、`.chat-quote`、`.code-snippet`，以及沒人用的 `@keyframes float／pulse-slow／shimmer`）。
 
+---
+
+## 🧠 知識圖譜（Graphify，給 AI／維護者）
+
+> 本節於 2026-10-23 由 `AGENTS.md` 搬來：**查閱型資料**（邊界表、節點數、指令）放 README（0 常駐成本），
+> `AGENTS.md` 只留「沒查就會做錯」的規則。要改圖譜前，**紅線一律先看 `AGENTS.md` §3.3**。
+
+### 圖譜在哪
+
+| 路徑 | 內容 | 什麼時候讀 |
+| --- | --- | --- |
+| `graphify-out/GRAPH_REPORT.md` | 摘要（節點／邊／社群數、EXTRACTED 比例、建圖 commit）＋ Community Hubs ＋ God Nodes ＋ 意外關聯 | 第一個讀它（10–20 KB，多數問題這份就夠） |
+| `graphify-out/graph.html` | 互動式視覺化 | 想看圖時才開 |
+| `graphify-out/graph.json` | 完整圖（0.26–1.8 MB） | **不要整檔讀**（幾乎必然超 token 預算） |
+
+`graphify-out/` 已被 `.gitignore` 排除（`git check-ignore -v graphify-out/graph.json` 可驗），**不可 commit**——否則會被 GitHub Pages 一起部署出去。
+
+### 現況與邊界
+
+> 現況（2026-10-23 更新）：**288 節點 ＝ code 247 ／ document 34 ／ concept 7**（508 邊、16 社群）。
+> 節點最多的來源：`app.js` 51、`nebula-canvas.js` 40、`health-check-browser.js` 35、`health-check.js` 33、`preview.js` 28、`AGENTS.md` 16、`theme.js` 13。
+
+| 類別 | 有沒有進圖 | 影響 |
+| --- | --- | --- |
+| `assets/js/**`、`tools/**`、`preview.js` | ✅ 程式碼節點（附檔名＋行號） | 架構／呼叫鏈／影響半徑都可靠圖譜 |
+| `README.md`、`開發者筆記.md`、`AGENTS.md` | ⚠️ **只有標題節點**（`file_type: document`；零成本、無語意抽取） | 能查到「哪份文件談過哪個主題」，但**不會有內容摘要** → 要讀內容請開檔。⚠️ 改 `.md` 的**標題**才會動到圖譜（只改內文不影響） |
+| `index.html` | ❌ **不進圖** | DOM 結構、區塊順序、`?v=` 版本號 → 一律直接讀檔 |
+| `assets/css/**`（6 檔） | ❌ **完全不進圖** | 版面、間距、顏色、z-index、影格動畫 → 直接讀 CSS，別浪費時間查圖 |
+| `assets/js/plugins-data.js`、`subtitles-data.js` | ❌ 已在 `.graphifyignore` 排除 | 避免數十個孤立節點；內容問題直接讀檔 |
+| `.vtt`（14）、圖片、`.nojekyll` 等 | ❌ 未進圖 | 報告 `Corpus Check → Unclassified` 會列出它們，屬正常 |
+
+### 常用指令（全部本地、免 API key）
+
+```powershell
+# 任務開始：理解架構／找影響半徑
+Get-Content graphify-out\GRAPH_REPORT.md -TotalCount 20 -Encoding UTF8
+graphify god-nodes --top 10
+graphify explain "initCustomVideoPlayer"          # 單一節點（附檔名＋行號）
+graphify affected "initCustomVideoPlayer" --depth 2   # 改動影響半徑
+graphify query "影片播放器怎麼初始化" --context call --budget 1500
+graphify path "A" "B"                             # 兩點關係路徑
+graphify diagnose multigraph                      # 圖譜品質診斷
+
+# 任務收尾：有改 JS／tools／preview.js 就跑（零成本、原始碼不外送）
+graphify update .
+```
+
+> ⚠️ `query` **不加 `--context`** 會撈出整片社群、遠超預算並回 exit code 1（那是超預算提示，不是壞掉）。
+> ⚠️ `graph_stats` 是 MCP 專屬工具名，**CLI 沒有**這個子命令。
+> ⚠️ `update` 沒有 `--code-only`（v0.9.80 實測 `exit 2`）；旗標一律查 `graphify --help` 的 `update <path>` 段落。
+
+---
+
+## 🗺️ 檔案地圖（要改哪裡）
+
+> 「進圖節點數」為 2026-10-23 建圖值，重跑 `graphify update .` 後以 `GRAPH_REPORT.md` 為準。
+
+| 檔案 | 職責 | 進圖節點數 |
+| --- | --- | --- |
+| `index.html` | 全站唯一頁面；`<head>` 的主題 bootstrap 白名單（防 FOUC）＋每支資產的 `?v=` | ❌ |
+| `assets/js/nebula-canvas.js` | 背景粒子引擎（星空 75／字形 92／餘燼 90 三模式）；速度與刷新率無關（4.20 dt 正規化）；迴圈守衛（4.21） | 40 |
+| `assets/js/app.js` | 自訂影片播放器＋UI 互動（God Nodes：`initCustomVideoPlayer`／`getPlayerDOM`／`switchTutorialVideo`／`wakePlayerUI`） | 51 |
+| `assets/js/theme.js` | 主題切換（`THEMES`、`DEFAULT_THEME = 'vscode'`）＋導覽 scrollspy（`initNavCurrent`） | 13 |
+| `assets/js/i18n.js` | zh-TW／en 雙語（C6 契約，各 115 鍵） | 7 |
+| `assets/js/storage.js` | `SafeStorage`（無痕模式安全存取；主題與語言靠它持久化） | 2 |
+| `assets/js/config.js` | 站點設定 `SITE_CONFIG`（appName／author／GitHub／defaultLang／`version`／`lastUpdated`／license） | 2 |
+| `assets/js/filter.js` | 外掛分類篩選 | 5 |
+| `assets/js/developer-notes.js` | 開發者筆記文章資料 | 2 |
+| `assets/js/plugins-data.js`、`subtitles-data.js` | 資料檔（字幕由產生器編譯） | ❌ 已排除 |
+| `assets/css/*`（6 檔） | variables／base／components／animations／theme-cursor／theme-vscode | ❌ |
+| `preview.js`、`preview-site.bat`、`preview-site-stop.bat` | 本機預覽伺服器（可重複執行；`--probe`／`--detach`／`--stop`） | 28 |
+| `tools/health-check.js` | C1–C8 原始碼契約（秒級、無相依） | 33 |
+| `tools/health-check-browser.js` | B1–B21 瀏覽器實測（CDP 驅動；`--calibrate`／`--only`） | 35 |
+| `tools/build-subtitles.js` | VTT → `subtitles-data.js`（**改字幕後必跑**） | 11 |
+| `tools/dead-css.js` | 死碼盤點（只報告；`--strict` 可掛 CI） | 11 |
+| `tools/update-site-meta.ps1` | 更新「網站更新時間」與各外掛版本號（寫 `config.js` 的 `lastUpdated`＋`index.html` 靜態備援值＋`plugins-data.js` 的 `version`） | 7 |
+| `graphify-out/` | 圖譜產物（**ignored，勿 commit**） | — |
+| `.graphifyignore` | 圖譜掃描排除清單（目前兩個資料檔） | — |
+| `AGENTS.md` | 專案層 AI 規範（圖譜優先／收尾更新圖譜／驗收契約／實測陷阱） | 16（2026-10-23） |
+| `README.md` | 本檔：上線／預覽／字幕／健檢／死碼／主題五處同步＋知識圖譜＋檔案地圖 | 14（標題節點） |
+| `開發者筆記.md` | 展示用文章內容 | ⚠️ 標題 |
+

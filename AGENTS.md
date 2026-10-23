@@ -1,7 +1,8 @@
 # AGENTS.md — antigravity-showcase-site（專案層規範）
 
 > 若你的 Harness／工作區另有**全域或使用者層**規範，**衝突時以全域為準**（安全／授權 ＞ 正確性 ＞ 精簡）。
-> 本檔只補「這個專案獨有」的三件事：**① 知識圖譜優先　② 改完主動更新圖譜　③ 改動後的驗收契約**。
+> 本檔只放「**AI 必須自己知道、不能靠查**」的東西：① 圖譜優先　② 改完主動更新圖譜　③ 驗收契約　④ 實測陷阱。
+> **查閱型資料不放這裡**（檔案地圖、完整圖譜邊界、指令速查）→ 見 `README.md` 的「🧠 知識圖譜」「🗺️ 檔案地圖」兩節。
 
 ---
 
@@ -73,24 +74,15 @@ if ($head -like "$rep*") { "圖譜與 HEAD 一致（$rep）" } else { "圖譜落
 
 ---
 
-## 2. 圖譜的邊界（別期待它回答什麼）
+## 2. 圖譜的邊界（只記三件事）
 
-> 現況（2026-10-15 建圖）：**285 節點 ＝ code 247 ／ document 31 ／ concept 7**（505 邊、17 社群）。
-> 節點最多的來源：`app.js` 51、`nebula-canvas.js` 40、`health-check-browser.js` 35、`health-check.js` 33、`preview.js` 28、**`AGENTS.md` 18**、`theme.js` 13。
-
-| 類別 | 有沒有進圖 | 影響 |
-| :--- | :--- | :--- |
-| `assets/js/**`、`tools/**`、`preview.js` | ✅ 程式碼節點（附檔名＋行號） | 架構／呼叫鏈／影響半徑都可靠圖譜 |
-| `README.md`、`開發者筆記.md`、**`AGENTS.md`** | ⚠️ **只有標題節點**（`file_type: document`；零成本、無語意抽取） | 能查到「哪份文件談過哪個主題」，但**不會有內容摘要** → 要讀內容請開檔。⚠️ 改 `.md` 的**標題**才會動到圖譜（只改內文不影響） |
-| `index.html` | ❌ **不進圖** | DOM 結構、區塊順序、`?v=` 版本號 → 一律直接讀檔 |
-| `assets/css/**`（6 檔） | ❌ **完全不進圖** | 版面、間距、顏色、z-index、影格動畫 → 直接讀 CSS，別浪費時間查圖 |
-| `assets/js/plugins-data.js`、`subtitles-data.js` | ❌ 已在 `.graphifyignore` 排除 | 避免數十個孤立節點；內容問題直接讀檔 |
-| `.vtt`（14）、圖片、`.nojekyll` 等 | ❌ 未進圖 | 報告 `Corpus Check → Unclassified` 會列出它們，屬正常 |
-
-- 圖譜是**程式架構圖**，不是行為文件：「某功能怎麼運作」要靠 `explain`／`query --context` ＋ 原始碼註解。
-- 📌 本專案的註解文化：`assets/js/nebula-canvas.js` 等檔頭的長註解**記錄了每一版的設計理由與實測數據**。
-  改動前先讀該檔頭註解，能避免重複踩坑或改壞已調校的數值。
-
+- **只有程式碼進圖**：`assets/js/**`、`tools/**`、`preview.js`。
+  `index.html`、`assets/css/**`（6 檔）、`plugins-data.js`／`subtitles-data.js`、`.vtt`／圖片**一律不進圖** → 直接讀檔，別浪費時間查圖。
+- `.md`（含本檔）只有**標題節點**、沒有內容摘要 → 要內容請開檔；⚠️ 只有改**標題**才會動到圖譜（改內文不影響）。
+- 圖譜是**程式架構圖**，不是行為文件：「某功能怎麼運作」靠 `explain`／`query --context` ＋ 原始碼**檔頭長註解**
+  （`nebula-canvas.js` 等記錄了每版的設計理由與實測數據——改動前先讀，能避免重複踩坑或改壞已調校的數值）。
+- 📌 完整邊界表（含現況 288 節點＝code 247／document 34／concept 7、各檔進圖節點數、`Unclassified` 說明）
+  → `README.md` 的「🧠 知識圖譜」章節。
 
 ---
 
@@ -164,64 +156,7 @@ $j = Get-Content graphify-out\graph.json -Raw -Encoding UTF8 | ConvertFrom-Json
 
 ---
 
-## 5. 檔案地圖（要改哪裡）
-
-| 檔案 | 職責 | 進圖節點數 |
-| :--- | :--- | :--- |
-| `index.html` | 全站唯一頁面；`<head>` 的主題 bootstrap 白名單（防 FOUC）＋每支資產的 `?v=` | ❌ |
-| `assets/js/nebula-canvas.js` | 背景粒子引擎（星空 75／字形 92／餘燼 90 三模式）；速度與刷新率無關（4.20 dt 正規化）；迴圈守衛（4.21） | 40 |
-| `assets/js/app.js` | 自訂影片播放器＋UI 互動（God Nodes：`initCustomVideoPlayer`／`getPlayerDOM`／`switchTutorialVideo`／`wakePlayerUI`） | 51 |
-| `assets/js/theme.js` | 主題切換（`THEMES`、`DEFAULT_THEME = 'vscode'`）＋導覽 scrollspy（`initNavCurrent`） | 13 |
-| `assets/js/i18n.js` | zh-TW／en 雙語（C6 契約，各 115 鍵） | 7 |
-| `assets/js/storage.js` | `SafeStorage`（無痕模式安全存取；主題與語言靠它持久化） | 2 |
-| `assets/js/config.js` | 站點設定 `SITE_CONFIG`（appName／author／GitHub／defaultLang／`version`／`lastUpdated`／license） | 2 |
-| `assets/js/filter.js` | 外掛分類篩選 | 5 |
-| `assets/js/developer-notes.js` | 開發者筆記文章資料 | 2 |
-| `assets/js/plugins-data.js`、`subtitles-data.js` | 資料檔（字幕由產生器編譯） | ❌ 已排除 |
-| `assets/css/*`（6 檔） | variables／base／components／animations／theme-cursor／theme-vscode | ❌ |
-| `preview.js`、`preview-site.bat`、`preview-site-stop.bat` | 本機預覽伺服器（可重複執行；`--probe`／`--detach`／`--stop`） | 28 |
-| `tools/health-check.js` | C1–C8 原始碼契約（秒級、無相依） | 33 |
-| `tools/health-check-browser.js` | B1–B21 瀏覽器實測（CDP 驅動；`--calibrate`／`--only`） | 35 |
-| `tools/build-subtitles.js` | VTT → `subtitles-data.js`（**改字幕後必跑**） | 11 |
-| `tools/dead-css.js` | 死碼盤點（只報告；`--strict` 可掛 CI） | 11 |
-| `tools/update-site-meta.ps1` | 更新「網站更新時間」與各外掛版本號（寫 `config.js` 的 `lastUpdated`＋`index.html` 靜態備援值＋`plugins-data.js` 的 `version`） | 7 |
-| `graphify-out/` | 圖譜產物（**ignored，勿 commit**） | — |
-| `.graphifyignore` | 圖譜掃描排除清單（目前兩個資料檔） | — |
-| `AGENTS.md` | **本檔**：專案層 AI 規範（圖譜優先／收尾更新圖譜／驗收契約） | 18 |
-| `README.md` | 部署／預覽／字幕／健檢／主題五處同步的正式說明 | ⚠️ 標題 |
-| `開發者筆記.md` | 展示用文章內容 | ⚠️ 標題 |
-
----
-
-## 6. 指令速查（照抄即可）
-
-```powershell
-# ── 圖譜：任務開始（理解架構／找影響半徑）
-Get-Content graphify-out\GRAPH_REPORT.md -TotalCount 20 -Encoding UTF8
-graphify god-nodes --top 10
-graphify affected "<節點名>" --depth 2
-graphify query "<問題>" --context call --budget 1500
-
-# ── 圖譜：任務收尾（有改 JS 就跑；零成本）
-graphify update .
-
-# ── 本機預覽
-preview-site.bat            # 啟動（可重複執行：已在跑就只開網站）
-preview-site-stop.bat       # 關閉預覽伺服器
-
-# ── 驗收
-node tools/health-check.js
-node tools/health-check-browser.js
-node tools/health-check-browser.js --only B7,B8     # 只跑指定項目
-node tools/health-check-browser.js --calibrate      # 負對照：證明工具真的抓得到缺陷
-
-# ── 字幕（編輯 assets/subtitles/*.vtt 之後）
-node tools/build-subtitles.js
-```
-
----
-
-## 7. 常見陷阱（實測踩過）
+## 5. 常見陷阱（實測踩過）
 
 | # | 陷阱 | 對策 |
 | :--- | :--- | :--- |
@@ -236,8 +171,11 @@ node tools/build-subtitles.js
 
 ---
 
-## 8. 本檔的維護
+## 6. 本檔的維護
 
 - 本檔是**專案層**規範，目標是「AI 不需要使用者提醒就能照做」；新增規則請維持同樣風格（表格、可照抄的指令、明列紅線）。
 - 若你的 Harness／工作區另有全域 `AGENTS.md` 或 `graphify-knowledge-graph` 這類 skill，**流程細節以該處為準**；本檔只保留這個專案的最小可執行版本。
+- **分工原則（不要再長回去）**：本檔只放「沒查就會做錯」的規則；
+  **查閱型內容**（檔案地圖、完整圖譜邊界表、指令速查）放 `README.md` 對應章節，本檔最多留一行指標。
+  判斷法：**這條規則在我「什麼檔案都還沒讀」時就必須知道嗎？** 是 → 放本檔；否 → 放 `README.md`。
 - 本檔引用的事實（節點數、契約值、版本號）會隨時間過期：**改了圖譜／契約就順手更新對應數字**。
