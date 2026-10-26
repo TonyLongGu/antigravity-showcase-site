@@ -47,7 +47,7 @@ description: 維護 antigravity-showcase-site（GitHub Pages 純靜態展示站�
 | 規模 | **288** nodes / **508** edges / **16** communities（13 shown、3 thin omitted）；95% EXTRACTED · 5% INFERRED |
 | 建圖 commit | `b6acbe41`（報告日期 2026-10-23）；當日 HEAD＝`af16ba6` ⇒ **報告已落後**（其間只改文案／時間戳，屬無害過期） |
 | 產物大小 | `GRAPH_REPORT.md` **7.1 KB**（可整讀）、`graph.json` **279 KB**（禁整讀）、`graph.html` **242 KB** |
-| 節點來源（前 8） | `app.js` 51、`nebula-canvas.js` 40、`health-check-browser.js` 35、`health-check.js` 33、`preview.js` 28、`AGENTS.md` 16、`README.md` 14、`theme.js` 13 |
+| 節點來源（前 8） | `app.js` 51、`nebula-canvas.js` 40、`health-check-browser.js` 35、`health-check.js` 33、`preview.js` 28、`AGENTS.md` 16、`README.md` 14、`theme.js` 13 （⚠️ `AGENTS.md` 已於 2026-10-26 瘦身為派送句 ⇒ 下次 `update` 後它的標題節點會由 16 掉到個位數、總節點數略減，屬預期變化） |
 | 不產生節點 | `index.html`（實測 **0**）、`assets/css/*`（6 檔）、`plugins-data.js`／`subtitles-data.js`（`.graphifyignore` 排除）、`.vtt`（14 檔未分類） |
 | 現況判讀 | 只改 CSS／文案／`.vtt` 時圖譜不動；改 `assets/js/**`、`tools/**`、`preview.js` 才需要更新（§5） |
 
