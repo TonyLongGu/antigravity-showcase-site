@@ -7,7 +7,7 @@ description: 維護 antigravity-showcase-site（純靜態展示站、GitHub Page
 
 > 一句話：**這個 repo 的「事實」都在這裡；數字會過期——§3 一律先驗證再用。**
 > 分工：圖譜通用流程（安裝、旗標、成本）→ skill `graphify-knowledge-graph`；技能格式 → `skill-authoring`。本技能只管**這個 repo**。
-> 本檔＝專案知識落點：repo 根 `AGENTS.md` 只有技能索引；`docs/project-notes.md` 已於 2026-10-28 併回本檔後退役。
+> 本檔＝專案知識落點：repo 根 `AGENTS.md` 只有技能索引；`docs/project-notes.md` 已於 2026-10-28 併回本檔後**刪除**（回收筒可還原），⛔ 不要再建平行副本。
 
 ---
 
@@ -44,10 +44,10 @@ description: 維護 antigravity-showcase-site（純靜態展示站、GitHub Page
 | 項目 | 值 |
 | :--- | :--- |
 | 圖譜位置 | `graphify-out/`（`.gitignore` 已排除，**勿 commit** —— 會被 Pages 部署出去） |
-| 規模 | **289** nodes / **509** edges / **17** communities（13 shown、4 thin 省略） |
-| 建圖標記 | `Built from commit` `95b53d32`＝**HEAD**（2026-10-28 精簡 `AGENTS.md`／`project-notes.md` 後重跑 `update`；前版為 289／516／14、`bd7dcf12`） |
-| 語料 | 19 files · ~56,093 words；25 檔未分類（`.vtt` 14、`.css` 6 等） |
-| 產物大小 | `GRAPH_REPORT.md` **7.1 KB**（可整讀）、`graph.json` **282 KB**（禁整讀）、`graph.html` **243 KB** |
+| 規模 | **287** nodes / **507** edges / **17** communities（12 shown、5 thin 省略） |
+| 建圖標記 | `Built from commit` `1c2ad856`＝**HEAD**（2026-10-28 刪除 `project-notes.md` 後重跑 `update`；前版 289／509／17、`95b53d32`） |
+| 語料 | 18 files · ~56,075 words；25 檔未分類（`.vtt` 14、`.css` 6 等） |
+| 產物大小 | `GRAPH_REPORT.md` **6.8 KB**（可整讀）、`graph.json` **280 KB**（禁整讀）、`graph.html` **241 KB** |
 | 節點來源（TOP） | `assets/js/app.js` 51、`assets/js/nebula-canvas.js` 40、`tools/health-check-browser.js` 35、`tools/health-check.js` 33、`preview.js` 28、`README.md` 14、`assets/js/theme.js` 13、**本技能 `SKILL.md` 13**、`tools/build-subtitles.js` 11、`tools/dead-css.js` 11 |
 | 不產生節點 | `index.html`（實測 **0**）、`assets/css/*`（6 檔）、`plugins-data.js`／`subtitles-data.js`（`.graphifyignore` 排除）、`.vtt`（14 檔） |
 | ⚠️ `*.md` 特性 | **只取標題節點**：改**標題**才動圖，改內文不會。**本技能自己的標題也在圖裡**（13 節點）⇒ 增刪章節後要跑 `update` |
@@ -172,7 +172,7 @@ graphify cluster-only . --no-label # 產生 GRAPH_REPORT.md；--no-label 不呼�
 
 | 日期 | 變更 | 來源 |
 | :--- | :--- | :--- |
-| 2026-10-28 | **架構切回「技能索引 ＋ 本技能」**：`AGENTS.md`（1,940 字元／42 行）瘦身為條例式索引，`docs/project-notes.md`（§3–§9）整併回本檔後退役；§3 改記 **289／509／17**、`Built from 95b53d32`（＝HEAD）；新增「`*.md` 只取標題節點、本技能標題也在圖裡」的更新規則 | 使用者指示：三 repo 統一規格（極精簡 AGENTS ＋ 專案技能） |
+| 2026-10-28 | **架構切回「技能索引 ＋ 本技能」**：`AGENTS.md`（1,940 字元／42 行）瘦身為條例式索引，`docs/project-notes.md`（§3–§9）整併回本檔後**刪除**（回收筒）；§3 改記 **287／507／17**、`Built from 1c2ad856`（＝HEAD）；新增「`*.md` 只取標題節點、本技能標題也在圖裡」的更新規則 | 使用者指示：三 repo 統一規格（極精簡 AGENTS ＋ 專案技能） |
 | 2026-10-27 | 知識回歸 `AGENTS.md`＋`docs/project-notes.md`，技能退役（本檔前身 `.agents/skills/antigravity-showcase-site-maintenance/`） | 使用者指示（當時偏好單一 `AGENTS.md`） |
 | 2026-10-27 | 圖譜更新：305／534／16 → **288／510／15**（刪除退役技能檔後） | 收尾依 §2 執行 `graphify update .` |
 | 2026-10-26 | 建立技能版（由 repo 根 `AGENTS.md` 全文改寫）：圖譜常數改為複驗值、合併「紅線」「反模式」兩表 | 使用者指示 |
