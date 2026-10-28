@@ -152,14 +152,14 @@ node tools/dead-css.js --strict   # 有死碼時以退出碼 1 結束（可掛 h
 
 ## 🧠 知識圖譜（Graphify，給 AI／維護者）
 
-> 本節於 2026-10-23 由 `AGENTS.md` 搬來：**查閱型資料**（邊界表、節點數、指令）放 README（0 常駐成本），
-> `AGENTS.md` 只留「沒查就會做錯」的規則。要改圖譜前，**紅線一律先看 `AGENTS.md` §3.3**。
+> 本節於 2026-10-23 由 `AGENTS.md` 搬來：**查閱型資料**（邊界表、節點數、指令）放 README（0 常駐成本）。
+> 要改圖譜前，**紅線與授權一律先看技能 `antigravity-showcase-site-maintenance`**（§5 更新授權、§7 驗收契約、§8 反模式）；`AGENTS.md` 只有技能索引。
 
 ### 圖譜在哪
 
 | 路徑 | 內容 | 什麼時候讀 |
 | --- | --- | --- |
-| `graphify-out/GRAPH_REPORT.md` | 摘要（節點／邊／社群數、EXTRACTED 比例、建圖 commit）＋ Community Hubs ＋ God Nodes ＋ 意外關聯 | 第一個讀它（10–20 KB，多數問題這份就夠） |
+| `graphify-out/GRAPH_REPORT.md` | 摘要（節點／邊／社群數、EXTRACTED 比例、建圖 commit）＋ Community Hubs ＋ God Nodes ＋ 意外關聯 | 第一個讀它（約 7 KB，多數問題這份就夠） |
 | `graphify-out/graph.html` | 互動式視覺化 | 想看圖時才開 |
 | `graphify-out/graph.json` | 完整圖（0.26–1.8 MB） | **不要整檔讀**（幾乎必然超 token 預算） |
 
