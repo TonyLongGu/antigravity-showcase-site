@@ -53,7 +53,6 @@ MCP 是「隨開隨用的能力」，卻也是最容易拖垮 AI 專注力的一
 - **\`AGENTS.md\`**：每輪都必須遵守的鐵律——常駐、每輪都付 Token ⇒ 只留通則與精要。
 - **Skills**：「怎麼做」的流程、判準、腳本——只有 description 常駐，靠語意觸發叫用。
 - **Supermemory**：事實、決策與理由、偏好、環境變更——查得到就好、不必常駐、可改可忘。
-
 - **路由判準**：違反它會出事 ⇒ \`AGENTS.md\`；它是「怎麼做」⇒ skill；其餘 ⇒ Supermemory。
 - **記憶是可能過期的假設**：涉外部世界（模型／價格／API／版本／法規）引用前複驗，過期立即更正並註明日期。
 - **主動記憶**：動手前主動回想相關的坑與決策；對話中產生重點時主動寫入（先查重、寫後驗證，並在回覆中透明告知，使用者可隨時「忘掉」撤回）。
@@ -79,7 +78,6 @@ AI 能自主做多少事，不能憑感覺，而要依「**可逆性 × 影響�
 
 - **治理層技能**（規則、記憶、MCP 開關、刪除安全、健檢、授權治理）：**每輪都要用，永不關閉**。
 - **能力包**（遊戲引擎、AI 媒體產線、中文寫作／版式／簡報…）：按任務類型拆成獨立技能包，**隨需啟閉**，由工作區的 Junction 控制。
-
 - **取用路由**：先判斷「這任務要什麼能力」，再判斷「哪個包有」；只要與交付物正相關就建議載入（寧可先載，不要做到一半才發現缺料），但一次最多建議 **2 包／4 支**，且不無差別全開。
 - **載入機制**：\`skills\` 工具只把技能**名稱**投影進系統提示，\`description\` 與本文要**叫用後**才進 context ⇒ **「包已開」不等於「技能已載入」**，開工時仍要做一次包內挑選。
 
@@ -142,7 +140,6 @@ Memory is not "write down whatever comes to mind" — it is stored in three laye
 - **\`AGENTS.md\`**: the iron laws that must hold every turn — always resident, paying tokens each turn ⇒ keep it general and concise.
 - **Skills**: the "how-to" workflows, criteria, and scripts — only the description is resident; the rest loads on semantic trigger.
 - **Supermemory**: facts, decisions and their rationale, preferences, environment changes — retrievable on demand, not resident, editable and forgettable.
-
 - **Routing rule**: if violating it causes harm ⇒ \`AGENTS.md\`; if it is "how to do it" ⇒ a skill; otherwise ⇒ Supermemory.
 - **Memory is a possibly-stale assumption**: for anything about the outside world (models / prices / APIs / versions / regulations), re-verify before citing; correct it immediately and note the date once stale.
 - **Proactive memory**: recall relevant pitfalls and decisions before starting work; when key points emerge in conversation, write them proactively (de-duplicate first, verify after writing, and disclose transparently in the reply so the user can retract with "forget").
@@ -168,7 +165,6 @@ Skills themselves come in two layers, to avoid "shutting down what should be res
 
 - **Governance skills** (rules, memory, MCP toggling, safe deletion, health checks, authorization): **used every turn, never disabled**.
 - **Capability packs** (game engines, AI media pipelines, Chinese writing / typesetting / presentations…): split into separate packs by task type, **enabled and disabled on demand**, controlled by the workspace's Junctions.
-
 - **Routing**: first decide "what capability this task needs," then "which pack has it"; load whenever positively related to the deliverable (better to load early than discover a gap mid-way), but suggest at most **2 packs / 4 skills** at a time, never enabling everything indiscriminately.
 - **Loading mechanics**: the \`skills\` tool projects only skill **names** into the system prompt; the \`description\` and body load only **after invocation** ⇒ **"pack enabled" does not equal "skill loaded"** — still pick within the pack when starting work.
 
