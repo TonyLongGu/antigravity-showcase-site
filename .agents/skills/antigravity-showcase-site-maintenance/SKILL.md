@@ -7,7 +7,7 @@ description: 維護 antigravity-showcase-site（純靜態展示站、GitHub Page
 
 > 一句話：**這個 repo 的「事實」都在這裡；數字會過期——§3 一律先驗證再用。**
 > 分工：圖譜通用流程（安裝、旗標、成本）→ skill `graphify-knowledge-graph`；技能格式 → `skill-authoring`。本技能只管**這個 repo**。
-> 本檔＝專案知識落點：repo 根 `AGENTS.md` 只有技能索引；`docs/project-notes.md` 已於 2026-10-28 併回本檔後**刪除**（回收筒可還原），⛔ 不要再建平行副本。
+> 本檔＝**這個 repo 唯一的知識落點**：repo 根**沒有** `AGENTS.md`（2026-11-05 移除，`git show <commit>:AGENTS.md` 可取回；⛔ 不要再建——多根工作區只讀一份，第二份會蓋掉首專案規範）；`docs/project-notes.md` 已於 2026-10-28 併回本檔後**刪除**，⛔ 不要再建平行副本。
 
 ---
 
@@ -19,7 +19,7 @@ description: 維護 antigravity-showcase-site（純靜態展示站、GitHub Page
 | **正例** | 「網站更新了但線上還是舊的」／「這個 repo 的圖譜過期了嗎？」 |
 | **負例** | 「graphify 怎麼安裝／`--no-viz` 是什麼」→ `graphify-knowledge-graph` |
 | **負例** | 「antigravity-plugins 外掛要改什麼」→ 那個 repo 自己的技能 |
-| **怎麼被叫用** | repo 根 `AGENTS.md` 的**技能索引**會指向本技能；也可直接打 `/antigravity-showcase-site-maintenance`。⚠️ 清單沒看到 ⇒ 直讀 `.agents/skills/antigravity-showcase-site-maintenance/SKILL.md` |
+| **怎麼被叫用** | 直接打 `/antigravity-showcase-site-maintenance`，或由 `description`（粒子引擎、快取版號、驗收契約）語意觸發——**本 repo 已無 `AGENTS.md` 索引，沒有東西會自動派送**。⚠️ 清單沒看到 ⇒ 直讀 `.agents/skills/antigravity-showcase-site-maintenance/SKILL.md` |
 
 > **何時不必用（不適用）**：只問「怎麼建圖／旗標」→ `graphify-knowledge-graph`；只是改錯字、調一行 CSS 且不談驗收 → 直接改、不要叫用本技能。
 
@@ -39,15 +39,15 @@ description: 維護 antigravity-showcase-site（純靜態展示站、GitHub Page
 
 ---
 
-## 3. 圖譜常數（2026-10-28 複驗，graphify 0.9.80）
+## 3. 圖譜常數（2026-11-05 複驗，graphify 0.9.80）
 
 | 項目 | 值 |
 | :--- | :--- |
 | 圖譜位置 | `graphify-out/`（`.gitignore` 已排除，**勿 commit** —— 會被 Pages 部署出去） |
-| 規模 | **287** nodes / **507** edges / **17** communities（12 shown、5 thin 省略） |
-| 建圖標記 | `Built from commit` `1c2ad856`＝**HEAD**（2026-10-28 刪除 `project-notes.md` 後重跑 `update`；前版 289／509／17、`95b53d32`） |
-| 語料 | 18 files · ~56,075 words；25 檔未分類（`.vtt` 14、`.css` 6 等） |
-| 產物大小 | `GRAPH_REPORT.md` **6.8 KB**（可整讀）、`graph.json` **280 KB**（禁整讀）、`graph.html` **241 KB** |
+| 規模 | **289** nodes / **510** edges / **17** communities（14 shown、3 thin 省略） |
+| 建圖標記 | `Built from commit` `4847a58e`＝**HEAD**（2026-11-05 刪除 `AGENTS.md` 後重跑 `update`；前版 287／507／17、`1c2ad856`） |
+| 語料 | 17 files · ~57,155 words；25 檔未分類（`.vtt` 14、`.css` 6 等） |
+| 產物大小 | `GRAPH_REPORT.md` **7.5 KB**（7,541 B，可整讀）、`graph.json` **284 KB**（291,118 B，禁整讀）、`graph.html` **245 KB**（250,786 B） |
 | 節點來源（TOP） | `assets/js/app.js` 51、`assets/js/nebula-canvas.js` 40、`tools/health-check-browser.js` 35、`tools/health-check.js` 33、`preview.js` 28、`README.md` 14、`assets/js/theme.js` 13、**本技能 `SKILL.md` 13**、`tools/build-subtitles.js` 11、`tools/dead-css.js` 11 |
 | 不產生節點 | `index.html`（實測 **0**）、`assets/css/*`（6 檔）、`plugins-data.js`／`subtitles-data.js`（`.graphifyignore` 排除）、`.vtt`（14 檔） |
 | ⚠️ `*.md` 特性 | **只取標題節點**：改**標題**才動圖，改內文不會。**本技能自己的標題也在圖裡**（13 節點）⇒ 增刪章節後要跑 `update` |
@@ -77,7 +77,7 @@ description: 維護 antigravity-showcase-site（純靜態展示站、GitHub Page
 
 - 改了 `assets/js/**`、`tools/**`、`preview.js` ⇒ 收尾**直接跑** `graphify update .`，不必再問；回報節點／邊／社群變化 ＋ `Built from commit` 是否＝HEAD。
 - 只改 **CSS／`index.html`／`.vtt`／圖片** ⇒ **不用跑**。
-- ⚠️ 改 `*.md` 的**標題**（含本技能、`AGENTS.md`、`README.md`、`docs/*.md`）⇒ **要跑**（`*.md` 會產生標題節點，節點數會變）；只改內文 ⇒ 不用。
+- ⚠️ 改 `*.md` 的**標題**（含本技能、`README.md`、`docs/*.md`）⇒ **要跑**（`*.md` 會產生標題節點，節點數會變）；只改內文 ⇒ 不用。
 - 邊界：
 
 | 情況 | 做法 |
@@ -139,7 +139,7 @@ node tools/health-check-browser.js --only B7,B8   # 判斷 B7–B11 抖動時用
 | 7 | 對沒有 `graphify-out/` 的專案跑 `update .` | 生出部分圖譜且無警示 | 先 `extract --code-only` ＋ `cluster-only`（§9） |
 | 8 | 只改 CSS／文案卻跑 `update .` | 浪費時間、誤以為圖譜有變 | 依 §5 判斷；純視覺改動不需跑 |
 | 9 | 整檔讀 `graph.json` | 爆 token、沒有導航價值 | 先讀報告，再 `god-nodes`／`explain` |
-| 10 | 把知識寫回 `AGENTS.md`、或又建 `docs/project-notes.md` 平行副本 | 兩份真相，改一邊忘一邊（2026-10-27／10-28 各一次） | 知識只放技能（可多支）；`AGENTS.md` 只放索引 |
+| 10 | 把知識寫回 `AGENTS.md`、或又建 `docs/project-notes.md` 平行副本 | 兩份真相，改一邊忘一邊（2026-10-27／10-28 各一次）；`AGENTS.md` 還會被多根工作區的第二份覆蓋 | 知識只放技能（可多支）；**repo 根不建 `AGENTS.md`** |
 
 > 以上是**實際失敗過**才寫上來的（2026-10-23 前的踩坑 ＋ 2026-10-26／27／28 複驗）。新踩到的坑補進本表。
 
@@ -161,9 +161,9 @@ graphify cluster-only . --no-label # 產生 GRAPH_REPORT.md；--no-label 不呼�
 
 ## 10. 本技能維護
 
-- 本技能＝這個 repo 的**專案知識主技能**：常數、授權、邊界、驗收契約、反模式在這裡；根 `AGENTS.md` 只做**索引＋每輪必做**，**不承載知識**。
-- **可擴充（設計前提）**：repo 之後可再加其他技能（動畫／i18n／部署…）。新增時：① 補 `AGENTS.md` 技能索引 ② 在該技能 §1 寫分流 ③ 同一條規則不得兩邊各留一份。
-- **取捨**：若技能沒被叫用，§5 的授權與 §6／§7 的鐵律不在 context；`AGENTS.md` 的技能索引就是為了讓「先叫用技能」每輪可見。
+- 本技能＝這個 repo 的**唯一知識落點**：常數、授權、邊界、驗收契約、反模式都在這裡；repo 根沒有 `AGENTS.md`（2026-11-05 移除）。
+- **可擴充（設計前提）**：repo 之後可再加其他技能（動畫／i18n／部署…）。新增時：① 在該技能 §1 寫分流 ② 同一條規則不得兩邊各留一份。
+- **取捨**：若技能沒被叫用，§5 的授權與 §6／§7 的鐵律不在 context；本 repo 已無 `AGENTS.md` 派送 ⇒ **使用者指名**或 `description` 觸發是唯一入口。
 - 數字（節點數、產物大小、契約值）會過期 ⇒ 一律「快照 ＋ 日期 ＋ 查法」；無法確認就寫查法，不要寫死。
 - **查閱型內容**（檔案地圖、完整圖譜邊界表、主題五處、使用者向說明）留在 `README.md`／`開發者筆記.md`，本檔最多一行指標。
 - 本檔不含絕對磁碟路徑。
@@ -172,6 +172,8 @@ graphify cluster-only . --no-label # 產生 GRAPH_REPORT.md；--no-label 不呼�
 
 | 日期 | 變更 | 來源 |
 | :--- | :--- | :--- |
+| 2026-11-05 | **移除 repo 根 `AGENTS.md`（純技能模式）**：§1 叫用方式改為「直接指名／`description` 觸發」、§10 三條改寫、§8 第 10 條改為「⛔ 不建 `AGENTS.md`」、§5 的 `*.md` 標題提醒移除 `AGENTS.md`；知識全在本檔 | 使用者實測：VS Code Copilot 只讀一份 `AGENTS.md`，多根工作區第二份會覆蓋首專案規範 ⇒ 全工作區只留 `ai` 那一份 |
+
 | 2026-10-28 | **架構切回「技能索引 ＋ 本技能」**：`AGENTS.md`（1,940 字元／42 行）瘦身為條例式索引，`docs/project-notes.md`（§3–§9）整併回本檔後**刪除**（回收筒）；§3 改記 **287／507／17**、`Built from 1c2ad856`（＝HEAD）；新增「`*.md` 只取標題節點、本技能標題也在圖裡」的更新規則 | 使用者指示：三 repo 統一規格（極精簡 AGENTS ＋ 專案技能） |
 | 2026-10-27 | 知識回歸 `AGENTS.md`＋`docs/project-notes.md`，技能退役（本檔前身 `.agents/skills/antigravity-showcase-site-maintenance/`） | 使用者指示（當時偏好單一 `AGENTS.md`） |
 | 2026-10-27 | 圖譜更新：305／534／16 → **288／510／15**（刪除退役技能檔後） | 收尾依 §2 執行 `graphify update .` |
