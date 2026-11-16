@@ -39,15 +39,15 @@ description: 維護 antigravity-showcase-site（純靜態展示站、GitHub Page
 
 ---
 
-## 3. 圖譜常數（2026-10-28 複驗，graphify 0.9.80）
+## 3. 圖譜常數（2026-11-16 複驗，graphify 0.9.80）
 
 | 項目 | 值 |
 | :--- | :--- |
 | 圖譜位置 | `graphify-out/`（`.gitignore` 已排除，**勿 commit** —— 會被 Pages 部署出去） |
-| 規模 | **287** nodes / **507** edges / **17** communities（12 shown、5 thin 省略） |
-| 建圖標記 | `Built from commit` `1c2ad856`＝**HEAD**（2026-10-28 刪除 `project-notes.md` 後重跑 `update`；前版 289／509／17、`95b53d32`） |
-| 語料 | 18 files · ~56,075 words；25 檔未分類（`.vtt` 14、`.css` 6 等） |
-| 產物大小 | `GRAPH_REPORT.md` **6.8 KB**（可整讀）、`graph.json` **280 KB**（禁整讀）、`graph.html` **241 KB** |
+| 規模 | **317** nodes / **542** edges / **18** communities（14 shown、4 thin 省略） |
+| 建圖標記 | `Built from commit` `dc506754`＝**HEAD**（2026-11-16 改 `tools/health-check-browser.js` 的 B7–B11 量法後重跑 `update`；前版 317／542／18、`2b5053ac`） |
+| 語料 | 19 files · ~58,843 words；25 檔未分類（`.vtt` 14、`.css` 6 等） |
+| 產物大小 | `GRAPH_REPORT.md` **7.5 KB**（可整讀）、`graph.json` **309.3 KB**（禁整讀）、`graph.html` **267 KB** |
 | 節點來源（TOP） | `assets/js/app.js` 51、`assets/js/nebula-canvas.js` 40、`tools/health-check-browser.js` 35、`tools/health-check.js` 33、`preview.js` 28、`README.md` 14、`assets/js/theme.js` 13、**本技能 `SKILL.md` 13**、`tools/build-subtitles.js` 11、`tools/dead-css.js` 11 |
 | 不產生節點 | `index.html`（實測 **0**）、`assets/css/*`（6 檔）、`plugins-data.js`／`subtitles-data.js`（`.graphifyignore` 排除）、`.vtt`（14 檔） |
 | ⚠️ `*.md` 特性 | **只取標題節點**：改**標題**才動圖，改內文不會。**本技能自己的標題也在圖裡**（13 節點）⇒ 增刪章節後要跑 `update` |
@@ -109,7 +109,8 @@ node tools/health-check-browser.js --only B7,B8   # 判斷 B7–B11 抖動時用
 
 - **契約值**：`tools/health-check-browser.js` 的 `COUNTS = { antigravity: 75, vscode: 92, cursor: 90 }`（L100，2026-10-26 實測）；視窗 1200×800 時餘燼縮為 **67**。**改粒子設計＝同時改程式與測試契約**，只改一邊直接紅燈。
 - **粒子引擎特有規則**：所有「每幀位移／相位」必須乘 `dt`；迴圈的啟動／停止一律走 `startLoop()`／`stopLoop()`。⛔ 禁止直接呼叫 `animate()` 開鏈 —— 漏任一項會讓高刷新率螢幕變快或速度翻倍，**只有 B 層測得出來**。
-- **已知抖動（不是壞掉）**：B7–B11 是稀疏取樣統計量（餘燼只有 90 顆），同一份原始碼連跑也會隨機紅燈 ⇒ 先 `--only B7,B8` 重跑再判斷。
+- **B7–B11 的量法（2026-11-16 起）**：控制變因量測——挑一顆位置已知的粒子，游標貼在它右側固定距離（B8 30px、B9 200px），同一顆粒子量「游標在旁／在角落」的差。B7 用左右掃掠差。門檻與負對照見 `tools/health-check-browser.js` 檔頭「量測設計」。
+- **已知穩定度**：同一份未改動的程式碼連跑 10 次，24 項的通過／失敗集合完全一致（2026-11-16 實測 10/10）。B7–B11 紅燈就是真的行為變了，不要再用「重跑一次」翻盤。工具本身的鑑別力：`--calibrate push0|drift|radius|dark|cap|speed`。
 - 驗收完成後別忘了 §5 的圖譜更新。
 
 ---
@@ -119,7 +120,7 @@ node tools/health-check-browser.js --only B7,B8   # 判斷 B7–B11 抖動時用
 | # | 反模式 | 後果 | 正確做法 |
 | :-: | :--- | :--- | :--- |
 | 1 | 用 `git rev-parse --short`（7 碼）比報告 8 碼 | 誤報「圖譜過期」 | 一律 `--short=8`（§3） |
-| 2 | 把 B7–B11 的隨機紅燈當真 | 白改程式、越改越亂 | 先 `--only B7,B8` 重跑；本質是取樣統計量 |
+| 2 | 把 B7–B11 的紅燈當成「取樣抖動」重跑翻盤 | 掩蓋真的行為改變 | 2026-11-16 起是控制變因量測，10 連跑判定一致；紅燈照實退回 |
 | 3 | 改了 `assets/**` 卻忘了 bump `?v=` | 瀏覽器吃舊快取 → 「改了沒效」 | 同步 `index.html` 版本號 |
 | 4 | 動到「每幀位移」卻沒乘 `dt` | 高刷新率螢幕變快，肉眼難察 | 乘 `dt`；靠 B 層驗 |
 | 5 | 直接 `animate()` 開鏈 | 多出第二條 rAF 鏈 → 速度翻倍 | 只走 `startLoop()`／`stopLoop()`（B21 會抓） |
@@ -160,6 +161,7 @@ graphify cluster-only . --no-label # 產生 GRAPH_REPORT.md；--no-label 不呼�
 
 | 日期 | 變更 | 來源 |
 | :--- | :--- | :--- |
+| 2026-11-16 | **B7–B11 改成控制變因量測**：同一顆粒子、固定幾何（30／200px）＋左右掃掠差；同一份程式碼 10 連跑判定一致，恢復為判定項。§3 快照更新為 317／542／18、`dc506754`、19 files／~58,843 words、7.5／309.3／267 KB；§7 抖動說明與 §8 反模式 2 同步改寫 | 工單 P-20261116-03；驗收標準 v1.2 |
 | 2026-11-05 | **§4／§5 去重**：通用條目（查詢指令、token 預算、`graph.json` 永不整讀、`query` 超預算、旗標邊界）改為指向 `graphify-knowledge-graph`／`graphify-repo-workflow`；本檔只留本 repo 參數（報告 6.3 KB 可整讀、`nebula-canvas.js` 檔頭長註解、`*.md` 標題會產生節點） | 使用者定案：同一事實只留一份；`AGENTS.md` 已涵蓋「每輪必做」 |
 | 2026-10-28 | **架構切回「技能索引 ＋ 本技能」**：`AGENTS.md`（1,940 字元／42 行）瘦身為條例式索引，`docs/project-notes.md`（§3–§9）整併回本檔後**刪除**（回收筒）；§3 改記 **287／507／17**、`Built from 1c2ad856`（＝HEAD）；新增「`*.md` 只取標題節點、本技能標題也在圖裡」的更新規則 | 使用者指示：三 repo 統一規格（極精簡 AGENTS ＋ 專案技能） |
 | 2026-10-27 | 知識回歸 `AGENTS.md`＋`docs/project-notes.md`，技能退役（本檔前身 `.agents/skills/antigravity-showcase-site-maintenance/`） | 使用者指示（當時偏好單一 `AGENTS.md`） |

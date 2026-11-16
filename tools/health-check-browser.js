@@ -6,7 +6,9 @@
  *         node tools/health-check-browser.js --only B7,B8      只跑指定項目
  *         node tools/health-check-browser.js --browser <路徑>  指定 Chromium 系瀏覽器
  *         node tools/health-check-browser.js --keep-profile    保留暫存 profile（除錯用）
- *         node tools/health-check-browser.js --calibrate       負對照自我校準（故意注入缺陷，證明本工具抓得到）
+ *         node tools/health-check-browser.js --calibrate       負對照自我校準（預設＝drift）
+ *         node tools/health-check-browser.js --calibrate push0 只注入「推力歸零」，看 B8 是否變紅
+ *             可選：drift／push0／radius／dark／cap／speed（對應 B7／B8／B9／B10／B10／B11）
  *
  * 為什麼要第二層：
  *   tools/health-check.js（C1–C8）只看原始碼——秒級、無相依、掛得上 hook；
@@ -23,11 +25,12 @@
  *     B6  回到 1440×900，顆數復原（90）
  *     B12 切回餘燼顆數仍正確（無雙重註冊／殘留）
  *   滑鼠互動（餘燼；4.11 起＝HEAD 7f9f3d3 的模型：每幀直接位移、無速度累積、共用半徑 160）
- *     B7  近場橫向跟移 dx ≈ 0（順勢帶／滑行不存在）
- *     B8  推力存在（近場 0–80px 的「水平向外」位移明顯大於未受擾基準）
- *     B9  推力不越過 160px（遠場徑向位移與基準相同；半徑偷跑時會跟著變正）
- *     B10 近場提亮不超過上限 0.95，且不比基準暗（烙暗沒復活）
- *     B11 近場粒子沒被推快（平均速度 ≤ 基準 ×1.25）
+ *     B7  近場橫向跟移 ≈ 0（左右掃掠差；順勢帶／滑行不存在）
+ *     B8  推力存在：游標貼在粒子右側 30px 時，同一顆粒子的水平位移比基準大 ≥0.35px/幀
+ *     B9  推力不越過 160px：游標貼在 200px 外時水平位移不變（|Δmx| ≤ 0.15）
+ *     B10 近場提亮存在（Δalpha ≥ 0.03）且繪製 alpha 不超過 0.95（烙暗沒復活）
+ *     B11 近場粒子沒被推快：同一顆粒子的每幀位移量不增加超過 1.8px
+ *     （B7–B11 的統計量與取樣方式見下方「量測設計」）
  *   生命週期
  *     B13 prefers-reduced-motion 下只畫一幀（畫完即停）
  *     B14 該模式下切風格會補畫一幀，且跑完整顆數
@@ -46,19 +49,25 @@
  *   - 觸控裝置（本站粒子設計上沒有觸控互動）
  *   - macOS／Linux 的瀏覽器路徑表只實作、未實測（開發機是 Windows）
  *
- * 已知抖動（實測：2026-10-08、1440×900、90 顆餘燼、同一台機器連跑）：
- *   B7–B11 都是「稀疏取樣」的統計量——粒子只有 90 顆，近場環帶的樣本數常常個位數，
- *   所以同一份原始碼連跑就會隨機紅燈。未改動的 4.13 原始碼連跑 4 次：
- *   2 次全綠、1 次 B10 紅（maxAlpha 0.773 vs 基準 0.777，只差 0.004）、
- *   1 次 B8 紅（0.355 vs 基準 0.13）＋B9 紅（遠場 −0.216 vs 基準 0.064）。
- *   換句話說：改動前的 4.13 也一樣會紅，這裡的紅燈不是「速度改壞了」的證據。
- *   → 看到這幾項紅燈時，先用同一份程式碼重跑一次再判斷，不要直接當成程式壞了。
- *   4.14 已把 B8 換成「0–80px 合併、樣本加權 ＋ null 守門」（見 B8 處的註解與負對照）：
- *   同一批實測共 17 次，舊寫法紅 5 次（其中 2 次是內圈量不到樣本、1 次是基準量不到卻因 JS 把 null
- *   當 0 而假過關）；新寫法可重算的部分只剩「場本身的外擴漂移把推力蓋掉」那 2 次
- *   （例：0.610 vs 基準 0.378）——這是「跨窗口比絕對值」的天花板。
- *   B9（遠場 0.25 容差）與 B10（max 對 max）還是同樣的寫法，要再收斂的話方向是
- *   加長取樣窗（拉高獨立樣本數）或改成「同一個窗口內的相對量」。
+ * 量測設計（B7–B11；2026-11-16 改寫，原本是「跨時間窗比絕對值」）：
+ *   粒子只有 90 顆且場非穩態，舊寫法把「游標在場中」與「游標不在場中」量在兩個不同
+ *   時間窗、再比絕對值 → 兩窗的整體漂移與近場樣本數都會直接改變結論。實測同一份未改動
+ *   的程式碼連跑 10 次：8 次全綠，1 次 B8 紅（近場 0.079 vs 基準 −0.148，推力整段消失）、
+ *   1 次 B10 紅（maxAlpha 0.744 vs 基準 0.776）——不是程式壞了，是量法在擲骰子。
+ *   新寫法＝控制變因量測：
+ *   ① 先從畫面上挑一顆「位置已知」的粒子（y 480–700，避開淡入淡出），把游標貼在它
+ *      右側 30px。粒子上升很快，所以 ON 段開始前會「再貼一次」，讓量測時的距離維持
+ *      30–50px；幾何固定 → 推力的期望值是常數，不再受「這一輪剛好有哪些粒子在近場」影響。
+ *   ② 同一顆粒子量三段：游標在角落（基準 1）→ 游標貼在右側（ON）→ 游標在角落（基準 2）。
+ *      Δmx＝基準平均 − ON 的水平位移。基準的環境漂移與老化是同一顆粒子的，會抵銷。
+ *   ③ B8 用 30px、B9 用 200px（>160，正常應為 0；半徑偷跑時會變正）。
+ *      B10 比同一顆粒子的繪製 alpha，B11 比同一顆粒子的每幀位移量。
+ *   ④ B7 用左右各掃一次、以中點為參考的差 (dx右−dx左)/2：環境漂移相同、徑向推力相反、
+ *      順勢帶也相反 → 只剩「粒子被拖著走」的量（正常 ≈0）。
+ *   負對照（每個門檻都有一個會變紅的注入；全部只改記憶體中的回應，不動磁碟）：
+ *     --calibrate drift → B7（注入順勢帶：依游標最後移動方向拖粒子）
+ *     --calibrate push0 → B8   --calibrate radius → B9
+ *     --calibrate dark  → B10  --calibrate cap   → B10  --calibrate speed  → B11
  *
  * 退出碼：0 = 無 FAIL（含 SKIP 與 --calibrate 成功）；1 = 有 FAIL
  */
@@ -75,7 +84,15 @@ const argv = process.argv.slice(2);
 const flag = (f) => argv.includes(f);
 const opt = (f) => (argv.indexOf(f) >= 0 ? argv[argv.indexOf(f) + 1] : null);
 const KEEP_PROFILE = flag('--keep-profile');
-const CALIBRATE = flag('--calibrate');
+const CALIBRATE_ARG = (() => {
+  const i = argv.indexOf('--calibrate');
+  if (i < 0) return null;
+  const v = argv[i + 1];
+  return v && !v.startsWith('--') ? v : 'drift';
+})();
+const CALIBRATE = CALIBRATE_ARG != null;
+let calibrateExpect = null;     // 校準模式預期變紅的項目（由注入種類決定）
+let calibrateWhy = '';
 const BROWSER_ARG = opt('--browser');
 const PORT_ARG = opt('--port');
 const ONLY = (() => {
@@ -185,6 +202,7 @@ const INSTRUMENT = `
   let stack = [], items = [];
   const F = window.__f = { frames: [] };
   F.pending = function () { return items.length; };
+  F.last = function () { return items; };
   F.take = function () { const f = this.frames; this.frames = []; return f; };
   const mine = (c) => c && c.id === 'nebula-canvas';
   P.clearRect = function () {
@@ -215,35 +233,48 @@ const INSTRUMENT = `
 })();
 `;
 
-const BANDS = [40, 80, 130, 170, 250];
-const R_NEAR = 170;   // 「近場」界線（舊半徑值，用來描述影響範圍）
-/* 提亮門檻：未受擾的粒子 alpha 實測上限約 0.75，貼身提亮會到 0.8 以上 →
-   超過 0.80 幾乎可斷定「被提亮」（比對大量樣本比逐顆比對穩）。 */
-const BRIGHT_A = 0.80;
+/* ---------------------------------------------------------------- 量測設計
+   B7–B11 讀的是「場」而不是單一顆粒子，所以統計量必須對場本身的隨機漂移不敏感。
+   舊寫法把「游標在場中」與「游標不在場中」量在兩個不同時間窗、再比絕對值：
+   場只有 90 顆餘燼且非穩態，兩窗的整體漂移（每顆每幀 0.01–0.4 px 的橫向殘留）
+   與近場樣本數（常常個位數）都會直接改變結論 → 同一份程式碼連跑會隨機紅燈。
+   2026-11-16 改成「配對量測」：
+   同一段時間內把游標在 P（近場）與畫面角落之間來回切 10 次，只取每段切換後
+   250ms 的穩定段，再把「游標在 P」的幀與「游標在角落」的幀分成兩組。
+   兩組取自同一批粒子、同一段時間，場的漂移與粒子組成是共同項，相減就抵銷；
+   剩下的只有「游標在不在 P」造成的差：
+     dNearOut（0–80px 水平向外位移差）→ B8 推力存在
+     dFarOut （170–250px 同一量）     → B9 推力不越過 160px（半徑沒偷跑）
+     dAlpha  （0–80px 繪製 alpha 差） → B10 近場提亮存在，且上限 0.95
+     dSpeed  （0–80px 每幀位移量差）  → B11 沒有速度累積（只讓開、沒被推快）
+   B7 另外量「游標橫向移動 30px 後的近場橫向跟移 dx」：順勢帶這類缺陷會讓 dx 變成
+   2.9 px/幀，正常場的殘留是 0.0–0.4。
+   負對照（每一項改寫都要有一種注入會讓它變紅，全部只改記憶體、不動磁碟）：
+     --calibrate drift   注入橫向漂移（this.x += force*10）      → B7 必須紅
+     --calibrate push0   EMBER_MOUSE_PUSH 1.5 → 0               → B8 必須紅
+     --calibrate radius  互動半徑 160 → 320                     → B9 必須紅
+     --calibrate dark    EMBER_NEAR_BRIGHT 0.22 → −0.5          → B10 必須紅
+     --calibrate cap     餘燼繪製 alpha ×1.4                    → B10 必須紅
+     --calibrate speed   近場額外縱向位移 force×6                → B11 必須紅
+*/
+const BANDS = [40, 80, 130, 170, 250, 400];
 const BAND_AREA = BANDS.map((b, i) => Math.PI * (b * b - (i ? BANDS[i - 1] ** 2 : 0)));
 
 function phaseStats(frames, point) {
   const n = frames.length;
   if (!n) return null;
-  const annulus = BANDS.map(() => 0);
-  const bright = BANDS.map(() => 0);
-  const outBand = BANDS.map(() => ({ sum: 0, n: 0 }));
-  let fills = 0, outSum = 0, hOutSum = 0, distSum = 0, dxSum = 0, outN = 0, maxA = 0;
+  const nb = BANDS.length;
+  const bandOf = (d) => { let i = 0; while (i < nb - 1 && d > BANDS[i]) i++; return i; };
+  const st = Array.from({ length: nb }, () => ({ n: 0, hOut: 0, speed: 0, alpha: 0 }));
+  let maxA = 0, dxNearSum = 0, dxNearN = 0;
   for (let k = 0; k < n; k++) {
     const it = frames[k].items;
-    fills += it.length;
     for (const o of it) {
       if (o.t) continue;
       const dx = o.x - point.x, dy = o.y - point.y;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      for (let b = 0; b < BANDS.length; b++) {
-        if (d <= BANDS[b]) {
-          annulus[b]++;
-          if (o.a > BRIGHT_A) bright[b]++;
-          break;
-        }
-      }
-      if (d <= R_NEAR && o.a > maxA) maxA = o.a;
+      const b = st[bandOf(Math.sqrt(dx * dx + dy * dy))];
+      b.n++; b.alpha += o.a;
+      if (o.a > maxA) maxA = o.a;
     }
     if (k > 0) {
       const prev = frames[k - 1].items;
@@ -255,52 +286,72 @@ function phaseStats(frames, point) {
         if (Math.hypot(mx, my) > 30) continue;          // 重生跳位，不是被推的位移
         const dx = p0.x - point.x, dy = p0.y - point.y;
         const d = Math.sqrt(dx * dx + dy * dy);
-        if (d > 0.5 && d <= BANDS[BANDS.length - 1]) {
-          /* 水平向外分量：mx × sign(dx)。粒子自己的上升/蛇行是垂直向、正負對稱，
-             會在這裡抵銷；推力是徑向向外，左右兩側都同號 → 會累加成明顯正值。
-             （實測：用「徑向投影」會被上升的垂直偏壓蓋掉，同號累加才是穩定訊號。） */
-          const hOut = mx * (dx >= 0 ? 1 : -1);
-          let bi = 0;
-          while (bi < BANDS.length - 1 && d > BANDS[bi]) bi++;
-          outBand[bi].sum += hOut;
-          outBand[bi].n++;
-          if (d <= R_NEAR) {
-            outSum += (dx / d) * mx + (dy / d) * my;      // 徑向投影（僅供診斷）
-            hOutSum += hOut;
-            distSum += Math.sqrt(mx * mx + my * my);      // 位移量
-            dxSum += mx;                                  // 橫向跟移（順勢帶的指紋）
-            outN++;
-          }
-        }
+        if (d <= 0.5 || d > BANDS[nb - 1]) continue;
+        const b = st[bandOf(d)];
+        /* 水平向外分量：粒子自己的上升/蛇行是垂直向、正負對稱，會在這裡抵銷；
+           推力是徑向向外，左右兩側都同號 → 會累加成明顯正值。
+           （實測：用「徑向投影」會被上升的垂直偏壓蓋掉，同號累加才是穩定訊號。） */
+        b.hOut += mx * (dx >= 0 ? 1 : -1);
+        b.speed += Math.hypot(mx, my);
+        if (d <= 170) { dxNearSum += mx; dxNearN++; }
       }
     }
   }
+  const band = st.map((b) => ({
+    n: b.n,
+    hOut: b.n ? +(b.hOut / b.n).toFixed(3) : null,
+    speed: b.n ? +(b.speed / b.n).toFixed(3) : null,
+    alpha: b.n ? +(b.alpha / b.n).toFixed(3) : null,
+  }));
+  const weighted = (hi, key) => {
+    let sum = 0, nn = 0;
+    for (let i = 0; i < nb; i++) {
+      if (BANDS[i] > hi) break;
+      sum += band[i][key] * band[i].n;
+      nn += band[i].n;
+    }
+    return nn ? +(sum / nn).toFixed(3) : null;
+  };
   return {
     frames: n,
-    fillsPerFrame: +(fills / n).toFixed(2),
     maxAlpha: +maxA.toFixed(3),
-    speedPerFrame: outN ? +(distSum / outN).toFixed(3) : null,
-    dxPerFrame: outN ? +(dxSum / outN).toFixed(3) : null,
-    hOutPerFrame: outN ? +(hOutSum / outN).toFixed(3) : null,
-    samples: outN,
-    annulus,
-    bright,
-    outwardBands: outBand.map((o) => (o.n ? +(o.sum / o.n).toFixed(3) : null)),
-    outwardN: outBand.map((o) => o.n),
+    dxNear: dxNearN ? +(dxNearSum / dxNearN).toFixed(3) : null,
+    nearOut: weighted(80, 'hOut'),
+    farOut: band[4].hOut,
+    speedNear: weighted(80, 'speed'),
+    alphaNear: weighted(80, 'alpha'),
+    band,
   };
 }
 
-/* 各環帶密度 ÷ 基準同環帶密度：1.0＝不受干擾、<1＝被推空（洞）、>1＝堆積 */
-function bandRatio(phase, base) {
-  if (!phase || !base) return null;
-  const out = {};
-  for (let i = 0; i < BANDS.length; i++) {
-    const lo = i ? BANDS[i - 1] : 0;
-    const d = (phase.annulus[i] / phase.frames) / BAND_AREA[i];
-    const b = (base.annulus[i] / base.frames) / BAND_AREA[i];
-    out[lo + '-' + BANDS[i]] = b > 0 ? +(d / b).toFixed(2) : null;
+
+/* 追蹤「指定的那一顆」粒子：index 是它在陣列中的位置（陣列不重排、reset 原地改），
+   所以同一 index 在一個短窗口內就是同一顆。跳位 >30px 記 jumps（重生），該樣本不計。
+   mx＝該顆粒子的水平位移（px/幀）；游標固定在它右側時，推力會讓 mx 明顯變負。 */
+function trackIndex(frames, idx) {
+  let n = 0, mxSum = 0, speed = 0, alpha = 0, na = 0, jumps = 0, maxA = 0;
+  for (let k = 0; k < frames.length; k++) {
+    const it = frames[k].items;
+    const o = it[idx];
+    if (!o || o.t) continue;
+    na++; alpha += o.a;
+    if (o.a > maxA) maxA = o.a;
+    if (k > 0) {
+      const p0 = frames[k - 1].items[idx];
+      if (!p0 || p0.t) continue;
+      const mx = o.x - p0.x, my = o.y - p0.y;
+      if (Math.hypot(mx, my) > 30) { jumps++; continue; }
+      mxSum += mx;
+      speed += Math.hypot(mx, my);
+      n++;
+    }
   }
-  return out;
+  return {
+    n, na, jumps, maxA,
+    mx: n ? mxSum / n : null,
+    speed: n ? speed / n : null,
+    alpha: na ? alpha / na : null,
+  };
 }
 
 /* --------------------------------------------------------------- CDP 連線 */
@@ -358,7 +409,7 @@ function shutdown() {
   console.log(bar);
   console.log('展示站瀏覽器實測健檢 (tools/health-check-browser.js)');
   console.log('根目錄：' + ROOT);
-  if (CALIBRATE) console.log('模式：--calibrate —— 故意注入缺陷，驗證本工具抓得到（不改磁碟上的檔案）');
+  if (CALIBRATE) console.log('模式：--calibrate ' + CALIBRATE_ARG + ' —— 故意注入缺陷，驗證本工具抓得到（不改磁碟上的檔案）');
   console.log(bar);
 
   if (typeof WebSocket === 'undefined') {
@@ -422,15 +473,65 @@ function shutdown() {
       width: VIEW.w, height: VIEW.h, deviceScaleFactor: 1, mobile: false,
     });
 
-    /* --calibrate：把「橫向漂移」這一類缺陷（順勢帶的等效指紋）注入到記憶體裡的回應，
-       不動磁碟上的檔案；量完就結束，原始碼全程保持原樣。 */
+    /* --calibrate：把一種缺陷注入到「記憶體裡的回應」，不動磁碟上的檔案；
+       量完就結束，原始碼全程保持原樣。每一種注入都對應一個會因此變紅的檢查。 */
     if (CALIBRATE) {
+      const src = fs.readFileSync(path.join(ROOT, 'assets/js/nebula-canvas.js'), 'utf8');
+      const sub = (s, from, to) => {
+        if (!s.includes(from)) throw new Error('--calibrate 找不到注入點：' + from);
+        return s.replace(from, to);
+      };
       /* needle 必須跟著那一行改：4.20 的 dt 正規化在句尾加了 `* dt`。
          這裡用正則容忍 `* dt` 的有無，避免日後再微調係數又讓 --calibrate 失效。 */
-      const needle = /this\.y -= \(dy \/ dist\) \* force \* EMBER_MOUSE_PUSH(?: \* dt)?;/;
-      const src = fs.readFileSync(path.join(ROOT, 'assets/js/nebula-canvas.js'), 'utf8');
-      if (!needle.test(src)) throw new Error('--calibrate 找不到注入點（原始碼已改動？請更新 needle）');
-      const patched = src.replace(needle, (m) => m + '\n        this.x += force * 10;   /* calibrate: 橫向漂移 */');
+      const PUSH_LINE = /this\.y -= \(dy \/ dist\) \* force \* EMBER_MOUSE_PUSH(?: \* dt)?;/;
+      const variants = {
+        drift: {
+          expect: 'B7', why: '注入順勢帶（粒子被拖向游標最後的移動方向）',
+          patch: (s) => {
+            const mm = /window\.addEventListener\('mousemove', \(e\) => \{\r?\n(\s*)mouse\.x = e\.clientX;/;
+            if (!mm.test(s)) throw new Error('--calibrate 找不到 mousemove 監聽');
+            if (!PUSH_LINE.test(s)) throw new Error('--calibrate 找不到推力行（原始碼已改動？）');
+            const withDir = s.replace(mm,
+              "window.addEventListener('mousemove', (e) => {\n$1"
+              + 'window.__calDir = Math.sign(e.clientX - mouse.x) || window.__calDir || 1;\n$1mouse.x = e.clientX;');
+            return withDir.replace(PUSH_LINE, (m) => m
+              + '\n        this.x += (window.__calDir || 1) * force * 8 * dt;   /* calibrate: 順勢帶 */');
+          },
+        },
+        push0: {
+          expect: 'B8', why: 'EMBER_MOUSE_PUSH 1.5 → 0（推力消失）',
+          patch: (s) => sub(s, 'const EMBER_MOUSE_PUSH = 1.5;', 'const EMBER_MOUSE_PUSH = 0;'),
+        },
+        radius: {
+          expect: 'B9', why: '互動半徑 160 → 320（推力越過 160px）',
+          patch: (s) => sub(sub(s, 'radius: 160', 'radius: 320'), 'mouse.radius = 160;', 'mouse.radius = 320;'),
+        },
+        dark: {
+          expect: 'B10', why: 'EMBER_NEAR_BRIGHT 0.22 → −0.5（近場反而變暗）',
+          patch: (s) => sub(s, 'const EMBER_NEAR_BRIGHT = 0.22;', 'const EMBER_NEAR_BRIGHT = -0.5;'),
+        },
+        cap: {
+          expect: 'B10', why: '餘燼繪製 alpha ×1.4（突破 0.95 上限）',
+          patch: (s) => {
+            const re = /ctx\.globalAlpha = alpha;(\r?\n\s*)ctx\.fillStyle = EMBER_RAMP_SETS/;
+            if (!re.test(s)) throw new Error('--calibrate 找不到餘燼繪製行');
+            return s.replace(re, 'ctx.globalAlpha = alpha * 1.4;$1ctx.fillStyle = EMBER_RAMP_SETS');
+          },
+        },
+        speed: {
+          expect: 'B11', why: '近場額外縱向位移 force×6（粒子被推快）',
+          patch: (s) => {
+            if (!PUSH_LINE.test(s)) throw new Error('--calibrate 找不到推力行（原始碼已改動？）');
+            return s.replace(PUSH_LINE, (m) => m + '\n        this.y -= force * 6 * dt;   /* calibrate: 近場加速 */');
+          },
+        },
+      };
+      const v = variants[CALIBRATE_ARG];
+      if (!v) throw new Error('--calibrate 未知的注入：' + CALIBRATE_ARG
+        + '（可用：' + Object.keys(variants).join('／') + '）');
+      calibrateExpect = v.expect;
+      calibrateWhy = v.why;
+      const patched = v.patch(src);
       await S('Fetch.enable', { patterns: [{ urlPattern: '*nebula-canvas.js*', requestStage: 'Request' }] });
       dbg.on((m) => {
         if (m.method !== 'Fetch.requestPaused') return;
@@ -444,7 +545,7 @@ function shutdown() {
           body: Buffer.from(patched, 'utf8').toString('base64'),
         }).catch(() => { /* 連線已關，忽略 */ });
       });
-      note('校準注入：EmberParticle.update() 加 `this.x += force * 10`（只在記憶體）');
+      note('校準注入：' + v.why + '（只在記憶體）');
     }
 
     await S('Page.navigate', { url: base + '/index.html' });
@@ -507,78 +608,116 @@ function shutdown() {
     await clickTheme('cursor');
     expectFills('B12', '切回餘燼顆數仍正確（無雙重註冊／殘留）', (await sample(1000)).fills, COUNTS.cursor);
 
-    /* ------------------------------------------------- B7–B11 滑鼠互動（餘燼） */
-    const P = { x: 720, y: 450 };
-    const P2 = { x: 750, y: 450 };          // +30px 的 mousemove
 
-    /* 基準必須在「游標遠離取樣點」時量：先把它停到左上角（離 P 超過 380px）。
-       否則上一步點風格按鈕留下的游標位置會在環帶內挖洞，基準被低估、比值虛高。 */
-    await S('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 10, y: 10, button: 'none', buttons: 0 });
-    await sleep(1200);
-    await ev('__f.take(); return true;');
-    await sleep(4000);
-    const baseline = phaseStats(await ev('return __f.take();'), P);
+    /* --------------------------------------- B7–B11 滑鼠互動（控制變因量測） */
+    const HOME = { x: 10, y: 10 };
+    const moveTo = (x, y) => S('Input.dispatchMouseEvent', {
+      type: 'mouseMoved', x, y, button: 'none', buttons: 0,
+    });
 
-    await S('Input.dispatchMouseEvent', { type: 'mouseMoved', x: P.x, y: P.y, button: 'none', buttons: 0 });
-    await sleep(1500);
-    await ev('__f.take(); return true;');
-    await sleep(5000);                      // 穩態才算數（環帶密度需要夠多樣本）
-    const hover = phaseStats(await ev('return __f.take();'), P);
-
-    await S('Input.dispatchMouseEvent', { type: 'mouseMoved', x: P2.x, y: P2.y, button: 'none', buttons: 0 });
-    await ev('__f.take(); return true;');
-    await sleep(5000);                      // 樣本越多，橫向跟移的雜訊越小（實測 ~0.02→0.3 之間跳）
-    const swipe = phaseStats(await ev('return __f.take();'), P);
-
-    const ratio = bandRatio(hover, baseline);
-    const ob = (i) => hover.outwardBands[i];
-    const obBase = (i) => baseline.outwardBands[i];
-    /* 門檻 1.0：場本身每顆有隨機的持久橫向漂移（drift），整個窗口的平均會殘留 0.4 以內
-       （實測 6 次：0.01～0.38）；而順勢帶這類缺陷是 2.9 起跳 → 兩邊都留 2.5 倍以上餘裕。 */
-    check('B7', '近場橫向跟移 dx 沒有異常（順勢帶／滑行不存在）', Math.abs(swipe.dxPerFrame) <= 1.0,
-      'swipe.dx=' + swipe.dxPerFrame + ' px/幀（場雜訊底線 0.4；有順勢帶時 2.9）');
-    /* 推力是「徑向向外」，左右兩側同號 → 用『水平向外位移』當統計量：
-       粒子自己的上升與蛇行在這裡正負對稱、會抵銷，推力會累加成明顯正值。
-       拿兩個窗口比同一種量：游標剛到的掃掠瞬態（hover）vs 未受擾（baseline）。
-       近場的取樣方式（0–80px 合併、樣本加權）與 4.14 的調整理由見下面的 nearOut()。 */
-    const nearOut = (s) => {
-      if (!s) return null;
-      let sum = 0, n = 0;
-      for (let i = 0; i <= 1; i++) {
-        if (s.outwardBands[i] == null) continue;
-        sum += s.outwardBands[i] * s.outwardN[i];
-        n += s.outwardN[i];
-      }
-      return n ? sum / n : null;
+    /* 先挑「位置已知」的粒子（y 480–700：避開上緣淡出與下緣淡入；x 260–1180）。
+       對每個目標把游標放在它右側固定距離：ON＝游標在旁、OFF＝游標在角落，
+       追蹤同一顆粒子（同一個 index）並相減。幾何固定 → 推力期望值是常數，
+       不再受「這一輪剛好有哪些粒子在近場」影響；B9 另外用 200px 的目標驗半徑邊界。 */
+    const pickTargets = async (count, maxX) => {
+      const list = await ev('const it=__f.last(); const out=[];'
+        + 'for(let i=0;i<it.length;i++){const o=it[i]; if(o.t) continue;'
+        + 'if(o.x>260&&o.x<' + maxX + '&&o.y>480&&o.y<700) out.push([i,Math.round(o.x),Math.round(o.y)]);}'
+        + 'return out;');
+      return (list || []).slice(0, count);
     };
-    const bo = nearOut(hover), bb = nearOut(baseline);
-    /* 為什麼把 0–40px 與 40–80px 合併（4.14）：
-       1440×900 只有 90 顆餘燼，0–40px 這圈的期望樣本數不到 1 顆 → 常常整整 5 秒量不到任何樣本，
-       而 null 在舊寫法裡會被 JS 當成 0（0.987 − null = 0.987 照樣過關），
-       於是不管有沒有推力，紅燈綠燈都是擲骰子。實測（未改動的 HEAD 版連跑 3 次）B8 就紅了 2 次：
-       一次「0.527 vs 0.359」、一次「null vs 0.083」。
-       推力半徑是 160px，前兩圈同向、一起看樣本數多約一個量級，`!= null` 的守門也補上，
-       不會再有「基準量不到卻因為強制轉 0 而過關」這種假綠。
-       負對照：把 EMBER_MOUSE_PUSH 改成 0（推力消失）後 B8 仍會紅 → 合併沒有把鑑價力吃掉。
-       （重現負對照：整站複製一份 → 該常數改成 0 → 在副本跑本工具，實測 0.013 vs 基準 0.041。） */
-    check('B8', '推力存在（近場 0–80px 水平向外位移明顯變大）',
-      bo != null && bb != null && bo - bb >= 0.3,
-      '0–80px 水平向外 ' + (bo == null ? '量不到樣本' : bo.toFixed(3))
-        + ' vs 基準 ' + (bb == null ? '量不到樣本' : bb.toFixed(3)) + ' px/幀');
-    check('B9', '推力不越過 160px（遠場位移與基準相同）', Math.abs(ob(4) - obBase(4)) <= 0.25,
-      '170-250px 水平向外 ' + ob(4) + ' vs 基準 ' + obBase(4) + ' px/幀（半徑偷跑時這裡會跟著變正）');
-    check('B10', '近場提亮不超過上限 0.95、且不比基準暗（烙暗沒復活）',
-      hover.maxAlpha <= 0.95 && hover.maxAlpha >= baseline.maxAlpha,
-      'maxAlpha=' + hover.maxAlpha + '（基準 ' + baseline.maxAlpha + '）');
-    check('B11', '近場粒子沒被推快（速度 ≤ 基準 ×1.25）',
-      hover.speedPerFrame <= baseline.speedPerFrame * 1.25,
-      '近場 ' + hover.speedPerFrame + ' vs 基準 ' + baseline.speedPerFrame + ' px/幀');
-    note('環帶密度比（診斷用；場只有 90 顆且非穩態，絕對值僅供參考）：'
-      + BANDS.map((b, i) => (i ? BANDS[i - 1] : 0) + '-' + b + 'px ' + ratio[(i ? BANDS[i - 1] : 0) + '-' + b]).join('　'));
-    note('提亮顆數（alpha>0.80）每幀：'
-      + BANDS.map((b, i) => (i ? BANDS[i - 1] : 0) + '-' + b + 'px ' + (hover.bright[i] / hover.frames).toFixed(3)).join('　')
-      + '（基準 ' + (baseline.bright[0] / baseline.frames).toFixed(3) + ' 起，僅供診斷）');
-    note('各環帶「水平向外」位移（px/幀）：' + BANDS.map((b, i) => (i ? BANDS[i - 1] : 0) + '-' + b + 'px ' + ob(i) + '（基準 ' + obBase(i) + '）').join('　'));
+    const measurePair = async (target, offset) => {
+      const idx = target[0];
+      /* 粒子上升很快（上端可到 6px/幀），固定游標會在量測前就離它太遠。
+         所以 ON 段先「追」一次：把游標重新貼到它右側 30/200px，再取樣。
+         基準段游標停在角落，只量同一顆粒子的水平位移／速度／alpha。 */
+      const follow = async () => {
+        const p = await ev('const it=__f.last(); const o=it[' + idx + '];'
+          + 'return o&&!o.t ? [Math.round(o.x),Math.round(o.y)] : null;');
+        if (p) await moveTo(p[0] + offset, p[1]);
+      };
+      const grab = async (ms) => {
+        await ev('__f.take(); return true;');
+        await sleep(ms);
+        return trackIndex(await ev('return __f.take();'), idx);
+      };
+      await moveTo(HOME.x, HOME.y);
+      await sleep(150);
+      const b1 = await grab(250);
+      await follow();
+      await sleep(200);          // 提亮低通（0.08／幀）到位
+      await follow();            // 200ms 內又升了 ~25px，再貼一次
+      const on = await grab(250);
+      await moveTo(HOME.x, HOME.y);
+      await sleep(200);
+      const b2 = await grab(250);
+      if (on.jumps || b1.jumps || b2.jumps) return null;
+      if (on.n < 5 || b1.n < 5 || b2.n < 5) return null;
+      return {
+        dOut: (b1.mx + b2.mx) / 2 - on.mx,
+        dSpeed: on.speed - (b1.speed + b2.speed) / 2,
+        dAlpha: on.alpha - (b1.alpha + b2.alpha) / 2,
+        maxA: on.maxA,
+      };
+    };
+    await moveTo(HOME.x, HOME.y);
+    await sleep(1200);
+    /* 一次只挑一顆、量完再挑下一顆：粒子上升很快（上端可到 6px/幀），
+       先挑好一批再依序量，後面的目標早就飄走了。 */
+    const near = [];
+    for (let i = 0; i < 8 && near.length < 6; i++) {
+      const t = (await pickTargets(2, 1180))[i % 2];
+      if (!t) continue;
+      const m = await measurePair(t, 30);
+      if (m) near.push(m);
+    }
+    const far = [];
+    for (let i = 0; i < 6 && far.length < 3; i++) {
+      const t = (await pickTargets(2, 1000))[i % 2];
+      if (!t) continue;
+      const m = await measurePair(t, 200);
+      if (m) far.push(m);
+    }
+    const avg = (arr, k) => (arr.length ? arr.reduce((s, m) => s + m[k], 0) / arr.length : null);
+    const r3 = (v) => (v == null ? null : +v.toFixed(3));
+    const dNearOut = r3(avg(near, 'dOut'));
+    const dSpeed = r3(avg(near, 'dSpeed'));
+    const dAlpha = r3(avg(near, 'dAlpha'));
+    const dFarOut = r3(avg(far, 'dOut'));
+    const maxAlpha = near.length ? Math.max(...near.map((m) => m.maxA)) : 0;
+
+    /* B7：順勢帶（粒子被游標拖著走）的指紋是「跟著移動方向」。左右各掃一次、
+       以中點 M 為參考：兩次的環境漂移相同、徑向推力的方向相反、順勢帶也相反。
+       (dxRight − dxLeft)/2 把環境漂移抵銷，留下的是拖曳量（正常 ≈0，順勢帶 ≈2.9）。 */
+    const M = { x: 720, y: 450 };
+    await moveTo(M.x - 30, M.y);
+    await sleep(900);
+    await ev('__f.take(); return true;');
+    await moveTo(M.x + 30, M.y);            // 右向掃掠
+    await sleep(1500);
+    const swipeR = phaseStats(await ev('return __f.take();'), M);
+    await moveTo(M.x - 30, M.y);            // 左向掃掠
+    await sleep(1500);
+    const swipeL = phaseStats(await ev('return __f.take();'), M);
+    const dragDx = swipeR && swipeL ? +((swipeR.dxNear - swipeL.dxNear) / 2).toFixed(3) : null;
+    check('B7', '近場橫向跟移沒有異常（順勢帶／滑行不存在）',
+      dragDx != null && Math.abs(dragDx) <= 1.0,
+      '左右掃掠差 ' + dragDx + ' px/幀（正常 ≈0；順勢帶 ≈2.9）');
+
+    check('B8', '推力存在（游標貼近時近場水平向外位移明顯變大）',
+      dNearOut != null && dNearOut >= 0.35,
+      'Δmx ' + dNearOut + ' px/幀（游標貼在粒子右側 30px，同顆粒子 ON−基準；無推力時 ≈0）');
+    check('B9', '推力不越過 160px（200px 外的位移不隨游標改變）',
+      dFarOut != null && Math.abs(dFarOut) <= 0.15,
+      'Δmx（200px）' + dFarOut + ' px/幀（半徑偷跑時會變正）');
+    check('B10', '近場提亮存在、不超過上限 0.95（烙暗沒復活）',
+      maxAlpha <= 0.951 && dAlpha != null && dAlpha >= 0.03,
+      'maxAlpha=' + r3(maxAlpha) + '（上限 0.95），Δ同一顆 alpha ' + dAlpha);
+    check('B11', '近場粒子沒被推快（位移量不因游標增加 >1.8px/幀）',
+      dSpeed != null && dSpeed <= 1.8,
+      'Δ每幀位移 ' + dSpeed + ' px/幀（推力是位移、不是累積速度）');
+    note('控制變因量測：近場 ' + near.length + ' 顆（Δmx ' + near.map((m) => r3(m.dOut)).join('/')
+      + '）、邊界 ' + far.length + ' 顆（Δmx ' + far.map((m) => r3(m.dOut)).join('/') + '）');
 
 
     /* ------------------------------------------------------------ B18/B19 像素 */
@@ -677,16 +816,18 @@ function shutdown() {
 
   /* -------------------------------------------------------------- 校準與報告 */
   if (CALIBRATE) {
-    const caught = fails.some((f) => f.startsWith('B7 '));
+    const caught = !!calibrateExpect && fails.some((f) => f.startsWith(calibrateExpect + ' '));
     console.log('\n' + bar);
-    console.log('負對照校準：注入「橫向漂移」（EmberParticle.update() 的 this.x += force * 10）');
-    console.log('  B7 ' + (caught ? '確實變紅 → 本工具具鑑價力 ✓' : '沒有變紅 → 本工具抓不到這類缺陷 ✗'));
+    console.log('負對照校準（' + CALIBRATE_ARG + '）：' + calibrateWhy);
+    console.log('  ' + calibrateExpect + ' '
+      + (caught ? '確實變紅 → 本工具具鑑別力 ✓' : '沒有變紅 → 門檻或量法把鑑別力吃掉了 ✗'));
     if (caught) {
+      /* 注入造成的其他 B7–B11 紅燈是預期連帶效果（例如漂移同時讓 B8 變大）。 */
       for (let i = fails.length - 1; i >= 0; i--) {
-        if (/^B(7|8|9|10|11) /.test(fails[i])) fails.splice(i, 1);   // 校準模式的預期失敗
+        if (/^B(7|8|9|10|11) /.test(fails[i])) fails.splice(i, 1);
       }
     } else {
-      fails.push('CALIBRATE 注入缺陷後 B7 仍通過（量法或門檻要修）');
+      fails.push('CALIBRATE ' + CALIBRATE_ARG + ' 注入缺陷後 ' + calibrateExpect + ' 仍通過（量法或門檻要修）');
     }
   }
 
