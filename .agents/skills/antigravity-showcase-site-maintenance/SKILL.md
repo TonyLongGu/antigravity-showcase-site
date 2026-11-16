@@ -45,7 +45,7 @@ description: 維護 antigravity-showcase-site（純靜態展示站、GitHub Page
 | :--- | :--- |
 | 圖譜位置 | `graphify-out/`（`.gitignore` 已排除，**勿 commit** —— 會被 Pages 部署出去） |
 | 規模 | **317** nodes / **542** edges / **18** communities（14 shown、4 thin 省略） |
-| 建圖標記 | `Built from commit` `dc506754`＝**HEAD**（2026-11-16 改 `tools/health-check-browser.js` 的 B7–B11 量法後重跑 `update`；前版 317／542／18、`2b5053ac`） |
+| 建圖標記 | `Built from commit` `dc506754`（2026-11-16 改 `tools/health-check-browser.js` 的 B7–B11 量法後重跑 `update`；交付 commit `b1adfec5` 的 tools 變更已含在圖內——重跑只報無拓撲變更，stamp 因此停在它的父 commit。前版 317／542／18、`2b5053ac`） |
 | 語料 | 19 files · ~58,843 words；25 檔未分類（`.vtt` 14、`.css` 6 等） |
 | 產物大小 | `GRAPH_REPORT.md` **7.5 KB**（可整讀）、`graph.json` **309.3 KB**（禁整讀）、`graph.html` **267 KB** |
 | 節點來源（TOP） | `assets/js/app.js` 51、`assets/js/nebula-canvas.js` 40、`tools/health-check-browser.js` 35、`tools/health-check.js` 33、`preview.js` 28、`README.md` 14、`assets/js/theme.js` 13、**本技能 `SKILL.md` 13**、`tools/build-subtitles.js` 11、`tools/dead-css.js` 11 |
